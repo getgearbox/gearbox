@@ -1,3 +1,33 @@
+All file copyrights licensed under the New BSD License with the exception of
+the Perl files listed below which are licensed under the Perl Artistic License.
+See the accompanying LICENSE and LICENSE.Artistic files for terms.
+
+Files licensed under Perl Artistic License:
+
+  ./tools/svcbuilder/lib/Gearbox/Service/Builder.pm
+  ./tools/svcbuilder/lib/Gearbox/Service/Entry.pm
+  ./tools/svcbuilder/lib/Gearbox/Utils.pm
+  ./tools/client/gearbox.pl
+  ./perl/Gearbox_Rest_Client/Gearbox/Rest/Client.pm
+  ./gearbox/t/core/httpd.pl
+  ./gearbox/t/swig/perl/setup.pm
+  ./gearbox/swig/perl/lib/Gearbox/ConfigFile.pm
+  ./gearbox/swig/perl/lib/Gearbox/JobManager.pm
+  ./gearbox/swig/perl/lib/Gearbox/Worker.pm
+  ./gearbox/swig/perl/lib/Gearbox/StopWatch.pm
+  ./gearbox/swig/perl/lib/Gearbox/StatusManager.pm
+  ./gearbox/swig/perl/lib/Gearbox/Logger.pm
+  ./common/build/gen_handlers_dir.pl
+  ./common/build/svn_ignore.pl
+  ./common/build/gen_handler_table.pl
+  ./workers/test-perl/workerTestPerl.pl
+  ./workers/test-cancel/perl/workerTestCancel.pl
+  ./workers/test-chained/perl/workerTestChained.pl
+  ./workers/test-sync/perl/workerTestSync.pl
+  ./workers/test-delay/perl/workerTestDelay.pl
+  ./workers/test-agents/perl/workerTestAgents.pl
+  ./workers/test-basic/perl/workerTestBasic.pl
+  
 Required Dependencies:
 
 log4cxx - http://logging.apache.org/log4cxx/
