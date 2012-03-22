@@ -1,0 +1,7 @@
+HEAD /json/empty HTTP/1.1
+Accept: */*
+Host: %{HOSTNAME}
+Content-Type: application/json
+Y-Nimbus-Sig: asdf12-asde
+Y-Rid: abcdef
+

@@ -1,0 +1,1 @@
+../../../../../workers/gearbox/schemas/update-global-status-v1.js

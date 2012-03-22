@@ -1,0 +1,23 @@
+{   
+    "component" : "gearbox",
+    "daemon_group" : "daemons",
+    "config_dir" : "./config_d",
+    
+    "daemons" : [{
+        "name" : "gearmand",
+        "logname" : "%{name}",
+        "command" : "/usr/sbin/gearmand -v -q libsqlite3 --libsqlite3-db=/var/gearbox/db/queue.db --user=%{gearbox.user} --listen=127.0.0.1 --port=%{gearman.port} --time-order"
+    }, {
+        "name" : "worker",
+        "logname": "%{component}",
+        "command" : "/usr/bin/workerGearbox --config /etc/gearbox/gearbox.conf",
+        "count" : 10,
+        "user" : "%{gearbox.user}"
+    }, {
+        "name" : "daemon",
+        "logname": "%{component}",
+        "command" : "/usr/bin/delayDaemon --config /etc/gearbox/gearbox.conf",
+        "count" : 1,
+        "user" : "%{gearbox.user}"
+    }]
+}

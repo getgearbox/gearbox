@@ -1,0 +1,38 @@
+{
+   log4cxx MDC (32bit)
+   Memcheck:Leak
+   fun:_Znwj
+   ...
+   fun:_ZN7log4cxx3MDC3putERKSsS2_
+   fun:_ZN7Gearbox8log_initERKSs
+}
+{
+   log4cxx MDC (64bit)
+   Memcheck:Leak
+   fun:_Znwm
+   ...
+   fun:_ZN7log4cxx3MDC3putERKSsS2_
+   fun:_ZN7Gearbox8log_initERKSs
+}
+{  
+   static soci connection
+   Memcheck:Leak
+   ...
+   obj:*/libsqlite3.so.*
+   fun:_ZN4soci23sqlite3_session_backendC1ERKSs
+   fun:_ZNK4soci23sqlite3_backend_factory12make_sessionERKSs
+   fun:_ZN4soci7sessionC1ERKNS_15backend_factoryERKSs
+   fun:_ZN7Gearbox8Database10Connection11get_sessionEi
+}
+{  
+   soci static statements
+   Memcheck:Leak
+   ...
+   obj:*/libsqlite3.so.*
+   fun:sqlite3_step
+   fun:_ZN4soci25sqlite3_statement_backend7loadOneEv
+   fun:_ZN4soci25sqlite3_statement_backend7executeEi
+   fun:_ZN4soci7details14statement_impl7executeEb
+   fun:_ZN4soci9statement7executeEb
+}
+

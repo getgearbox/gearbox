@@ -1,0 +1,133 @@
+coverity:: CCACHE:=
+
+covdump::
+	/home/y/bin/covdump --ignore '/t/'
+
+ifneq ($(EFENCE),)
+LLDLIBS += -lefence
+endif
+
+ifneq ($(DEBUG),)
+COMPOPTFLAGS=
+DEBUG=1
+endif
+
+efence ::
+	$(MAKE) $(MAKEFILEARG) EFENCE=1 DEBUG=1 default
+
+slow ::
+	$(MAKE) $(MAKEFILEARG) DEBUG=1 default
+
+# make tap is really just make test with
+# some special variables set
+TDIR=test_results
+tap ::
+	$(MAKE) $(MAKEFILEARG) TAP=1 TDIR=$(TDIR) test
+
+vgtest ::
+	$(MAKE) $(MAKEFILEARG) TAP=1 VGTEST=1 test
+
+
+# used as pkgrelease/install it will build
+# then install all packages into the root
+
+%/install:
+	$(MAKE) $(MAKEFILEARG) $* PACKAGE_INSTALL=1
+
+# # if we have yicfs, and we are doing %/install
+ifeq ($(PACKAGE_INSTALL),1)
+PACKAGE_INSTALL_RULE = package-install
+package-install:
+	echo FIXME
+endif
+
+# # setup rules to build .a's along with .so's
+ifneq ($(LIB_NAME),)
+PIC=-fPIC
+ifneq ($(SHLIB_VERSION),)
+ifneq ($(SHLIB_VERSION),handler)
+libs ::
+	$(MAKE) $(MAKEFILEARG) $* SHLIB_VERSION=
+
+clean ::
+	rm -rf *.a
+endif
+endif
+endif
+
+
+# clean packages as well
+clean:: package-clean
+
+# do we have TESTS to build?
+ifneq ($(TESTS),)
+
+# disable sign-compare in unit tests, keeps the code simpler
+$(TESTO):: WARN += -Wno-sign-compare
+$(TESTO):: COMPOPTFLAGS=
+$(RUNTESTS):: WARN += -Wno-sign-compare
+$(RUNTESTS):: COMPOPTFLAGS=
+endif
+
+# do we have tests to run?
+ifneq ($(RUNTESTS),)
+
+# special prefix when saving *.tap files
+TEST_PREFIX=$(subst /,~,$(patsubst $(shell cd $(TOP) && pwd)/%,%,$(shell pwd)))
+ifneq ($(PLATFORM_CURRENT),)
+TEST_PREFIX := $(TEST_PREFIX)~$(PLATFORM_CURRENT)
+endif
+
+# so we can tell gcov tests apart from efence tests
+ifneq ($(MODE),)
+TEST_PREFIX := $(TEST_PREFIX)~$(MODE)
+endif
+
+# for multi lang tests in workers/*/php etc
+ifneq ($(PREFIX),)
+TEST_PREFIX := $(TEST_PREFIX)~$(PREFIX)
+endif
+
+# set up "test" rules to save away *.tap files 
+# to upload to hudson or to just run prove on *.t
+test:: $(RUNTESTS)
+	if [ -n "$(TAP)" ]; then \
+		[ -d $(TOP)/$(TDIR) ] || mkdir $(TOP)/$(TDIR); \
+        echo "Running tests: $(RUNTESTS)"; \
+		for t in $(RUNTESTS); do \
+			echo "[$$(date -u)] ====> Test: $$t <===="; \
+            EXEC_ARGS=; \
+            [ "$(MODE)" = "gcov" ] && file $$t | grep -q perl && EXEC_ARGS="perl -MDevel::Cover -I . "; \
+            [ -n "$(VGTEST)" ] && file $$t | grep -q ELF && EXEC_ARGS="[ -d valgrind ] || mkdir ./valgrind && /home/y/bin$(GPLATFORMSUFFIX)/valgrind --xml=yes --xml-file=./valgrind/$$(basename $$t .t).xml $(VALGRIND_OPTIONS)"; \
+            eval $$EXEC_ARGS ./$$t 2>&1 | tee $(TOP)/$(TDIR)/$(TEST_PREFIX)~$$(basename $$t).tap; \
+		done; \
+        [ ! -d "cover_db" ] || $(GEARBOX_CFG)/build/cover2lcov; \
+        [ ! -d "valgrind" ] || $(GEARBOX_CFG)/build/checkValgrind; \
+	else \
+		[ -n "$$NO_TESTS" ] || PATH=$$PATH:. /home/y/bin/prove -e "" $(RUNTESTS); \
+	fi
+
+endif
+
+%/junit:
+	@cd $(@D) && perl -MTAP::Harness::JUnit -e 'exit TAP::Harness::JUnit->new({xmlfile=>"junit_output.xml", exec => ["cat"], merge => 1})->runtests(glob("*.tap"))->has_errors()'
+
+tapcoverage-mode: full-build tap
+	@if test "$(GCOV_REPORT_TARGETS)x" == "x"; then \
+		echo ; \
+		echo '=====================================================================' ; \
+		echo 'WARNING: Coverage reporting is not available for this platform / mode' ; \
+		echo '=====================================================================' ; \
+		echo ; \
+	else \
+		$(MAKE) $(MAKEFILEARG) $(GCOV_REPORT_TARGETS) ; \
+	fi;
+
+coverity-format:: COVERITY_LICENSE +=  --file $(shell pwd)
+
+shell-syntax-check:
+	@errors=0; \
+	for f in $$(svn status -v | awk '{print $$4}' | /usr/bin/xargs /usr/bin/file | grep Bourne | grep script | /bin/awk -F: '{print $$1}'); do \
+		/bin/bash -n $$f || let errors++; \
+	done; \
+	[ $$errors = 0 ] || exit $$errors;

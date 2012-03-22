@@ -1,0 +1,44 @@
+#!/home/y/bin/perl
+
+my $Errors = do {
+   local $/;
+   open my $file, "<../../core/Errors.h";
+   <$file>;
+};
+
+my @ERR;
+my %CODE;
+while( $Errors =~ /DEFINE_ERROR\((\w+),(\d+)\)/g ) {
+    push @ERR, $1;
+    $CODE{$1} = $2;
+}
+
+print <<EOM;
+package Gearbox::Error;
+use overload
+    '""' => \\&msg,
+    '0+' => \\&code;
+
+sub new {
+    my (\$class,\$name,\$code,\$msg) = \@_;
+    return bless { name => \$name, code => \$code, msg => \$msg }, \$class;
+}
+sub name { shift->{name} }
+sub code { shift->{code} }
+sub msg { shift->{msg} }
+
+EOM
+
+for my $class (@ERR) {
+    print <<EOM;
+package ERR_$class;
+use base qw(Gearbox::Error);
+sub new { return \$_[0]->SUPER::new("$class",$CODE{$class},"ERR_$class: \$_[1]") }
+
+package ERR_CODE_$CODE{$class};
+use base qw(ERR_$class);
+
+EOM
+}
+
+print "1;\n";

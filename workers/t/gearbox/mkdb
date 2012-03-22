@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rm -rf ./.db
+mkdir -p .db
+
+TOP=../../..
+SQL=../../gearbox/sql
+
+$SQL/delay.sql.sh > /tmp/delay.sql
+$SQL/status.sql.sh > /tmp/status.sql
+
+$TOP/common/sql/dbsetup -u $USER -n ./.db/delay.db /tmp/delay.sql
+$TOP/common/sql/dbsetup -u $USER -n ./.db/status.db /tmp/status.sql

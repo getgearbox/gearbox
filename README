@@ -1,0 +1,42 @@
+Required Dependencies:
+
+log4cxx - http://logging.apache.org/log4cxx/
+boost - http://boost.org
+curl - http://curl.haxx.se/
+gearman C - https://launchpad.net/gearmand
+openssl - http://openssl.org
+soci - http://soci.sourceforge.net/
+yajl - http://lloyd.github.com/yajl
+
+Optional Dependencies:
+
+libzookeeper - c bindings for zookeeper
+             http://zookeeper.apache.org
+libtap++ - TAP testing interface in C++
+           http://code.google.com/p/libperl/wiki/Libtap
+swig-2.x - http://swig.org
+php5 - Zend for PHP Swig bindings - http://php.net
+apache2 - http://httpd.apache.org
+
+3rd Party Source:
+    
+This product includes PHP software, freely available from  <http://www.php.net/software/>
+
+  ./gearbox/swig/php/php_Json_helper.h
+  ./gearbox/swig/php/var_dump.h
+
+These above files contain modified code from the PHP project licensed as follows:
+
+  +----------------------------------------------------------------------+
+  | PHP Version 5                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2010 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+

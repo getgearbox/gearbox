@@ -1,0 +1,17 @@
+gearbox_barn_worker
+-------------------
+
+An example Gearbox worker used in the documentation 
+to demonstrate basic concepts (the REST API and 
+using the PHP worker API)
+
+Version: 1.0.1 - Tue Apr 12 13:25:53 PDT 2011
+    * Removed filepath cruft from /barn/v1/animal
+    * Set minimum package version for gearbox prerequisites.
+
+Version: 1.0.0 - Wed Feb 16 16:37:19 PST 2011
+    * GET, POST, PUT, and DELETE are all working.
+    * Different behaviors for spiders and pigs.
+
+Version: 0.1.0 - Fri Feb 11 13:52:38 PST 2011
+    Initial version. 

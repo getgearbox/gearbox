@@ -1,0 +1,1 @@
+../../schemas/create-testchained-thing-v1.js

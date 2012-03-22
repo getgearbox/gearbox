@@ -1,0 +1,17 @@
+TOP=$(shell cd ../../.. && pwd)
+include $(TOP)/common/make/Make.defs
+
+# runtests lists all tests in order they 
+# should be run, this is for tests
+# that done need to be compiled
+RUNTESTS = 
+
+# TESTS is for files that need to be compiled
+# done add static tests here, otherwise "make clean"
+# will remove them
+TESTS	= $(patsubst %.cc,%.t,$(wildcard *.cc))
+
+LINC += $(TAP_CFLAGS)
+LLDLIBS	+= $(TAP_LIBS) -lparent_directory_lib
+
+include $(TOP)/common/make/Make.rules

@@ -1,0 +1,1 @@
+../../schemas/delete-testchained-thing-v1.js

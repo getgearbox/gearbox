@@ -1,0 +1,1 @@
+{"arguments":[],"base_uri":"http://localhost:4080/testing","component":"trm","environ":{},"headers":{},"job_type":"sync","matrix_arguments":{},"operation":"get","query_params":{},"resource":{"type":"tier"},"version":"v1"}

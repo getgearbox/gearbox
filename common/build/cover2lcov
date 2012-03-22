@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::Cover::DB;
+
+use Getopt::Long;
+use Data::Dumper;
+
+my $cfg = {
+    verbose => 0,
+    db => 'cover_db',
+    out => 'lcov.info'
+};
+
+sub err {
+    print STDERR shift;
+    exit 1;
+}
+
+GetOptions(
+    'verbose|v+' => \$cfg->{verbose},
+    'db=s'           => \$cfg->{db},
+    'output|o=s' => \$cfg->{out}
+    ) || err "Usage: cover2lcov [--verbose] [-db <dbname>] [-output <outfile>]\n";
+
+my $db = Devel::Cover::DB->new( db => $cfg->{db} );
+err "Could not read database '" . $cfg->{db} . "'!\n" unless $db->exists;
+$db = $db->merge_runs;
+
+open ( my $lcov, '>', $cfg->{out} );
+
+my $cover = $db->cover;
+my $records = 0;
+for my $file ( $cover-> items ) {
+    next unless $file =~ /^\//;
+    my @report;
+    my $LH = 0;
+    my $LF = 0;
+    push @report, "SF:$file";
+    my $f = $cover->file( $file );
+
+    my $subs = $f->subroutine;
+    if ( $subs ) {
+        my $FNF = 0;
+	my $FNH = 0;
+	for my $sub ( $subs->items ) {
+            my $data = $subs->location($sub)->[0];
+	    next if ( $data-> name eq 'BEGIN' ) ;
+	    $FNF++;
+	    push @report, 'FN:' . $sub . ',' . $data->name;
+            push @report, 'FNDA:' . $data->covered . ',' . $data->name;
+	    if ( $data->covered gt 0 ) {
+		$FNH++;
+	    }
+	}
+	push @report, "FNF:$FNF";
+	push @report, "FNH:$FNH";
+    }
+
+    my $statements = $f->criterion( "statement" );
+    if ( $statements ) {
+	for my $stmt ($statements->items) {
+	    my $l = $statements->location($stmt);
+	    my $value = $l->[0]->val;
+	    $LH++ if $value;
+            $LF++;
+	    push @report, "DA:$stmt,$value";
+	}
+    }
+    push @report, "LH: $LH";
+    push @report, "LF: $LF";
+    push @report, "end_of_record\n";
+    if ( $LH gt 0 ) {
+	if ( $cfg->{verbose} ) { print "Wrote lcov data to '" . $cfg->{out} . "'...\n"; }
+	print $lcov join( "\n", @report );
+    $records += @report;
+    }
+    elsif ( $cfg->{verbose} ) {
+	print "No coverage data for '" . $file . "', skipping.\n";
+    }
+}
+
+close( $lcov );
+
+if ($records == 0 ) {
+    unlink $cfg->{out};
+}
+
+exit 0;

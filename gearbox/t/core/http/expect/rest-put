@@ -1,0 +1,8 @@
+PUT /json/bar HTTP/1.1
+Accept: */*
+Expect: 100-continue
+Host: %{HOSTNAME}
+Content-Length: 9
+Content-Type: application/json
+
+{"foo":1}

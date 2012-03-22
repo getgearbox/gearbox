@@ -1,0 +1,326 @@
+************************************
+Appendix A: Worker C++ API Reference
+************************************
+
+.. todo:: Just copying in relevant sections of the .h file for now. 
+
+
+.. cpp:function:: void Gearbox::Worker::max_requests(int max)
+
+    Sets the max number of requests.
+    
+    :max: The max number of requests.
+
+raw stuff
+
+::
+
+    class Worker {
+    public:
+        Worker(const std::string &config);
+        virtual ~Worker();
+    
+        virtual void run();
+    
+        virtual void pre_request( const Job & job );
+        virtual void post_request( const Job & job );
+    
+        enum response_t {
+            WORKER_SUCCESS,
+            WORKER_ERROR,
+            WORKER_CONTINUE,
+            WORKER_RETRY
+        };
+    
+        typedef  Worker::response_t (Worker::*handler_t)(const Job & job, JobResponse & response);
+
+        Gearbox::JobManager    & job_manager();
+        Gearbox::StatusManager & status_manager();
+        const ConfigFile & cfg() const;
+        void max_requests(int max);
+        int request_count() const;
+
+    protected:
+    
+        virtual void
+        register_handler(
+            const std::string & name,
+            handler_t handler
+        );
+    
+        virtual void
+        deregister_handler(
+            const std::string & name
+        );
+        
+    
+    class ConfigFile {
+    public:
+        ConfigFile( const std::string & file);
+        ConfigFile( const ConfigFile & copy );
+        ConfigFile & operator=(const ConfigFile & copy);
+        ~ConfigFile();
+        
+        const std::string &
+        get_string(
+            const std::string & section,
+            const std::string & key
+        ) const;
+
+        const std::string &
+        get_string_default(
+            const std::string & section,
+            const std::string & key,
+            const std::string & dflt
+        ) const;
+
+        int64_t
+        get_int(
+            const std::string & section,
+            const std::string & key
+        ) const;
+
+        int64_t
+        get_int_default(
+            const std::string & section,
+            const std::string & key,
+            int64_t dflt
+        ) const;
+
+        const std::string &
+        get_string(
+            const std::string & key
+        ) const;
+        
+        const std::string &
+        get_string_default(
+            const std::string & key,
+            const std::string & dflt
+        ) const;
+
+        int64_t
+        get_int(
+            const std::string & key
+        ) const;
+
+        int64_t
+        get_int_default(
+            const std::string & key,
+            int64_t dflt
+        ) const;
+
+        const Json &
+        get_json(
+            const std::string & key
+        ) const;
+
+        const Json &
+        as_json() const;
+
+
+
+
+
+
+    class JobResponse {
+    public:
+        JobResponse();
+        JobResponse(const JobResponse & copy);
+        JobResponse & operator=(const JobResponse & copy);
+        ~JobResponse();
+        
+        void content( const std::string & content );
+        const std::string & content() const;
+        
+        void headers( const Hash & headers );
+        void add_header( const std::string & name, const std::string & value );
+        const Hash & headers() const;
+        
+        void status( const StatusPtr & status );
+        const StatusPtr & status() const;
+
+        void code( int code );
+        int code() const;
+
+        void job( const JobPtr & job );
+        const JobPtr & job() const;
+    
+    class JobImpl;
+    class JobResponse;
+    
+
+    typedef std::vector<std::string> Array;
+
+    class Job {
+    public:
+        enum JobType {
+            JOB_UNKNOWN,
+            JOB_SYNC,
+            JOB_ASYNC
+        };
+        
+        Job( const Job & );
+        ~Job();
+
+        Job & content( const std::string & content );
+        const std::string & content() const;
+        const Json & json_content() const;
+
+        Job & arguments( const Array & args );
+        Job & add_argument( const std::string & arg );
+        const Array & arguments() const;
+        
+        Job & matrix_arguments( const Hash & matrix );
+        Job & add_matrix_argument( const std::string & name, const std::string & value);
+        const Hash & matrix_arguments() const;
+
+        Job & query_params( const Hash & params );
+        Job & add_query_param( const std::string & name, const std::string & value);
+        const Hash & query_params() const;
+
+        Job & headers( const Hash & head );
+        Job & add_header( const std::string & name, const std::string & value);
+        const Hash & headers() const;
+
+        Job & environ( const Hash & environ );
+        Job & add_environ( const std::string & name, const std::string & value);
+        const Hash & environ() const;
+
+        Job & status( const std::string & status_id );
+        const std::string & status() const;
+
+        Job & name( const std::string & name );
+        const std::string & name() const;
+
+        const std::string & base_uri() const;
+
+        Job & type(JobType t);
+        JobType type() const;
+
+        Job & api_version( const std::string & ver );
+        const std::string & api_version() const;
+
+        Job & operation( const std::string & op );
+        const std::string & operation() const;
+
+        Job & component( const std::string & comp );
+        const std::string & component() const;
+
+        Job & resource_type( const std::string & type );
+        const std::string & resource_type() const;
+
+        Job & resource_name( const std::string & name );
+        const std::string & resource_name() const;
+
+        std::string resource_uri() const;
+
+        Job & remote_ip( const std::string & ip );
+        const std::string & remote_ip() const;
+
+        Job & remote_user( const std::string & ip );
+        const std::string & remote_user() const;
+
+        Job & timeout( int t );
+        int timeout() const;
+
+        // name of job impl
+        const char * impltype() const;
+
+        // for debugging
+        std::string serialize() const;
+
+        JobResponse run() const;
+
+
+
+
+    typedef boost::shared_ptr<Job> JobPtr;
+    typedef std::vector< std::vector<JobPtr> > JobQueue;
+
+    class JobImpl;
+    class JsonSchema;
+
+    class JobManager {
+
+    public:
+        JobManager(const ConfigFile & cfg);
+        JobManager(const JobImpl * j);
+        JobManager(const JobManager & copy);
+        JobManager & operator=(const JobManager & copy);
+        ~JobManager();
+
+        void parent_uri( const std::string & parent_uri );
+        void base_uri( const std::string & base_uri );
+        
+        void cfg( const ConfigFile & cfg);
+
+        bool known_job_name( const std::string & name ) const;
+        
+        JobPtr job(const std::string & name);
+        JobPtr job(HttpClient::method_t method, const Uri & uri);
+
+        // create job from envelope
+        JobPtr job(const std::string & name, const std::string & envelope);
+
+        static std::string gen_id(const std::string & prefix);
+
+        JobQueue    job_queue( const Json & job_config );
+        static void job_queue_run( JobQueue & jobs );
+
+        // template wrapper to apply attributes to jobs returned from job_queue:
+        // example: JobManager::job_queue_apply(jobs, &Job::content, my_content);
+        template<typename T>
+        static void 
+        job_queue_apply(
+            JobQueue & jobs,
+            Job & (Job::*func)(const T &),
+            const T & data
+        ) {
+            unsigned int imax = jobs.size();
+            for( unsigned int i=0; i < imax; i++ ) {
+                unsigned int jmax = jobs[i].size();
+                for( unsigned int j=0; j < jmax; j++ ) {
+                    Job & job = *jobs[i][j];
+                    (job.*func)(data);
+                }
+            }
+        }
+        
+        static JsonSchema * getSchema(const JobImpl * ji, const ConfigFile & cfg );
+
+
+    class Job;
+    typedef boost::shared_ptr<Job> JobPtr;
+
+    typedef boost::shared_ptr<Status> StatusPtr;
+    typedef boost::shared_ptr<StatusCollection> StatusCollectionPtr;
+
+    class StatusManager {
+    public:
+        StatusManager(const ConfigFile & cfg);
+        StatusManager(const std::string & type, const ConfigFile & cfg);
+        StatusManager(const StatusManager & copy);
+        StatusManager & operator=(const StatusManager & copy);
+        ~StatusManager();
+        void base_uri( const std::string & base_uri );
+
+        StatusPtr create(
+            const std::string & name,
+            const std::string & operation,
+            const std::string & resource_uri = ""
+        ) const;
+        
+        StatusPtr fetch(
+            const std::string & name
+        ) const;
+
+        StatusPtr fetch(
+            JobPtr job
+        ) const;
+
+        StatusCollectionPtr collection() const;
+
+    private:
+        class Private;
+        Private *impl;
+    };

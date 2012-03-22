@@ -1,0 +1,4 @@
+#!/bin/bash
+
+[ -d .db/sandbox ] && .db/sandbox/stop
+rm -rf .db

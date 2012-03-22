@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# requires mysql sandbox.  See http://mysqlsandbox.net/
+./rmdb
+mkdir -p .db
+cd .db
+VER=$(mysql --version | perl -pi -e 's/^.*Distrib ([^ ,]+).*$/$1/')
+perl -e "sprintf('%04s-%04s-%04s', split(/[.]/, '$VER')) gt '0005-0001-0002' ? exit 0 : exit 1" \
+    && OPT="-c plugin-load=innodb=ha_innodb.so -c plugin_dir=lib/mysql/plugin"
+make_sandbox_from_installed $VER --upper_directory=`pwd` -d=sandbox -P=8935 --no_confirm --no_show -c log=`pwd`/sandbox/mysql.log -c skip-networking $OPT

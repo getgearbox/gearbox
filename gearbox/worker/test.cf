@@ -1,0 +1,5 @@
+{
+    "gearman_host" : "localhost",
+    "gearman_port" : 4730,
+    "log_config_file" : "../../etc/logger/stdout-logger.conf"
+}

@@ -1,0 +1,52 @@
+* Overview
+    * Concepts
+        - "Gearbox is a framework for building scalable, reliable, asynchronous REST services in a standard manner."
+        * Synchronous and asynchronous request handling 
+            - why asynchronous web services?
+            - we want to fire off long-running jobs. We use a model of async workers in queues to support this.
+        * REST and JSON 
+            - so how to control our workers? We want a standard REST interface for doing this.
+            - we use JSON schema validation 
+            - job management
+    * Architecture
+        * REST Handler (mod_gearbox)
+        * Reliable Queue (gearman)
+        * Job Handlers (gearbox::workers)
+        * Persistence (sqlite/mysql/sherpa)
+        * Service Configuration
+* Getting Started
+    * Installation
+    * Tutorial 
+        - exercising workerTestBasic
+        - what is going on in the filesystem
+        - what is going on at the command line
+* Gearbox REST API
+    * URI Layout
+    * Asynchronous REST
+        - starting jobs
+        - status, polling, cancellation
+    * JSON Payloads
+        * Schema Validation
+* Building a Worker
+    * Writing the Worker
+    * Setting up Worker Infrastructure
+        * Creating JSON Schemas
+            - $ROOT/share/gearbox/schemas/create-testbasic-thing-v1.js 
+            - and friends
+        * Creating Conf Files
+            - $ROOT/conf/gearbox/{product}.conf
+            - $ROOT/conf/apache/{product}.conf
+        * Creating Handlers
+            $ROOT/conf/gearbox/gearbox-handlers.d
+        * Creating Infrastructure Directories
+            - $ROOT/var/gearbox/db/
+            - $ROOT/var/gearbox/services/
+    * Packaging the Worker
+        * YICF template
+    * Testing the Worker
+        * Manually Invoking the Worker
+        * Creating Unit Tests and Functional Tests
+        * Mock services
+* Appendix A: Worker C++ API Reference
+* Appendix B: Worker PHP API Reference
+* Appendix C: Building Gearbox from Source

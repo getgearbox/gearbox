@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm -rf ./.db
+mkdir -p .db
+TOP=../../../..
+
+$TOP/workers/gearbox/sql/status.sql.sh > /tmp/status.sql
+
+## initialize the status db nicely with our standard setup script
+$TOP/common/sql/dbsetup -u $USER -n ./.db/test.db /tmp/status.sql

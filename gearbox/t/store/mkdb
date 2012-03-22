@@ -1,0 +1,9 @@
+#!/bin/sh
+rm -rf ./.db
+mkdir -p .db
+cat <<EOF | sqlite3 ./.db/test.db
+CREATE TABLE foo ( id INTEGER PRIMARY KEY );
+CREATE TABLE bar ( id INTEGER PRIMARY KEY, value VARCHAR(255) );
+INSERT INTO bar VALUES ( 1, "palindrome" );
+INSERT INTO bar VALUES ( 2, "emordnilap" );
+EOF

@@ -1,0 +1,1 @@
+../../schemas/update-testbasic-thing-v1.js

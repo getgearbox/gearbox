@@ -1,0 +1,26 @@
+{
+  "user" : "gearbox",
+  "daemons": [
+    {
+      "name"    : "worker",
+      "count"   : 4,
+      "command" : "/usr/bin/worker -v -f /etc/config -u %{user}",
+      "user"    : "%{user}"
+    },
+    {
+      "name"    : "gearmand",
+      "command" : "/usr/sbin/gearmand"
+      // count by default is 1
+      // user by default is root
+    },
+    {
+      "name"    : "dhcpd",
+      "command" : "/usr/sbin/gearmand",
+      "count"   : 0
+      // don't do anything in this case
+    }
+  ],
+
+  
+  "other_keys_we_ignore" : "stuff"
+}

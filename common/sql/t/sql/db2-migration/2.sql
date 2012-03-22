@@ -1,0 +1,2 @@
+ALTER table test1 ADD COLUMN col2 INTEGER NOT NULL DEFAULT 0;
+UPDATE test1 SET col2 = col1;

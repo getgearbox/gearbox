@@ -1,0 +1,27 @@
+// developer guide notes
+
+* Gearbox is a framework useful for developing scalable, distributed web services.
+  * REST
+  * JSON Schema Validation
+  * Synchronous and asynchronous request handling
+  * Job management
+* Gearbox REST API
+   * Advantages of asynchronous web services 
+   * URI layout
+   * Asynchronous REST
+      * Status, Polling, Cancellation
+* Gearbox architecture
+  * rest handler (mod_gearbox)
+  * reliable queue ( gearman)
+  * job handlers (gearbox::workers)
+  * persistence ( sqlite/mysql/sherpa)
+  * service configuration/management
+* how to build a service
+  * dependencies
+  * worker process
+     * C++
+     * PHP
+   * JSON Schema, Validation
+   * Job control
+   * Unit Tests, Function Tests
+      * Mock services

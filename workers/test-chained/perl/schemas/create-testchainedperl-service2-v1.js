@@ -1,0 +1,1 @@
+../../schemas/create-testchained-service2-v1.js

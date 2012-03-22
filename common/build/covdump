@@ -1,0 +1,193 @@
+#!env perl
+use strict;
+use warnings;
+use File::Basename qw(basename);
+use YAML qw();
+use Cwd qw();
+use Getopt::Long;
+
+my $config_file = "$ENV{HOME}/.covdump";
+my $cfg = YAML::LoadFile($config_file);
+
+my $basedir = Cwd::cwd();
+
+GetOptions(
+    "ignore=s"     => \$cfg->{ignore},
+    "dir=s"        => \$cfg->{dir},
+    "license=s"    => \$cfg->{license},
+    "references!"  => \$cfg->{references},
+    "cov-prefix|cov_prefix=s" => \$cfg->{cov_prefix},
+    "help"         => \&usage,
+) || usage(1);
+
+my $IGNORE = qr{$cfg->{ignore}} if $cfg->{ignore};
+my $PREFIX = $cfg->{cov_prefix} || "/usr/share/coverity/prevent-linux";
+my $DIR    = $cfg->{dir} || "./coverity_temp";
+my $LIC    = $cfg->{license} || "/etc/coverity/license.dat";
+my $REF    = defined $cfg->{references} ? $cfg->{references} : 1;
+
+my $bin = "$PREFIX/bin/cov-format-errors";
+
+# arg validation
+die "$bin does not exist\n" unless -e $bin;
+die "Cannot execute $bin\n" unless -x $bin;
+die "$DIR does does not exist\n" unless -e $DIR;
+die "$DIR is not a directory\n" unless -d $DIR;
+die "$LIC does not exist\n" unless -e $LIC;
+die "Cannot read $LIC\n" unless -r $LIC;
+
+my $data = qx{$PREFIX/bin/cov-format-errors --dir $DIR -sf $LIC --emacs-style | /usr/bin/perl /usr/bin/gSTLFilt.pl /width:0 /banner:n};
+
+my @errors = ( $data =~ /(Error:.*?)(?=(?:Error:|$))/gs );
+my $count = 0;
+for my $error ( @errors ) {
+    my @line = split /\n/, $error;
+    my ($type) = ( (shift @line) =~ /Error: ([A-Z_.]+)/ );
+    my ($file,$line,$col) = split /:/, $line[0];
+    next unless $file =~ s{^$basedir/?}{};
+    next if defined $IGNORE && $file =~ /$IGNORE/o;
+    
+    $count++;
+
+    warn "error [$type] at $file line $line\n";
+
+    my @files;
+    my %data;
+    while (@line) {
+        my $fileinfo = shift @line;
+        my $desc = shift @line;
+        # group desc for the same file together
+        $desc =~ s/^\S+:\s+//;
+        push @{$data{$fileinfo}}, $desc;
+        # keep files in order
+        push @files, $fileinfo;
+    }
+    
+    my $first = 1;
+    my %uniq;
+    # only report the files the first time we see them,
+    # the comments have all been grouped together
+    @files = grep { !$uniq{$_}++ } @files;
+    for my $fileinfo ( @files ) {
+        my $file = $fileinfo;
+        next unless $file =~ s{^$basedir/?}{};
+        if( $first ) {
+            warn "    ", join("\n", @{$data{$fileinfo}}), "\n";
+            $first = 0;
+        }
+        else {
+            warn "    ", $file, "\n";
+            warn "        ", join ("\n        ", @{$data{$fileinfo}}), "\n";
+        }
+        last if( !$REF );
+    }
+}
+
+print "found $count defects\n";
+exit ($count ? 1 : 0);
+
+sub usage {
+    my $exit = shift;
+    my $io = $exit ? \*STDERR : \*STDOUT;
+    print $io <<EOM;
+Usage: covdump [--ignore=<pattern>] [--dir=<path>] [--cov-prefix=<path>]
+               [--license=<path>] [--no-references]
+Options:
+   --ignore:        Regular Expression for filenames to ignore Coverity
+                    alerts on.  Default (none)
+   --dir:           Path to intermediate output directory.
+                    Default: ./coverity_temp
+   --cov-prefix:    Path to where Coverity install is.
+                    Default: /usr/share/coverity/prevent-linux
+   --license:       Path to Coverity license file.
+                    Default: /etc/coverity/license.dat
+   --no-references: Turn of contextual references for the Coverity error.
+   --help:          This usage message.
+
+For more documentation run:
+       man covdump
+EOM
+    exit($exit);
+};
+
+__END__
+=head1 NAME
+
+B<covdump> - Covertity error dumper
+
+=head1 DESCRIPTION 
+
+B<covdump> is a tool to dump Coverity errors in an easily readable format
+to be used with your editors "compile mode"
+
+=head1 SYNOPSIS
+
+    $ covdump
+
+    In Emacs I run:
+    M-x compile
+    Set compile command to "covdump"
+
+    Then to jump editor to error:
+    M-x next-error
+
+=head1 CONFIGURATION and OPTIONS
+
+B<covdump> allows for a B<.covdump> file to be anywhere in the current directory or above. 
+B<covdump> uses Yahoo::Config::DirTree for this behavior and therefore the B<.covdump> file format is YAML.  Otherwise you can configure B<covdump> through command line options.
+
+=over
+
+=item license [--license=<path>]
+
+Specify an alternative location to the Coverity license file.  The default is 
+/etc/coverity/license.dat
+
+In the B<.covdump> file it would look like:
+
+    license: /path/to/license.dat
+
+=item references [--no-references]
+
+Change the default setting to show contextual references for each error message.
+The default is on (1). To turn off references by default the B<.covdump>
+file would look like:
+
+    references: 0
+
+=item dir [--dir=<dir>]
+
+Change the default name for the Coverity intermediate directory.  The default
+value is "coverity_temp".
+
+In the B<.covdump> file it would look like:
+
+    dir: other_dir
+
+=item ignore [--ignore=<pattern>]
+
+Set exclusion regular expression to skip files that match the pattern.  For example
+if you want to skip files in tests directory you could set the value like:
+
+    # node the / in this is a literal part of the path string
+    ignore: /tests/
+
+=item cov_prefix [--cov-prefix=<path>]
+
+Change the default location for where Coverity is installed.  The default is
+/usr/share/coverity/prevent-linux.  The is used to find the cov-format-errors
+Coverity tool, such that the path is at B<cov_prefix>/bin/cov-format-errors.
+
+    cov_prefix: /alternate/path/to/coverity
+
+=back
+
+=head1 AUTHORS
+
+=over
+
+=item Cory Bennett
+
+=back
+
+=cut

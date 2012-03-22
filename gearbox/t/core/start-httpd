@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -d ./http/requests ]; then
+    rm -rf ./http/requests/*
+else 
+    mkdir -p ./http/requests
+fi
+./httpd.pl

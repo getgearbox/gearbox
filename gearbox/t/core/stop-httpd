@@ -1,0 +1,2 @@
+#!/bin/sh
+[ -e ./httpd.pid ] && kill $(cat ./httpd.pid)

@@ -1,0 +1,1 @@
+{"arguments":[],"base_uri":"http://localhost:4080/testing","component":"nc","environ":{},"headers":{},"job_type":"sync","matrix_arguments":{},"operation":"audit","query_params":{},"resource":{"type":"image"},"version":"v1"}

@@ -1,0 +1,1 @@
+../../schemas/delete-testsync-thing-v1.js

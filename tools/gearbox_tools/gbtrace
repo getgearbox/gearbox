@@ -1,0 +1,232 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use LWP::UserAgent;    
+use HTTP::Request;
+use File::Basename;
+use Getopt::Long;
+use URI;
+use JSON qw(to_json from_json);
+use Term::ANSIColor;
+
+sub usage {
+    warn <<EOM;
+Usage: $0 [options] <status uri> [<status uri>+]
+Options:
+  --brief:      only show status uris in tree form
+  --errors:     only show complete status details for operations that
+                have failed
+  --messages:   like brief mode but will print messages
+  --depth=i:    recurse maximum of levelsl deep when processing children
+  --resource:   print the resource uri instead of the status uri in the
+                hightlighted header
+  --help:       this message
+  --json:       dump out entire status tree in JSON format
+  --yaml:       dump out entire status tree in YAML format
+  --template=s: overwrite which template to use for output
+  --no-color:   turn off color highlighting
+  --watch=i     poll the status this many seconds (default=2)
+  --id          only print resource ids, not the full uri
+EOM
+    exit;
+}
+
+my %opts = (
+    color => -t STDOUT ? 1 : 0
+);
+
+my @ARGS = @ARGV;
+GetOptions(
+    'brief|b'      => \$opts{brief},
+    'errors|e'     => \$opts{errors},
+    'depth|d=i'    => \$opts{depth},
+    'messages|m'   => \$opts{messages},
+    'resource|r'   => \$opts{resource},
+    'help|h'       => \&usage,
+    'json|j'       => \$opts{json},
+    'yaml|y'       => \$opts{yaml},
+    'template|t=s' => \$opts{template},
+    'color!'       => \$opts{color},
+    'watch|w:i'    => \$opts{watch},
+    'id'           => \$opts{id},
+) || usage();
+
+$opts{watch} = 2 if defined $opts{watch} && !$opts{watch};
+
+my $uri = $ARGV[0] || usage();
+
+$|++; # autoflush
+
+$SIG{INT} = sub {
+    print color("clear") if $opts{color};
+    exit(0);
+};
+
+my %headers = (
+    'Accept' => 'application/json',
+    'Content-Type' => 'application/json',
+);
+
+
+
+my $sso = LWP::UserAgent->new(timeout => 4);
+do {
+    my $stack = [];
+    for my $uri ( @ARGV ) {
+        $uri =~ m{^\w+://} || die "$uri does not appear to be a uri\n";
+        my $uri_stack = stack($uri);
+        push @$stack, @$uri_stack;
+    }
+
+    if( $opts{json} ) {
+        print to_json($stack, {pretty => 1});
+    }
+    elsif( $opts{yaml} ) {
+        require YAML;
+        print YAML::Dump($stack);
+    }
+    else {
+        # use template
+        require Template;
+        my %color_filters = ();
+        for my $c ( qw(clear reset dark bold underline underscore blink reverse concealed black white red green yellow
+                       blue cyan magenta on_black on_red on_green on_yellow on_blue on_magenta on_cyan on_white) ) {
+            if( defined $opts{color} && !$opts{color} ) {
+                $color_filters{$c} = sub { shift };
+            }
+            else {
+                $color_filters{$c} = sub { color($c) . shift(@_) . color("clear") };
+            }
+        }
+        
+        my $config = {
+            INCLUDE_PATH => "/etc/gearbox/templates:$ENV{HOME}/.gearbox/templates",
+            INTERPOLATE  => 1,               # expand "$var" in plain text
+            EVAL_PERL    => 1,               # evaluate Perl code blocks
+            ABSOLUTE     => 1,               # allow absolute paths for templates
+            RELATIVE     => 1,               # allow relateive paths for templates
+            VARIABLES    => { opts => \%opts, ENV => \%ENV },
+            PRE_CHOMP    => "~",
+            POST_CHOMP   => "~",
+            FILTERS => {
+                %color_filters,
+                ctime => sub { my $t = shift || time; scalar localtime $t },
+            }
+        };
+        
+        # load Template::Stash to make method tables visible
+        require Template::Stash;
+        $Template::Stash::HASH_OPS if 0;
+        # define list method to return new list of odd numbers only
+        $Template::Stash::HASH_OPS->{ job_name } = sub {
+            my $child = shift;
+            return "do_unknown_job"
+                unless $child->{uri}
+                    && $child->{operation}
+                    && $child->{component};
+            my ($v,$r) = ( $child->{uri} =~ m{/(v\d+)/([^/]+)} );
+            return "do_$child->{operation}_$child->{component}_${r}_$v";
+        };    
+        
+        # create Template object
+        my $tmpl = Template->new($config);
+        my $t = $opts{template} || "trace.tt";
+        $t = "$t.tt" unless substr($t,-3,3) eq ".tt";
+        my $output;
+        $tmpl->process($t, { root => $stack }, \$output)
+            || die "Error: " . $tmpl->error;
+        if( $opts{watch} ) {
+            system("clear") if $opts{color};
+            my $prog = File::Basename::basename($0);
+            print "Every $opts{watch}s: $prog @{ARGS}\n";
+            print "Last: " . scalar(localtime()). "\n";
+            
+        }
+        print $output;
+    }
+    # stop looping when the top level status completes
+    my $running = 0;
+    for my $trace ( @$stack ) {
+        if( !$trace->{progress} || $trace->{progress} != 100 ) {
+            $running = 1;
+        }
+    }
+
+    exit 0 unless $running;
+
+    if( $opts{watch} ) {
+        sleep $opts{watch};
+    }
+} while($opts{watch});
+
+sub req {
+    my($method,$uri,$content) = @_;
+    my $u = URI->new($uri);
+    my $req = HTTP::Request->new($method,$uri);
+    if( $content ) {
+        $req->content($content);
+    }
+    $req->header(%headers);
+    my $resp = $sso->request($req);
+    return $resp;
+}
+
+sub stack_children {
+    my ( $stack, $resp, $data, $depth) = @_;
+    my $node = $stack->[-1];
+    return unless $node->{children};
+    return if defined $opts{depth} && $depth > $opts{depth};
+
+    my @children = @{$node->{children}};
+    $node->{children} = [];
+    for my $child ( @children ) {
+        my $resp = req("GET", $child);
+        $data = eval {
+            from_json($resp->decoded_content);
+        } || {};
+        stack_data($node->{children}, $resp, $data);
+        stack_children($node->{children}, $resp, $data, $depth + 1);
+    }
+}
+
+sub stack_data {
+    my ($stack,$resp,$data) = @_;
+    unless ( keys %$data ) {
+        # resp failed to parse as json, probably INTERNAL SERVER ERROR
+        $data = {
+            code => $resp->code,
+            progress => 100,
+            status => $resp->status_line,
+            content => $resp->decoded_content,
+            uri => $resp->request()->uri()->canonical,
+            status_uri => $resp->request()->uri()->canonical,
+            messages => [ $resp->message() ],
+            failures => 0,
+            state => "UNKNOWN",                
+        };
+    }
+    my $node = $data;
+
+    push @$stack, $node;
+
+    $node->{progress} = "???"
+        unless defined $node->{progress};
+
+    $node->{operation} ||= "???";
+}
+
+sub stack {
+    my ($uri) = @_;
+    my $root = [];
+
+    my $resp = req("GET", $uri);
+    my $data = eval {
+        from_json($resp->decoded_content);
+    } || {};
+    
+    
+    stack_data($root, $resp, $data);
+    stack_children($root, $resp, $data, 1);
+    return $root;
+}

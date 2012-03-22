@@ -1,0 +1,20 @@
+To test out this the worker framework
+
+1) start gearmand:
+
+gearmand -v -v -v -q libsqlite3 --libsqlite3-db=/tmp/gearman.db
+
+2) start worker:
+
+sudo ./test
+
+(the log output will go to /var/gearbox/all.log)
+
+3) run client/job
+
+gearman -f hello "{'name': 'coryb'}"
+
+That should return "Hello coryb";
+
+You can run it in the background with the -b option.  No
+output will be printed, but you can see the result in the log.

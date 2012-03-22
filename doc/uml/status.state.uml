@@ -1,0 +1,34 @@
+(*) -down-> PENDING
+
+PENDING -right-> [run] RUNNING
+PENDING --> [cancel] CANCELLED
+PENDING --> [bad request] COMPLETED
+
+SUSPENDED --> [lapse yield time\nor event handler] RUNNING
+
+RUNNING --> [done] COMPLETED
+RUNNING --> [stop] STOPPING
+RUNNING --> [delay/retry] SUSPENDED
+if "cancel" then
+--> [delayed] STOPPING
+else
+--> [not delayed] STOPPED
+endif
+
+STOPPING --> [checkpoint] STOPPED 
+STOPPING --> [done] COMPLETED
+
+STOPPED --> [cancel] CANCELLING
+
+if "success" then
+--> [true] CANCELLED
+else
+--> [false] COMPLETED
+endif
+
+COMPLETED -up-> [cancel] CANCELLING
+COMPLETED --> (*)
+CANCELLED --> (*)
+
+# a graph was created by pasting the above content into plantuml.com
+# http://plantuml.com:80/plantuml/img/TP7FJiCm3CRlaV8EraxRf8etG49hXP1ALz7j13s4ngKH8Ib92khRqp_fQ8QuMVv-jZ_Rs_qE8gw_LNGBUPB53zaz9PJu428ZtXetQC-cKoKydRDi8YxwA5LCLIXBEDnbXoHDa_XAVsKS37vsQDq07H_pD3cD42N5kHZ999v1oLgBq0kK79pum1Ub3U0NAWSDKroYMLcWn8TpBTSAW-w1QfrkIoXEnpoVYiDIbAo_CUXCFp2B9Kf43Pjvjmsu1XKblpZoTJkK5hsgj8EG65kXugAUDlOr_d8DLk-j5igjs13vivS7bfjT7T-VPhHkkwf2QmFlpdGOF6hbl6P378owkBxa8EhQ_wQke07PxdT3QXcqf7u0

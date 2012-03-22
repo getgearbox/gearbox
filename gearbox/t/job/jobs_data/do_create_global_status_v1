@@ -1,0 +1,1 @@
+{"arguments":[],"base_uri":"http://localhost:4080/testing","component":"global","content":"{\"name\":\"s-123456\",\"operation\":\"CREATE\",\"uri\":\"http://localhost/foo/v1/beep\"}","environ":{},"headers":{},"job_type":"sync","matrix_arguments":{},"operation":"create","query_params":{},"resource":{"type":"status"},"version":"v1"}

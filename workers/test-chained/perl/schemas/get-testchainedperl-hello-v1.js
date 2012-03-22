@@ -1,0 +1,1 @@
+../../schemas/get-testchained-hello-v1.js

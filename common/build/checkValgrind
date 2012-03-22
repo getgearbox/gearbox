@@ -1,0 +1,47 @@
+#!/home/y/bin/perl
+
+my @files = qx{find ./valgrind -name \*.xml};
+chomp(@files);
+
+use XML::Simple;
+use File::Basename qw(basename);
+
+my $count = 0;
+for my $file ( @files ) {
+    my $data = XMLin( $file, ForceArray => 1 );
+    next unless $data->{error};
+    my $test = basename($file, ".xml");
+    warn "\n" if $count;
+    warn "##################################################\n";
+    warn "File: $test.t\n";
+    warn "##################################################\n";
+    # use Data::Dumper;
+    # warn Dumper($data);
+    my $error_count = 0;
+    for my $err ( @{$data->{error}} ) { 
+        $count++;
+        warn "\n" if $error_count++;
+
+        my $what = $err->{xwhat}->[0]->{text}->[0] || $err->{what}->[0];
+        warn "Error $error_count: $what\n";
+        for( my $i=0; $i < @{$err->{stack}->[0]->{frame}}; $i++ ) {
+            my $frame = $err->{stack}->[0]->{frame}->[$i];
+            my $fn = $frame->{fn}->[0] || "???";
+            my $str = "$i: [$frame->{ip}->[0]] $fn ";
+            if ( $frame->{file} && $frame->{line} ) {
+                $str .= "($frame->{file}->[0]:$frame->{line}->[0])";
+            }
+            elsif( $frame->{obj} ) {
+                $str .= "($frame->{obj}->[0])";
+            }
+            else {
+                $str .= "(???)";
+            }
+            warn "    $str\n";
+        }
+    }
+}
+
+warn "\n" if $count;
+warn "$count Valgrind Errors detected\n";
+exit(1) if $count;

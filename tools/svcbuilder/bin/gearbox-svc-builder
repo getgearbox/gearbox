@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings 'all';
+use Getopt::Long qw(:config no_ignore_case);
+use Gearbox::Service::Builder;
+
+my $file;          # our json config file
+my $key;           # the key in the config file that talks about daemons
+my $servicedir;    # where to store our generated files
+my $supervised_dir;# specify alternate dir for the supervise daemon
+my $help;          # print usage info
+my $verbose;       # be very verbose
+my $prefix;        # use this prefix in the svc names
+
+GetOptions(
+    'file=s'           => \$file,
+    'key=s'            => \$key,
+    'service_dir|s=s'    => \$servicedir,
+    'supervised_dir|S=s' => \$supervised_dir,
+    'prefix=s'         => \$prefix,
+    'help'             => \$help,
+    'verbose'          => \$verbose
+) or usage(2);
+
+usage(2) unless $file && $key && $servicedir;
+
+my $builder = Gearbox::Service::Builder->new(
+    file        => $file,
+    key         => $key,
+    service_dir => $servicedir,
+    supervised_dir => $supervised_dir,
+    prefix      => $prefix,
+);
+
+my $err = $builder->generate;
+exit $err;
+
+sub usage {
+    my $err = shift;
+
+    print <<EOT;
+$0 [options]
+
+Generate and manage daemontools entries.
+
+Where options are:
+
+  -f|--file=FILENAME      Json config file to read
+  -k|--key=KEY            Key in the config file that has info about daemons
+  -s|--service_dir=DIR    Where to store our generated files
+  -S|--supervised_dir=DIR The directory that supervise is monitoring (default /services)
+  -p|--prefix=PREFIX      Prefix to use for naming service entries
+  -v|--verbose            Display debugging info
+  -h|--help               Print this message
+
+Example:
+
+foo.json
+--------
+{
+  "user" : "gearbox",
+  "daemons": [
+    { "name"    : "worker",
+      "count"   : 4,
+      "command" : "/usr/bin/worker -f /etc/config",
+      "user"    : "%{user}"  },
+    { "name"    : "gearmand",
+      "command" : "/usr/sbin/gearmand"
+// default count is 1 and user is root
+    }
+  ], "other_keys_we_ignore" : "stuff"
+}
+
+$0 --file=foo.json --key=daemons --servicedir=/var/gearbox-svcs --prefix=gearbox-
+EOT
+    exit $err;
+}

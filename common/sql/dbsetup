@@ -1,0 +1,331 @@
+#!/bin/bash -u
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+function usage {
+    arg=${1:-0}
+    [ "$arg" = 1 ] && exec >&2
+    cat <<EOF
+$0 [OPTIONS] <sql file>
+Options:
+    -c <config file>: json config file that contains keys for "db_type",
+                      "db_name", "db_user", "db_pass", "db_host" or "db_port".
+    -t <db type>    : database type, "sqlite3" [default] or "mysql"
+    -n <db name>    : name of database
+    -u <db user>    : database user to use
+    -p <db pass>    : password to use for database application user (mysql only)
+    -a <db pass>    : password to use for database admin user (mysql only)
+    -H <db host>    : hostname to use for connection (mysql only)
+    -P <db port>    : port to use for connetion (mysql only)
+    -s <db sock>    : socket file to use for database connction (mysql only)
+    -h              : this help message
+ENV:
+     SQLITE         : path to sqlite3 binary
+     MYSQLDPIDFILE  : path to mysqld pid file
+     MYSQL          : path to mysql client binary
+EOF
+    exit 1
+}
+
+function die {
+    echo "$(basename $0) Fatal: $1" >&2
+    exit 1
+}
+
+function getconf {
+    perl -MJSON -e "print JSON->new->decode(scalar qx{cat $1})->{$2} || ''"
+}
+
+function success {
+    echo "OK";
+}
+
+function get_db_pass {
+    user=$1
+    case $user in
+        *Admin)
+            echo $DB_ADMIN_PASS
+            exit
+            ;;
+        root)
+            ;;
+        *)
+            if [ -n "$DB_PASS" ]; then
+                echo $DB_PASS
+                exit
+            fi
+            ;;
+    esac
+}
+
+function check_service {
+    if [ "$DB_TYPE" = "sqlite3" ]; then
+        SQLITE=${SQLITE-$(which sqlite3)}
+        echo -n "- Checking that sqlite3 client ($SQLITE): "
+        [ -x "$SQLITE" ] && success || die "Unable to find sqlite3";
+        # check "access"
+    else
+        # mysql
+        MYSQL=${MYSQL-$(which mysql)}
+        echo -n "- Checking for mysql client ($MYSQL): "
+        [ -x "$MYSQL" ] && success || die "Unable to find mysql client";
+
+        if [ "$DB_HOST" = "localhost" -o -n "$DB_SOCK" ]; then
+            echo -n "- Checking that mysqld is running: "
+            kill -0 $(cat $MYSQLDPIDFILE) && success || die "mysqld is not running";
+
+            MYSQL="$MYSQL -u root"
+            [ -n "$DB_SOCK" ] && MYSQL="$MYSQL --socket=$DB_SOCK"
+            PW=$(get_db_pass root)
+        else
+            MYSQL="$MYSQL -u ${DB_USER}Admin --host=$DB_HOST --port=$DB_PORT"
+            PW=$(get_db_pass ${DB_USER}Admin)
+        fi
+
+        echo -n "- Checking for access to mysql: "
+        ## first check if there is a root password set
+        if ! $MYSQL -e 'SELECT 1' >/dev/null 2>&1; then
+            if [ -z "$PW" ]; then
+                die "Unable to log in as $DB_USER without password"
+            fi
+            
+	        if $MYSQL --password=$PW -e 'SELECT 1' >/dev/null 2>&1; then
+                success
+                MYSQL="$MYSQL --password=$PW"
+            else
+                die "Unable to connect to mysql using password"
+            fi
+        else
+            success
+        fi
+    fi
+}
+
+function check_db_exists {
+    echo -n "- Checking for existing database: "
+    if [ "$DB_TYPE" = "sqlite3" ]; then
+        if [ -f "$DB_NAME" ]; then
+            chmod 664 $DB_NAME || die "chmod on $DB_NAME failed"
+            chown $DB_USER $DB_NAME || die "chown to $DB_USER failed"
+            ver=$(get_db_version)
+            if [ "$ver" -gt 0 ]; then
+                success
+                return 0
+            else
+                echo "Nope!"
+                return 1
+            fi
+        else
+            echo "Nope!"
+            return 1
+        fi
+    else
+        # mysql
+        if $MYSQL -e "use $DB_NAME" >/dev/null 2>&1; then
+            ver=$(get_db_version)
+            if [ "$ver" -gt 0 ]; then
+                success
+                return 0
+            else
+                echo "Nope!"
+                return 1
+            fi
+        else
+            echo "Nope!"
+            return 1
+        fi
+    fi
+}
+
+function create_user {
+    user=$1
+    privs=$2
+    
+    pw=$(get_db_pass $user)
+    HAS_USER=$(echo "SELECT user FROM user WHERE user='$user' AND host='$DB_HOST';" | $MYSQL -N mysql)
+    if [ -z "$HAS_USER" ]; then
+        STMT="CREATE USER ${user}@localhost"
+        OUT="no password"
+        if [ -n "$pw" ]; then
+	        STMT="$STMT IDENTIFIED BY '$pw'"
+	        OUT="using password"
+        fi
+        echo -n "- Creating $DB_NAME mysql user ($user) [$OUT]: "
+        $MYSQL -e "$STMT" && success || die "Failed to create user!"
+    else
+        PW_CORRECT=$(echo "SELECT 1 FROM user WHERE user='$user' AND host='$DB_HOST' AND password=PASSWORD('$pw');" | $MYSQL -N mysql)
+        if [ "$PW_CORRECT" != "1" ]; then
+            echo -n "- Updating password for $user: "
+            $MYSQL mysql -e "UPDATE user SET password=PASSWORD('$pw') WHERE user='$user' AND host='$DB_HOST'; FLUSH PRIVILEGES;" && success || die "Failed to update password for user $user";
+        fi
+    fi
+    
+    echo -n "- Granting access for $user to $DB_NAME: "
+    STMT="GRANT $privs ON ${DB_NAME}.* TO ${user}@localhost WITH GRANT OPTION"
+    $MYSQL -e "$STMT" && success || die "Failed to grant privileges for $user"
+}
+
+function check_users {
+    if [ "$DB_TYPE" = "sqlite3" ]; then
+        chown $DB_USER $DB_NAME || die "chown to $DB_USER failed"
+        chmod 664 $DB_NAME || die "chmod on $DB_NAME failed"
+    else
+        # mysql
+        if [ "$DB_HOST" = "localhost" -o -n "$DB_SOCK" ]; then
+            create_user ${DB_USER}Admin ALL
+            create_user ${DB_USER} DELETE,EXECUTE,INSERT,SELECT,UPDATE
+        fi
+    fi
+}
+
+function create_db {
+    echo -n "- Creating database $DB_NAME: "
+    if [ "$DB_TYPE" = "sqlite3" ]; then
+        [ ! -d $(dirname $DB_NAME) ] && mkdir -p $(dirname $DB_NAME)
+        if $SQLITE $DB_NAME < $DB_SQL; then
+            chown $DB_USER $DB_NAME || die "chown to $DB_USER failed"
+            chmod 664 $DB_NAME || die "chmod on $DB_NAME failed"
+            success
+        else
+            die "Failed to create database!"
+        fi
+    else
+        # mysql
+        echo "CREATE SCHEMA IF NOT EXISTS $DB_NAME" | $MYSQL || die "Failed to create database!"
+        $MYSQL $DB_NAME < $DB_SQL && success || die "Failed to create database!"
+    fi
+}
+
+function get_db_version {
+    [ "$DB_TYPE" = "sqlite3" ] && DB_CMD="$SQLITE" || DB_CMD="$MYSQL -N"
+    echo "SELECT max(version) FROM version;" | $DB_CMD $DB_NAME 2>/dev/null || echo 0
+}
+
+function get_db_version_undo {
+    [ "$DB_TYPE" = "sqlite3" ] && DB_CMD="$SQLITE" || DB_CMD="$MYSQL -N"
+    enc=$(echo "SELECT revert FROM version WHERE version = $1;" | $DB_CMD $DB_NAME)
+    echo $enc | perl -pe 's/%([\da-fA-F]{2})/chr(hex($1))/ge'
+}
+
+function upgrade_db {
+    from=$(($1+1))
+    to=$2
+    [ "$DB_TYPE" = "sqlite3" ] && DB_CMD="$SQLITE" || DB_CMD="$MYSQL"
+    for v in $(seq $from $to); do
+        echo -n "- Upgrading $DB_NAME to version $v: "
+        file="$DB_SQL_MIGRATION/$v.sql"
+        [ -f "$file" ] || die "upgrade failed: $file does not exists"
+        undo="$DB_SQL_MIGRATION/$v.undo.sql"
+        [ -f "$undo" ] || die "upgrade failed: $undo does not exists"
+        cat $file | $DB_CMD $DB_NAME && success || die "upgrade failed"
+        undoenc=$(perl -pe 's/(\W)/sprintf("%%%02x",ord($1))/ge' < $undo)
+        echo -n "- Updating db version table: "
+        echo "INSERT INTO version VALUES($v,\"$undoenc\");" |  $DB_CMD $DB_NAME && success || die "updating version failed"
+    done
+    ver=$(get_db_version)
+    echo -n "- Verify DB version == $2: ";
+    [ "$ver" = "$2" ] && success || die "db version expected to be \"$2\", got \"$ver\""
+}
+
+function downgrade_db {
+    from=$1
+    to=$(($2+1))
+    [ "$DB_TYPE" = "sqlite3" ] && DB_CMD="$SQLITE" || DB_CMD="$MYSQL"
+    for v in $(seq $to $from | tac); do
+        echo -n "- Downgrading $DB_NAME to version $v: "
+        undo=$(get_db_version_undo $v)
+        [ -n "$undo" ] || die "downgrade failed, no undo information for version $v"
+        echo "$undo" | $DB_CMD $DB_NAME && success || die "downgrade failed"
+        echo -n "- Updating db version table: "
+        echo "DELETE FROM version WHERE version = $v;" | $DB_CMD $DB_NAME && success || die "downgrade failed"
+    done
+    ver=$(get_db_version)
+    echo -n "- Verify DB version == $2: ";
+    [ "$ver" = "$2" ] && success || die "db version expected to be \"$2\", got \"$ver\""
+}
+
+function modify_db {
+    db_ver=$(get_db_version)
+    [ -n "$db_ver" ] || die "Unable to determine current database version for $DB_NAME"
+    lastsql=
+    if [ -d "$DB_SQL_MIGRATION" ]; then
+        lastsql=$(cd $DB_SQL_MIGRATION && ls *.sql 2>/dev/null| grep -v undo | sort -nr | head -1)
+        lastsql=$DB_SQL_MIGRATION/$lastsql
+    fi
+    [ -z "$lastsql" ] && lastver=1 || lastver=$(basename $lastsql .sql)
+    if [ "$db_ver" = "$lastver" ]; then
+        echo -n "- Verify DB version == $db_ver: ";
+        success
+        return
+    fi
+    [ "$db_ver" -lt "$lastver" ] && upgrade_db $db_ver $lastver
+    [ "$db_ver" -gt "$lastver" ] && downgrade_db $db_ver $lastver
+}
+
+function setup_db {
+    if ! check_db_exists; then
+        create_db
+    else
+        modify_db
+    fi
+    check_users
+}
+
+#
+# main
+#
+while getopts "c:t:n:u:p:a:H:P:s:h" options; do
+    case $options in
+        c)
+            [ -f "$OPTARG" ] || usage 1
+            [ -z "${DB_TYPE:-}" ] && DB_TYPE=$(getconf $OPTARG db_type)
+            [ -z "${DB_NAME:-}" ] && DB_NAME=$(getconf $OPTARG db_name)
+            [ -z "${DB_USER:-}" ] && DB_USER=$(getconf $OPTARG db_user)
+            [ -z "${DB_PASS:-}" ] && DB_PASS=$(getconf $OPTARG db_pass)
+            [ -z "${DB_ADMIN_PASS:-}" ] && DB_ADMIN_PASS=$(getconf $OPTARG db_admin_pass)
+            [ -z "${DB_HOST:-}" ] && DB_HOST=$(getconf $OPTARG db_host)
+            [ -z "${DB_PORT:-}" ] && DB_PORT=$(getconf $OPTARG db_port)
+            [ -z "${DB_SOCK:-}" ] && DB_SOCK=$(getconf $OPTARG db_sock)
+            ;;
+        t) DB_TYPE=$OPTARG;;
+        n) DB_NAME=$OPTARG;;
+        u) DB_USER=$OPTARG;;
+        p) DB_PASS=$OPTARG;;
+        a) DB_ADMIN_PASS=$OPTARG;;
+        H) DB_HOST=$OPTARG;;
+        P) DB_PORT=$OPTARG;;
+        s) DB_SOCK=$OPTARG;;
+        h) usage;;
+    esac
+done
+
+# set up defaults
+[ -z "${DB_TYPE:-}" ] && DB_TYPE=sqlite3
+[ -z "${DB_USER:-}" ] && DB_USER=gearbox
+[ -z "${DB_HOST:-}" ] && DB_HOST=localhost
+[ -z "${DB_PORT:-}" ] && DB_PORT=3306
+[ -z "${DB_SOCK:-}" -a -S "/tmp/mysql.sock" ] && DB_SOCK=/tmp/mysql.sock
+[ -z "${DB_PASS:-}" ] && DB_PASS=
+[ -z "${DB_ADMIN_PASS:-}" ] && DB_ADMIN_PASS=
+
+[ -z "$DB_NAME" ] && die "db_name not set"
+
+# remove flags so $1 points to sql file
+shift $(($OPTIND - 1))
+
+DB_SQL=$1
+[ -f "$DB_SQL" ] || usage 1;
+
+DB_SQL_MIGRATION=$(dirname $DB_SQL)/$(basename $DB_SQL .sql)-migration
+
+echo ------------------------------------------------------------------------
+echo  ${DB_NAME} Database Setup...
+echo
+
+check_service
+setup_db
+
+echo
+echo Setup was successful.
+echo
+echo ------------------------------------------------------------------------

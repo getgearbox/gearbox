@@ -1,0 +1,1 @@
+{"operation":"create","uri":"http://resource/foo","status_uri":"http://status/foo","progress":0,"messages":[],"children":[],"parent":"http://parent/foo","ctime":1294452811,"mtime":1294452811}

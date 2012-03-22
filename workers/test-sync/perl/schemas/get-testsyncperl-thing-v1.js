@@ -1,0 +1,1 @@
+../../schemas/get-testsync-thing-v1.js

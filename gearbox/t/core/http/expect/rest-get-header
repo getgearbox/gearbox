@@ -1,0 +1,6 @@
+GET /json/bar HTTP/1.1
+Accept: */*
+Host: %{HOSTNAME}
+Content-Type: application/json
+Y-Rid: abcdef
+

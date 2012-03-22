@@ -1,0 +1,24 @@
+CREATE TABLE version (
+       version INTEGER NOT NULL,
+       revert  TEXT
+);
+INSERT INTO version (version) VALUES(1);
+
+CREATE TABLE test1 (
+       col1 INTEGER NOT NULL
+);
+
+INSERT INTO test1 VALUES(1);
+INSERT INTO test1 VALUES(2);
+INSERT INTO test1 VALUES(3);
+INSERT INTO test1 VALUES(4);
+
+CREATE TABLE test2 (
+       col1 INTEGER NOT NULL
+);
+
+INSERT INTO test2 VALUES(1);
+INSERT INTO test2 VALUES(2);
+INSERT INTO test2 VALUES(3);
+INSERT INTO test2 VALUES(4);
+       

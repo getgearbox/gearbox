@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Gearbox;
+use DBI;
+use Getopt::Long;
+use IO::Socket::INET;
+
+my %opts;
+GetOptions(
+    'config' => \$opts{config}, 
+    'all'  => \$opts{all}, # how all worker functions, even those not running
+    'pending' => \$opts{pending}, # pending only
+    'delay' => \$opts{delay}, # delay only
+);
+
+my $conf =  $opts{config} || "/etc/gearbox/gearbox.conf";
+my $cfg = Gearbox::ConfigFile->new($conf);
+
+unless( $opts{delay} ) {
+    my $gmhost = $cfg->get_string_default("gearman", "host", "localhost");
+    my $gmport = $cfg->get_int_default("gearman", "port", 4730 );
+    
+    my $sock = IO::Socket::INET->new(
+        ReuseAddr => 1,
+        PeerAddr => $gmhost,
+        PeerPort => $gmport,
+        Proto => "tcp",
+    ) || die "gearman not listening at $gmhost:$gmport\n";
+    
+    $sock->print("status\n");
+    
+    # will get back this format
+    # FUNCTION\tTOTAL\tRUNNING\tAVAILABLE_WORKERS
+    # followed by "." to note end of response
+    my @functions;
+    while( my $line = $sock->getline() ) {
+        chomp($line);
+        last if $line eq ".";
+        my @parts = split /\s+/, $line;
+        push @functions, {
+            name => $parts[0],
+            total => $parts[1],
+            running => $parts[2],
+            workers => $parts[3]
+        } if $opts{all} || $parts[1] || $parts[2];
+    }
+    
+    @functions =  sort {
+        $b->{running} <=> $a->{running}
+            || $b->{total} <=> $a->{total}
+        } @functions;
+    
+    
+    if( @functions ) {
+        print "Queued Jobs:\n";
+        
+        my ($max) = sort { $b <=> $a } map { length($_->{name}) } @functions;
+        printf("%-${max}s %7s %7s %7s\n", "function", "running", "queued", "workers");
+        printf("%-${max}s %7i %7i %7i\n",  $_->{name}, $_->{running}, $_->{total}, $_->{workers})
+            for @functions;
+    }
+    else {
+        print "No Queued Jobs.\n";
+    }
+    print "\n" unless $opts{pending};
+}
+
+unless ( $opts{pending} ) {   
+    my $delay = $cfg->get_json("delay");
+    
+    my $dsn;
+    if ( $delay->{db_type} eq "sqlite3" ) {
+        $dsn = "dbi:SQLite:dbname=$delay->{db_name}";
+    } elsif ( $delay->{db_type} eq "mysql" ) {
+        $dsn = "DBI:mysql:database=$delay->{db_name};mysql_socket=$delay->{db_sock};host=" . $delay->{db_host} . ";port=" . $delay->{db_port};
+    } else {
+        die "db type unsupported\n";
+    }
+    
+    my $dbh = DBI->connect($dsn, $delay->{db_user}, $delay->{db_pass});
+    
+    my $data =  $dbh->selectall_arrayref(<<EOM, {Slice => {}});
+SELECT name, status_name, time
+  FROM jobs
+ ORDER BY time ASC
+EOM
+    
+    if( @$data ) {
+        print "Delayed Jobs:\n";
+        for my $row ( @$data ) {
+            printf(
+                "%35s %30s %s\n", 
+                $row->{name}, 
+                $row->{status_name}, 
+                scalar(localtime($row->{time}))
+            );
+        }
+    }
+    else {
+        print "No Delayed Jobs.\n";
+    }
+}
