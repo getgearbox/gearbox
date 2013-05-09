@@ -1,13 +1,25 @@
+SETUP
+=====
 brew install ccache
-export PATH=/usr/local/Cellar/ccache/3.1.9/libexec:$PATH
 brew install boost
 brew install log4cxx
 brew install ossp-uuid
-export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/opt/ossp-uuid/lib/pkgconfig
 
 brew install mysql
 brew edit gearman
  -- change ["--without-mysql"] to ["--with-mysql=/usr/local/bin/mysql_config"]
 brew install gearman
 brew install soci --with-mysql --with-boost
-# brew install zookeeper
+
+INIT
+====
+export PATH=/usr/local/Cellar/ccache/3.1.9/libexec:$PATH
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/opt/ossp-uuid/lib/pkgconfig
+./autogen.sh
+./configure
+
+BUILD
+=====
+make check
+
+
