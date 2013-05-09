@@ -7,13 +7,16 @@ using namespace Gearbox;
 
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(12);
 
     const int BUFSIZE = 32;
     char buf[BUFSIZE];
 
+    using Gearbox::strlcpy;
+
     // normal copy, ret value strlen(of the source)
-    IS( strlcpy(buf, "1234567890", sizeof buf), 10UL );
+    IS( strlcpy(buf, "1234567890", (size_t)sizeof buf), 10UL );
     
     // verify contents
     IS( buf, "1234567890");

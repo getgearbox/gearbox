@@ -8,6 +8,7 @@ using namespace Gearbox;
 
 int main()
 {
+    chdir(TESTDIR);
     TEST_START(14);
 
     std::vector<std::string> words;

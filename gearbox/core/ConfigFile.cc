@@ -3,6 +3,7 @@
 
 #include <gearbox/core/ConfigFile.h>
 
+#include "config.h"
 #include <gearbox/core/logger.h>
 #include <glob.h>
 #include <map>

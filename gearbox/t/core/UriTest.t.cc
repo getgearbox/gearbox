@@ -13,6 +13,7 @@ namespace bfs=boost::filesystem;
 // section numbers in ()s refer to RFC3986
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(90);
     log_init("./unit.conf");
     
@@ -182,7 +183,7 @@ int main() {
     IS( uri.canonical(), "file:///usr/local/giblets" );
     IS( uri.str(), "file:///usr/local/giblets" );
 
-    IS( Uri::urlescape_part("http://foo.com?bar=baz;bif"), "http%3A%2F%2Ffoo%2Ecom%3Fbar%3Dbaz%3Bbif") ;
+    IS( Uri::urlescape_part("http://foo?bar=baz;bif"), "http%3A%2F%2Ffoo%3Fbar%3Dbaz%3Bbif") ;
 
     TEST_END;
 }

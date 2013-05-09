@@ -8,7 +8,6 @@ CFLAGS=-g
 CXXFLAGS=-g
 export DYLD_FORCE_FLAT_NAMESPACE=1
 
-TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(top_srcdir)/auto/tap-driver.sh
 LIBTAP=deps/libtap++-0.01/libtap++.la
 check_PROGRAMS = $(TESTS)
 check_LTLIBRARIES = $(LIBTAP)

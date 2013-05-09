@@ -4,20 +4,29 @@
 #include <gearbox/core/Json.h>
 #include <gearbox/core/JsonGenerator.h>
 
+#include <limits>
 #include <string>
+
+#include <boost/lexical_cast.hpp>
+
 using std::string;
 
 namespace Gearbox {
 
+    const std::string double_format = "%." + boost::lexical_cast<string>(std::numeric_limits<double>().digits10) + "g";
+
 string Json::Generator::generate(const Json & json, bool beautify) {
 
-    yajl_gen_config conf = { beautify, "  " };
-    yajl_gen g = yajl_gen_alloc(&conf, NULL);
+    yajl_gen g = yajl_gen_alloc(NULL);
+    if( beautify ) {
+        yajl_gen_config(g, yajl_gen_beautify, 1);
+        yajl_gen_config(g, yajl_gen_indent_string, "  ");
+    }
 
     Json::Generator::generate(g, &json);
 
     const unsigned char * buf;  
-    unsigned int len;  
+    size_t len;  
     yajl_gen_get_buf(g, &buf, &len);  
     string tmp(reinterpret_cast<const char *>(buf), len);
     yajl_gen_free(g);  
@@ -35,8 +44,14 @@ void Json::Generator::generate(yajl_gen g, const Json * j) {
     case Json::INT:
         yajl_gen_integer(g, j->as<int64_t>());
         break;
-    case Json::DOUBLE:
-        yajl_gen_double(g, j->as<double>());
+    case Json::DOUBLE: {
+
+        // this used to work, but it seems yajl_gen_double now has precision issues
+        // yajl_gen_double(g, j->as<double>());
+        char i[32];
+        int chars = sprintf(i, double_format.c_str(), j->as<double>());
+        yajl_gen_number(g, i, chars);
+    }
         break;
     case Json::STRING:
         yajl_gen_string(

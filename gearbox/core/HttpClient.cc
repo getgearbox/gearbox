@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include "config.h"
 #include <sstream>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/case_conv.hpp>

@@ -7,6 +7,7 @@
 using namespace Gearbox;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(5);
 
     ConfigFile cfg("cfg/2.cfg");

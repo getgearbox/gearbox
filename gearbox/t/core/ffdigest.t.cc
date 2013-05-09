@@ -20,6 +20,7 @@ namespace bfs=boost::filesystem;
 using namespace std;
 
 int main() {
+    chdir(TESTDIR);
     log4cxx::PropertyConfigurator::configure("../../../common/conf/stdout-logger.conf");
 
     TEST_START(6);
@@ -28,13 +29,13 @@ int main() {
     TempFile small("/tmp/ffdigest.small");
     small.close();
     small.unlink();
-    OK( run("dd bs=1M count=1 if=/dev/zero of=" + small.name() + " 2> /dev/null") == 0 );
+    OK( run("dd bs=1048576 count=1 if=/dev/zero of=" + small.name() + " 2> /dev/null") == 0 );
 
     // create a "large" (64Mb) file of zeros
     TempFile large("/tmp/ffdigest.large");
     large.close();
     large.unlink();
-    OK( run("dd bs=1M count=64 if=/dev/zero of=" + large.name() + " 2> /dev/null") == 0 );
+    OK( run("dd bs=1048576 count=64 if=/dev/zero of=" + large.name() + " 2> /dev/null") == 0 );
 
     OK( digest_full( small.name() ) == "b6d81b360a5672d80c27430f39153e2c" );
     OK( digest_full( large.name() ) == "7f614da9329cd3aebf59b91aadc30bf0" );

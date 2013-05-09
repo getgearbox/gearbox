@@ -17,10 +17,11 @@ using namespace Gearbox;
 bool sorter (Plugin* a,Plugin*b) { return (a->name() < b->name()); }
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(19);
     log_init("./unit.conf");
 
-    bfs::path pluginDir(TESTPLUGINDIR, bfs::no_check);
+    bfs::path pluginDir(TESTPLUGINDIR);
 
     if( ! bfs::exists(pluginDir/"bogus.so") ) {
         std::string stdout;

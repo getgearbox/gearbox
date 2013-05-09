@@ -10,6 +10,7 @@
 using namespace Gearbox;
 
 int main() {
+    chdir(TESTDIR);
     log4cxx::PropertyConfigurator::configure("../../../common/conf/stdout-logger.conf");
     TEST_START(9);
     // encode/decode

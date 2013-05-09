@@ -36,23 +36,23 @@ private:
     
     static int parse_null(void * ctx);
     static int parse_boolean(void * ctx, int boolVal);
-    static int parse_number(void *ctx, const char *numberVal, unsigned int numberLen);
+    static int parse_number(void *ctx, const char *numberVal, size_t numberLen);
     static int parse_string(
         void * ctx, 
         const unsigned char * stringVal,
-        unsigned int stringLen
+        size_t stringLen
     );
     static int parse_start_map(void * ctx);
     static int parse_map_key(
         void * ctx,
         const unsigned char * key,
-        unsigned int stringLen
+        size_t stringLen
     );
     static int parse_end_map(void * ctx);
     static int parse_start_array(void * ctx);
     static int parse_end_array(void * ctx);
 
-    static yajl_parser_config cfg;
+    /* static yajl_parser_config cfg; */
     static yajl_callbacks callbacks;
 };
 

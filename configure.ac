@@ -8,7 +8,6 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_AUX_DIR([auto])
-AC_REQUIRE_AUX_FILE([tap-driver.sh])
 
 # Checks for programs.
 AC_PROG_CXX

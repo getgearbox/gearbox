@@ -10,6 +10,7 @@ using namespace Gearbox;
 using std::string;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(138);
     log_init("./unit.conf");
 

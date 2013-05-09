@@ -22,6 +22,7 @@ using Gearbox::operator<<;
 
 int main()
 {
+    chdir(TESTDIR);
     if (geteuid() == 0) {
         std::cerr << "This test should not be run as root" << std::endl;
         exit(1);
@@ -43,7 +44,8 @@ int main()
 
     // test execvp functionality
     args.clear();
-    args << "cat" << "/etc/shadow";
+    
+    args << "cat" << (bfs::exists("/etc/shadow") ? "/etc/shadow" : "/etc/master.passwd");
     // we shouldn't be able to cat that file
     string out, err;
     int rv = run(args, out, err);
@@ -63,7 +65,7 @@ int main()
     write_file(path, test_str);
 
     args.clear();
-    args << "cat" << path;
+    args << "cat" << path.string();
 
     rv = run(args, out, err);
     IS( rv, 0 ); // no error

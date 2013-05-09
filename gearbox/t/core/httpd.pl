@@ -1,4 +1,4 @@
-#!/bin/env perl
+#!/usr/bin/env perl
 ######################################################################
 # Copyright (c) 2012, Yahoo! Inc. All rights reserved.
 #
@@ -19,12 +19,12 @@ use HTTP::Status;
 use HTTP::Response;
                  
 my $d = HTTP::Daemon->new(
-    LocalAddr => "localhost.localdomain",
+    LocalAddr => "127.0.0.1",
     ReuseAddr => 1,
 ) || die "Daemon: $!";
 
 my $url = $d->url;
-$url =~ s{//[^:]+:(\d+)/$}{//localhost.localdomain:$1};
+$url =~ s{//[^:]+:(\d+)/$}{//127.0.0.1:$1};
 print $url;
 
 my $child_ok = 0;
@@ -126,7 +126,7 @@ while (my $c = $d->accept) {
         $c->send_status_line;
         $c->send_basic_header;
         $c->send_header("Set-Cookie" => "cook1=val1");
-        $c->send_header("Set-Cookie" => "cook2=val2; Domain=.localhost.localdomain; Path=/");
+        $c->send_header("Set-Cookie" => "cook2=val2; Domain=127.0.0.1; Path=/");
         $c->send_header("Set-Cookie" => "cook3=val3; Expires=Mon, 18-Jan-2037 00:00:01 GMT");
         $c->send_crlf;
         select $c;

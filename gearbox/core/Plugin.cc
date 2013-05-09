@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include "config.h"
 #include <gearbox/core/Plugin.h>
 #include <gearbox/core/logger.h>
 #include <gearbox/core/Errors.h>
@@ -60,31 +61,41 @@ Plugins Plugin::loadAll( const bfs::path & pluginDir )  {
         }
         bfs::directory_iterator dend;
         bfs::directory_iterator dit(pluginDir);
+        _INFO("shlib: " << SHLIB_EXT);
+        int extlen = strlen(SHLIB_EXT);
+        _INFO("extlen: " << extlen);
         for( ; dit != dend; ++dit ) {
-            string file = dit->string();
-            if( file.substr( file.size() - 3 ) == ".so" ) {
-                string name = dit->leaf();
+            string file = dit->path().string();
+            string name = dit->path().filename().string();
+            if( file.substr( file.size() - extlen ) == SHLIB_EXT ) {
                 // chop off the ".so"
-                name.erase(name.size()-3, 3);
+                name.erase(name.size() - extlen, extlen);
+            }
+            else if( file.substr( file.size() - 3 ) == ".so" ) {
+                // chop off the ".so"
+                name.erase(name.size() - 3, 3);
+            }
+            else {
+                continue;
+            }
 
-                // it looks like a shared object
-                pluginsMap[pluginDir].insert( 
-                    PluginMap::value_type(name,PluginPtr(new PrivatePlugin(file, name)))
-                );
-                if( !pluginsMap[pluginDir][name]->dl_ ) {
-                    string err = pluginsMap[pluginDir][name]->getError();
-                    pluginsMap.erase(pluginDir);
-                    gbTHROW( std::runtime_error( err ) );
-                }                   
-                try {
-                    pluginsMap[pluginDir][name]->getCtor();
-                    _DEBUG("loaded plugin: " << file);
-                }
-                catch( const std::exception & err ) {
-                    // module does not have a valid ctor, so ignore it
-                    _WARN("Ignoring plugin: " << err.what())
+            // it looks like a shared object
+            pluginsMap[pluginDir].insert( 
+                PluginMap::value_type(name,PluginPtr(new PrivatePlugin(file, name)))
+            );
+            if( !pluginsMap[pluginDir][name]->dl_ ) {
+                string err = pluginsMap[pluginDir][name]->getError();
+                pluginsMap.erase(pluginDir);
+                gbTHROW( std::runtime_error( err ) );
+            }                   
+            try {
+                pluginsMap[pluginDir][name]->getCtor();
+                _DEBUG("loaded plugin: " << file);
+            }
+            catch( const std::exception & err ) {
+                // module does not have a valid ctor, so ignore it
+                _WARN("Ignoring plugin: " << err.what())
                     pluginsMap[pluginDir].erase(name);
-                }
             }
         }
     }
@@ -101,23 +112,29 @@ Plugins Plugin::loadAll( const bfs::path & pluginDir )  {
 Plugin * Plugin::load( const bfs::path & pluginDir, const string & name ) {
     if( pluginsMap.find(pluginDir) == pluginsMap.end() 
         || pluginsMap[pluginDir].find(name) == pluginsMap[pluginDir].end() ) {
-        bfs::path dlname = pluginDir / (name + ".so");
-        if( bfs::exists(dlname) ) {
-            pluginsMap[pluginDir].insert(
-                PluginMap::value_type(
-                    name, PluginPtr(new PrivatePlugin(dlname.string(), name))
-                )
-            );
-            if( !pluginsMap[pluginDir][name]->dl_ ) {
-                string err = pluginsMap[pluginDir][name]->getError();
-                pluginsMap[pluginDir].erase(name);
-                gbTHROW( std::runtime_error( err ) );
+        const char * const exts[] = {SHLIB_EXT, ".so"};
+        int found = 0;
+        for(int i=0; i < 2; i++) {
+            bfs::path dlname = pluginDir / (name + exts[i]);
+            if( bfs::exists(dlname) ) {
+                pluginsMap[pluginDir].insert(
+                    PluginMap::value_type(
+                        name, PluginPtr(new PrivatePlugin(dlname.string(), name))
+                    )
+                );
+                if( !pluginsMap[pluginDir][name]->dl_ ) {
+                    string err = pluginsMap[pluginDir][name]->getError();
+                    pluginsMap[pluginDir].erase(name);
+                    gbTHROW( std::runtime_error( err ) );
+                }
+                found=1;
+                _DEBUG("loaded plugin: " << dlname.string());
             }
         }
-        else {
-            gbTHROW( std::runtime_error( "plugin \"" + dlname.string() + "\" does not exist" ) );
+        
+        if(!found) {
+            gbTHROW( std::runtime_error( "plugin \"" + name + "\" does not exist" ) );
         }
-        _DEBUG("loaded plugin: " << dlname.string());
     }
     return pluginsMap[pluginDir][name].get();
 }

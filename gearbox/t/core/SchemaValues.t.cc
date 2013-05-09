@@ -10,6 +10,7 @@
 using namespace Gearbox;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(144);
     log_init("./unit.conf");
 
@@ -136,8 +137,7 @@ int main() {
     THROWS( j.parse("\"0.256.0.0\""), "Json Exception: value does not match required schema format ip-address" );
     THROWS( j.parse("\"0.0.256.0\""), "Json Exception: value does not match required schema format ip-address" );
     THROWS( j.parse("\"0.0.0.256\""), "Json Exception: value does not match required schema format ip-address" );
-    // leading zeros invalid
-    THROWS( j.parse("\"01.0.0.0\""), "Json Exception: value does not match required schema format ip-address" );
+    THROWS( j.parse("\"0.0.0\""), "Json Exception: value does not match required schema format ip-address" );
 
     s.parse("{\"type\":\"string\",\"format\":\"ipv6\"}");
 

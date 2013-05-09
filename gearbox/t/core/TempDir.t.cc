@@ -16,6 +16,7 @@ namespace bfs=boost::filesystem;
 using namespace Gearbox;
 
 int main(int argc, char **argv) {
+    chdir(TESTDIR);
     TEST_START(9);
     log_init("./unit.conf");
 

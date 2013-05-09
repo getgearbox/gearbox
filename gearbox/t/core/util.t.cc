@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include "config.h"
 #include <tap/trivial.h>
 #include <gearbox/core/logger.h>
 #include <gearbox/core/util.h>
@@ -11,18 +12,19 @@ using namespace Gearbox;
 #include <signal.h>    /* kill */
 
 int main(int argc, char **argv) {
+    chdir(TESTDIR);
     TEST_START(20);
     log_init("./unit.conf");
 
-    IS( run("/bin/true"), 0 );
-    IS( run("/bin/false"), 1 );
+    IS( run(TRUE_BIN), 0 );
+    IS( run(FALSE_BIN), 1 );
 
     std::string stdout;
-    NOTHROW( run("(echo -n 1) && (echo -n 2 1>&2) && (echo -n 1) && (echo -n 2 1>&2)", stdout) );
+    NOTHROW( run("(/bin/echo -n 1) && (/bin/echo -n 2 1>&2) && (/bin/echo -n 1) && (/bin/echo -n 2 1>&2)", stdout) );
     IS(stdout, "1212");
 
     std::string stderr;
-    NOTHROW( run("(echo -n 1) && (echo -n 2 1>&2) && (echo -n 1) && (echo -n 2 1>&2)", stdout, stderr) );
+    NOTHROW( run("(/bin/echo -n 1) && (/bin/echo -n 2 1>&2) && (/bin/echo -n 1) && (/bin/echo -n 2 1>&2)", stdout, stderr) );
     IS(stdout, "11");
     IS(stderr, "22");
 
@@ -46,8 +48,8 @@ int main(int argc, char **argv) {
             "INTERNAL_SERVER_ERROR [500]: Could not open /dev/null/bad: Not a directory" );
 
     std::string contents;
-    OK( run("cat /etc/inittab", contents) == 0);
-    IS( slurp("/etc/inittab"), contents );
+    OK( run("cat /etc/resolv.conf", contents) == 0);
+    IS( slurp("/etc/resolv.conf"), contents );
 
     // test slurp on a non-seekable file (named pipe)
     {

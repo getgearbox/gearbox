@@ -182,8 +182,8 @@ static bool typeListContains(
     else {
         string & type = schema[typeListName].as<string>();
         if( type == "any" )   return true;
-            if( type == docType ) return true;
-            if( type == "number" && docType == "integer") return true;
+        if( type == docType ) return true;
+        if( type == "number" && docType == "integer") return true;
     }
     return false;
 }
@@ -197,7 +197,7 @@ bool JsonSchema::validType(const Json & json) {
     if( this->hasKey("type")
         && typeListContains(*this, "type", docType) )
         return true;
-        
+
     if( this->hasKey("disallow")
         && !typeListContains(*this, "disallow", docType) )
         return true;

@@ -6,6 +6,7 @@
 using namespace Gearbox;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(156);
     log_init("./unit.conf");
 

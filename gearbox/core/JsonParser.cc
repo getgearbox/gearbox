@@ -34,13 +34,14 @@ void Json::Parser::parse(
     ctx.cursor = &json;
     ctx.schema = schema;
     
-    YajlHandleAutoPtr yhap(yajl_alloc(&Json::Parser::callbacks, &Json::Parser::cfg, NULL, &ctx));
+    YajlHandleAutoPtr yhap(yajl_alloc(&Json::Parser::callbacks, NULL, &ctx));
     if( !yhap.get() ) {
         gbTHROW( JsonError(json.context(), "failed to create parser") );
     }
+    yajl_config(yhap.get(), yajl_allow_comments, 1);
     yajl_status stat = yajl_parse(yhap.get(), reinterpret_cast<const unsigned char *>(content.c_str()), content.size()); 
-    if( stat == yajl_status_insufficient_data ) {
-        stat = yajl_parse_complete(yhap.get());
+    if( stat == yajl_status_ok ) {
+        stat = yajl_complete_parse(yhap.get());
     }
     
     if( !ctx.exception.empty() ) {
@@ -145,7 +146,7 @@ int Json::Parser::parse_boolean(void * ctx, int boolVal) {
     }
 }
 
-int Json::Parser::parse_number(void *ctx, const char *numberVal, unsigned int numberLen) {
+int Json::Parser::parse_number(void *ctx, const char *numberVal, size_t numberLen) {
     try {
         Json * cur = getObj(ctx);
         if(!cur) return 0;
@@ -178,7 +179,7 @@ int Json::Parser::parse_number(void *ctx, const char *numberVal, unsigned int nu
 }
 
 int Json::Parser::parse_string(void * ctx, const unsigned char * stringVal,
-                        unsigned int stringLen) {
+                        size_t stringLen) {
     try {
         Json * cur = getObj(ctx);
         if( !cur ) return 0;
@@ -219,7 +220,7 @@ int Json::Parser::parse_start_map(void * ctx) {
 }
 
 int Json::Parser::parse_map_key(void * ctx, const unsigned char * key,
-                         unsigned int stringLen) {
+                         size_t stringLen) {
     try {
         assert(getJson(ctx)->impl_->type == Json::OBJECT);
         string name(reinterpret_cast<const char*>(key), stringLen);
@@ -307,7 +308,7 @@ int Json::Parser::parse_end_array(void * ctx) {
     }
 }
     
-yajl_parser_config Json::Parser::cfg = { 1, 1 };
+// yajl_parser_config Json::Parser::cfg = { 1, 1 };
 yajl_callbacks     Json::Parser::callbacks = {  
     Json::Parser::parse_null,  
     Json::Parser::parse_boolean,  

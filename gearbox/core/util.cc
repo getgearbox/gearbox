@@ -48,7 +48,7 @@ namespace Gearbox {
             lseek(fd, 0, SEEK_SET);
         }
         
-        bios::stream<bios::file_descriptor_source> f(fd, true); // will close fd
+        bios::stream<bios::file_descriptor_source> f(fd, boost::iostreams::close_handle); // will close fd
         if ( !f.is_open() ) {
             gbTHROW( ERR_LIBC("Could not open fd") );
         }

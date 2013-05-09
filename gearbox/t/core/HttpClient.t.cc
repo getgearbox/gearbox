@@ -13,6 +13,7 @@ using namespace Gearbox;
 namespace bfs=boost::filesystem;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(53);
     
     log_init("./unit.conf");
@@ -65,7 +66,7 @@ int main() {
     IS( hr.code(), 200 );
     IS( slurp("./http/requests/3"), slurp("./http/expect/get-accept-header") );
 
-    OK( run( "dd bs=1M count=8 if=/dev/urandom of=./http/get/random 2> /dev/null") == 0 );
+    OK( run( "dd bs=1048576 count=8 if=/dev/urandom of=./http/get/random 2> /dev/null") == 0 );
     bfs::path outf("./download");
     NOTHROW( hr = hc.GET( uri + "/random", outf ) );
     IS( hr.code(), 200 );

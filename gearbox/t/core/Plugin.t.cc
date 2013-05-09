@@ -14,10 +14,11 @@ namespace bfs = boost::filesystem;
 using namespace Gearbox;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(17);
     log_init("./unit.conf");
     
-    bfs::path pluginDir(TESTPLUGINDIR, bfs::no_check);
+    bfs::path pluginDir(TESTPLUGINDIR);
     
     Plugin * p = Plugin::load(pluginDir, "hello" );
     IS( p->name(), "hello" );
@@ -45,7 +46,7 @@ int main() {
     OK( !p->can("greet") );
     p->destroy(t);
 
-    THROWS_LIKE( Plugin::load(pluginDir, "does-not-exist"), "^plugin .*/does-not-exist.so\" does not exist$" );
+    THROWS_LIKE( Plugin::load(pluginDir, "does-not-exist"), "^plugin \"does-not-exist\" does not exist$" );
 
     if( ! bfs::exists(pluginDir/"bogus.so") ) {
         std::string stdout;
@@ -54,7 +55,7 @@ int main() {
     THROWS_LIKE( Plugin::load(pluginDir, "bogus" ), ".*/bogus.so: file too short" );
 
     p = Plugin::load(pluginDir, "hello");
-    THROWS_LIKE( p->getFunc("bogus"), ".*/hello.so: undefined symbol: bogus" );
+    THROWS_LIKE( p->getFunc("bogus"), "(undefined symbol|symbol not found)" );
     
     // verifh that fetch "hello" module again
     // will work to make sure it has not been
