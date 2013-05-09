@@ -61,9 +61,7 @@ Plugins Plugin::loadAll( const bfs::path & pluginDir )  {
         }
         bfs::directory_iterator dend;
         bfs::directory_iterator dit(pluginDir);
-        _INFO("shlib: " << SHLIB_EXT);
         int extlen = strlen(SHLIB_EXT);
-        _INFO("extlen: " << extlen);
         for( ; dit != dend; ++dit ) {
             string file = dit->path().string();
             string name = dit->path().filename().string();
