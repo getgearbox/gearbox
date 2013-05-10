@@ -1,5 +1,6 @@
 #ifndef GEARBOX_JSON_H
 #define GEARBOX_JSON_H
+#include "config.h"
 #include <map>
 #include <vector>
 #include <stdexcept>
@@ -183,41 +184,59 @@ template<> struct TypeToJsonType<bool> {
     typedef RealType & RetType;
 };
 
-template<> struct TypeToJsonType<int32_t>  {
+template<> struct TypeToJsonType<int>  {
     enum JsonType { Value = Json::INT };
     typedef int64_t RealType;
-    typedef int32_t RetType;
+    typedef int RetType;
 };
 
-template<> struct TypeToJsonType<int64_t> {
+template<> struct TypeToJsonType<long> {
     enum JsonType { Value = Json::INT };
     typedef int64_t RealType;
+# if __WORDSIZE == 64 && SIZEOF_LONG == 8
     typedef RealType & RetType;
-};
-
-template<> struct TypeToJsonType<uint32_t>  {
-    enum JsonType { Value = Json::INT };
-    typedef int64_t RealType;
-    typedef uint32_t RetType;
-};
-
-template<> struct TypeToJsonType<uint64_t> {
-    enum JsonType { Value = Json::INT };
-    typedef int64_t RealType;
-    typedef uint64_t RetType;
-};
-
-# if __WORDSIZE == 32
-template<> struct TypeToJsonType<long>  {
-    enum JsonType { Value = Json::INT };
-    typedef int64_t RealType;
+# else
     typedef long RetType;
+# endif
 };
 
-template<> struct TypeToJsonType<unsigned long>  {
+template<> struct TypeToJsonType<unsigned int>  {
     enum JsonType { Value = Json::INT };
     typedef int64_t RealType;
-    typedef long RetType;
+    typedef unsigned int RetType;
+};
+
+template<> struct TypeToJsonType<unsigned long> {
+    enum JsonType { Value = Json::INT };
+    typedef int64_t RealType;
+# if __WORDSIZE == 64 && SIZEOF_LONG == 8
+    typedef RealType & RetType;
+# else
+    typedef unsigned long RetType;
+# endif
+};
+
+#ifdef HAVE_LONG_LONG_INT
+template<> struct TypeToJsonType<long long>  {
+    enum JsonType { Value = Json::INT };
+    typedef int64_t RealType;
+# if __WORDSIZE == 64 && SIZEOF_LONG_LONG == 8
+    typedef RealType & RetType;
+# else
+    typedef long long RetType;
+# endif
+};
+#endif
+
+#ifdef HAVE_UNSIGNED_LONG_LONG_INT
+template<> struct TypeToJsonType<unsigned long long>  {
+    enum JsonType { Value = Json::INT };
+    typedef int64_t RealType;
+# if __WORDSIZE == 64 && SIZEOF_LONG_LONG == 8
+    typedef RealType & RetType;
+# else
+    typedef unsigned long long RetType;
+# endif    
 };
 #endif
 

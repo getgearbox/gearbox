@@ -15,6 +15,10 @@ AC_PROG_CC
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
+AC_TYPE_LONG_LONG_INT
+AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([long long])
+
 AC_ARG_VAR([SHASUM_BIN])
 AC_PATH_PROGS([SHASUM_BIN], [sha1sum shasum])
 if test -z "${SHASUM_BIN}"; then
@@ -41,6 +45,7 @@ AC_DEFINE_UNQUOTED([FALSE_BIN], ["${FALSE_BIN}"], [path to false binary])
 
 AC_DEFINE_UNQUOTED([SYSCONFDIR], ["`test "${prefix}" = "NONE" && prefix=; eval echo ${sysconfdir}`"], [path to system configuration files])
 AC_DEFINE_UNQUOTED([DATADIR], ["`test "${prefix}" = "NONE" && prefix=; eval echo ${datarootdir}`"], [path to data directory])
+AC_DEFINE_UNQUOTED([PLUGINSDIR], ["`test "${exec_prefix}" = "NONE" && exec_prefix=${prefix}; test "${exec_prefix}" = "NONE" && exec_prefix=; eval echo ${libexecdir}/gearbox/plugins`"], [path to data directory])
 
 AC_DEFINE_UNQUOTED([SHLIB_EXT], ["`eval echo ${shrext_cmds}`"], [shared libary extension])
 

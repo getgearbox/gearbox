@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include "config.h"
 #include <gearbox/job/JobManager.h>
 
 #include <gearbox/core/logger.h>
@@ -118,11 +119,13 @@ namespace Gearbox {
                 
                 std::string confdir = cfg.get_string_default("gearbox", "conf", SYSCONFDIR "/gearbox");
                 glob_t globbuf;
-                glob( std::string(confdir + "/*handlers[._]d").c_str(), GLOB_ONLYDIR, NULL, &globbuf);
+                glob( std::string(confdir + "/*handlers[._]d").c_str(), 0, NULL, &globbuf);
         
                 std::vector<std::string> job_dirs;
                 for( unsigned int i=0; i < globbuf.gl_pathc; i++ ) {
-                    job_dirs.push_back( globbuf.gl_pathv[i] );
+                    if( bfs::is_directory(bfs::path(globbuf.gl_pathv[i])) ) {
+                        job_dirs.push_back( globbuf.gl_pathv[i] );
+                    }
                 }
                 
                 globfree(&globbuf);
@@ -133,7 +136,7 @@ namespace Gearbox {
                     for ( bfs::directory_iterator itr( job_dirs[i] );
                           itr != end;
                           ++itr ) {
-                        std::string job = itr->leaf();
+                        std::string job = itr->path().filename().string();
                         size_t s = job.find( "do_", 0 );
                         if ( s < std::string::npos ) {
                             s = job.find("_", s);

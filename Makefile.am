@@ -2,7 +2,8 @@ AUTOMAKE_OPTIONS = foreign
 
 ACLOCAL_AMFLAGS = -I m4 --install
 
-lib_LTLIBRARIES= gearbox/core/libgearbox_core.la
+bin_PROGRAMS=
+lib_LTLIBRARIES=
 
 CFLAGS=-g
 CXXFLAGS=-g
@@ -28,7 +29,11 @@ TestMakefile.am: auto/testAutoMake.sh
 
 include TestMakefile.am
 
-bin_PROGRAMS=gearbox/core/gearbox_json
+###############################################
+### gearbox/core
+###############################################
+bin_PROGRAMS+=gearbox/core/gearbox_json
+lib_LTLIBRARIES+=gearbox/core/libgearbox_core.la
 
 gearbox_core_libgearbox_core_la_CXXFLAGS = $(YAJL_CFLAGS) $(CURL_CFLAGS) $(BOOST_CPPFLAGS) $(LOG4CXX_CFLAGS) $(UUID_CFLAGS)
 gearbox_core_libgearbox_core_la_LDFLAGS = $(YAJL_LIBS) $(CURL_LIBS) $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB) $(LOG4CXX_LIBS) $(BOOST_REGEX_LIB) -lcrypto $(UUID_LIBS) $(BOOST_IOSTREAMS_LIB)
@@ -83,3 +88,48 @@ gearbox_core_gearbox_json_SOURCES = gearbox/core/gearbox_json.cc
 gearbox_core_gearbox_json_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 gearbox_core_gearbox_json_LDADD = gearbox/core/libgearbox_core.la
 
+###############################################
+### gearbox/core
+###############################################
+lib_LTLIBRARIES+=gearbox/job/libgearbox_job.la
+
+gearbox_job_libgearbox_job_la_CXXFLAGS = $(GEARMAN_CFLAGS)
+gearbox_job_libgearbox_job_la_LDFLAGS = $(GEARMAN_LIBS) $(BOOST_LDFLAGS) $(BOOST_GRAPH_LIB)
+gearbox_job_libgearbox_job_la_LIBADD = gearbox/core/libgearbox_core.la
+gearbox_job_libgearbox_job_includes = \
+    gearbox/job/GearmanJobImpl.h \
+    gearbox/job/Job.h \
+    gearbox/job/JobImpl.h \
+    gearbox/job/JobManager.h \
+    gearbox/job/JobResponse.h \
+    gearbox/job/JobStatusImpl.h \
+    gearbox/job/JsonStatusImpl.h \
+    gearbox/job/RestJobImpl.h \
+    gearbox/job/Status.h \
+    gearbox/job/StatusCollection.h \
+    gearbox/job/StatusCollectionImpl.h \
+    gearbox/job/StatusCollectionImplV1.h \
+    gearbox/job/StatusImpl.h \
+    gearbox/job/StatusImplV1.h \
+    gearbox/job/StatusManager.h \
+    gearbox/job/TransientStatusImpl.h \
+    $(NULL)
+
+gearbox_job_libgearbox_job_la_SOURCES = $(gearbox_job_libgearbox_job_includes) \
+    gearbox/job/GearmanJobImpl.cc \
+    gearbox/job/Job.cc \
+    gearbox/job/JobImpl.cc \
+    gearbox/job/JobManager.cc \
+    gearbox/job/JobResponse.cc \
+    gearbox/job/JobStatusImpl.cc \
+    gearbox/job/JsonStatusImpl.cc \
+    gearbox/job/RestJobImpl.cc \
+    gearbox/job/Status.cc \
+    gearbox/job/StatusCollection.cc \
+    gearbox/job/StatusCollectionImpl.cc \
+    gearbox/job/StatusCollectionImplV1.cc \
+    gearbox/job/StatusImpl.cc \
+    gearbox/job/StatusImplV1.cc \
+    gearbox/job/StatusManager.cc \
+    gearbox/job/TransientStatusImpl.cc \
+    $(NULL)

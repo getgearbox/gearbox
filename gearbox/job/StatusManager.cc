@@ -1,6 +1,7 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include "config.h"
 #include <gearbox/core/logger.h>
 #include <gearbox/core/Plugin.h>
 #include <gearbox/core/Errors.h>
@@ -31,8 +32,7 @@ namespace Gearbox {
         static void loadAll(const ConfigFile & cfg) {
             if(loaded) return;
             bfs::path pluginDir( 
-                cfg.get_string_default("status", "plugin_path", PLUGINSDIR "/status"),
-                bfs::no_check
+                cfg.get_string_default("status", "plugin_path", PLUGINSDIR "/status")
             ); 
             Plugins plugins = Plugin::loadAll(pluginDir);
             for( unsigned int i=0; i < plugins.size(); ++i ) {
