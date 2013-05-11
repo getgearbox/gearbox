@@ -23,6 +23,7 @@ using namespace Gearbox;
 #include <stub/gearman.hh>
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(80);
     log_init("./unit.conf");
     ConfigFile cfg("./unit.conf");

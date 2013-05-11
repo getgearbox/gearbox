@@ -16,6 +16,7 @@ using namespace Gearbox;
 typedef vector<string> jobs;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(36);
     log_init("./unit.conf");
     ConfigFile cfg("./unit.conf");    

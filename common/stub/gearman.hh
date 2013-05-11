@@ -45,7 +45,7 @@ gearman_worker_add_function(gearman_worker_st *worker,
 }
 
 const char *
-gearman_worker_error(gearman_worker_st *worker) {
+gearman_worker_error(const gearman_worker_st *worker) {
     return "gearmand error";
 }
 
