@@ -13,7 +13,6 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include <dlfcn.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -110,8 +109,6 @@ namespace Gearbox {
             std::string sock;
             soci::session * sess;
             std::string type;
-            const soci::backend_factory * backend;
-            void * dl;
             Private(const std::string & type)
                 : dbname("test"),
                   user("root"),
@@ -120,64 +117,14 @@ namespace Gearbox {
                   port(""),
                   sock(""),
                   sess(NULL),
-                  type(type),
-                  backend(NULL),
-                  dl(NULL) {}
+                  type(type) {}
         };
 
         Connection::Connection(const std::string & type) : impl(new Private(type)) {
-            try {
-                std::string factory_name("factory_" + type);
-                
-                typedef soci::backend_factory const * (*factory_t)(void);
-                factory_t f = (factory_t)dlsym(RTLD_DEFAULT, factory_name.c_str());
-                char * err = dlerror();
-                if( err ) {
-                    // libsoci_core should have the "soci_create_session" symbol,
-                    // so first we need to find the symbol address,
-                    // then find the file name that the symbol comes from
-                    // then replace "core" with db driver type, to hopefully
-                    // end up with something like: /usr/lib/libsoci_sqlite3-3.0.0.so
-                    void * addr = dlsym(RTLD_DEFAULT, "soci_create_session");
-                    if( addr ) {
-                        Dl_info dli;
-                        if( dladdr(addr, &dli) ) {
-                            std::string soname(dli.dli_fname);
-                            size_t s = soname.find("soci_core");
-                            if( s != std::string::npos ) {
-                                soname.replace(s, 9, "soci_" + type);
-                                _DEBUG("Attempting to load " << soname);
-                                this->impl->dl = dlopen(soname.c_str(), RTLD_NOW | RTLD_GLOBAL);
-                                if( !this->impl->dl ) {
-                                    const char * err = dlerror();
-                                    _WARN("Failed to load soci module: " << err);
-                                    gbTHROW( ERR_INTERNAL_SERVER_ERROR(
-                                                 "Unable to load soci module for " + type + ": " +  err
-                                             ) );
-                                }
-                            }
-                        }
-                    }
-                    
-                    // hopefully by now we have the soname loaded so we can find the factory symbol
-                    f = (factory_t)dlsym(RTLD_DEFAULT, factory_name.c_str());
-                    char * err = dlerror();
-                    if( err ) {
-                        _FATAL("Failed to find " << factory_name << " symbol after loading: " << err);
-                        gbTHROW( ERR_INTERNAL_SERVER_ERROR("Unable to load soci module for " + type ) );
-                    }
-                }
-                this->impl->backend = f();
-            }
-            catch( ... ) {
-                delete impl;
-                throw;
-            }
         };
 
         Connection::~Connection() {
             if( this->impl->sess ) delete this->impl->sess;
-            if( this->impl->dl ) dlclose(this->impl->dl);
             delete impl;
         }
         
@@ -275,7 +222,7 @@ namespace Gearbox {
                 }
             }
                 
-            this->impl->sess = new soci::session(*this->impl->backend, this->connection_string());
+            this->impl->sess = new soci::session(this->impl->type, this->connection_string());
             return *this->impl->sess;
         }
 

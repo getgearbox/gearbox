@@ -162,31 +162,31 @@ namespace Gearbox {
     }
 }
 
-namespace soci {
-    namespace details {
-        template <>
-        struct exchange_traits<unsigned int>
-        {
-            typedef basic_type_tag type_family;
-            enum { x_type = x_unsigned_long };
-        };
-#ifndef __i386__
-        template <>
-        struct exchange_traits<int64_t>
-        {
-            typedef basic_type_tag type_family;
-            enum { x_type = x_long_long };
-        };
-#else
-        template <>
-        struct exchange_traits<time_t>
-        {
-            typedef basic_type_tag type_family;
-            enum { x_type = x_unsigned_long };
-        };
-#endif
-    }
-}
+// namespace soci {
+//     namespace details {
+//         template <>
+//         struct exchange_traits<unsigned int>
+//         {
+//             typedef basic_type_tag type_family;
+//             enum { x_type = x_unsigned_long };
+//         };
+// #ifndef __i386__
+//         template <>
+//         struct exchange_traits<int64_t>
+//         {
+//             typedef basic_type_tag type_family;
+//             enum { x_type = x_long_long };
+//         };
+// #else
+//         template <>
+//         struct exchange_traits<time_t>
+//         {
+//             typedef basic_type_tag type_family;
+//             enum { x_type = x_unsigned_long };
+//         };
+// #endif
+//     }
+// }
 
 
 

@@ -14,11 +14,12 @@ struct TestConnection : public Connection {
 };
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(25);
     log_init("./unit.conf");
     
-    THROWS_LIKE( TestConnection("bogus"), 
-            "INTERNAL_SERVER_ERROR \\[500\\]: Unable to load soci module for bogus: ([^ ]+)/libsoci_bogus-3.0.0.so: cannot open shared object file: No such file or directory" );
+    THROWS( TestConnection("bogus").get_session(),
+            "Failed to find shared library for backend bogus" );
 
     THROWS( Connection::get("bogus"), 
             "Database connection bogus has not been registered!" );

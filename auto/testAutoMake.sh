@@ -53,3 +53,15 @@ ${name}_SOURCES=$test
 
 EOF
 done
+
+addTests gearbox/t/store
+for test in gearbox/t/store/*.t.cc; do
+    name=$(amName $test)
+    cat <<EOF
+${name}_CXXFLAGS=${test_CXXFLAGS} -DTESTDIR='"\$(abs_top_srcdir)/gearbox/t/store"'
+${name}_LDFLAGS=\$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
+${name}_LDADD=\$(LIBTAP) gearbox/store/libgearbox_store.la
+${name}_SOURCES=$test
+
+EOF
+done

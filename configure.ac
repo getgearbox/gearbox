@@ -66,10 +66,18 @@ PKG_CHECK_MODULES([UUID], [uuid], [], [exit 1])
 PKG_CHECK_MODULES([GEARMAN], [gearmand], [], [exit 1])
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lcrypto':
-AC_CHECK_LIB([crypto], [main])
+AC_CHECK_LIB([crypto], [main], [
+  AC_ARG_VAR([CRYPTO_LIB])
+  CRYPTO_LIB=-lcrypto
+], [exit 1])
+
 # FIXME: Replace `main' with a function in `-lzookeeper_st':
-AC_CHECK_LIB([zookeeper_st], [main])
+AC_CHECK_LIB([zookeeper_st], [main], [], [])
+
+AC_CHECK_LIB([soci_core], [main], [
+  AC_ARG_VAR([SOCI_CORE_LIB])
+  SOCI_CORE_LIB=-lsoci_core
+], [exit 1])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])

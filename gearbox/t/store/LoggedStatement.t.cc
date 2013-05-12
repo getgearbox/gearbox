@@ -9,6 +9,7 @@ using namespace Gearbox;
 using namespace Gearbox::Database;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(23);
     OK( run("./mkdb") == 0 );
     log_init("./unit.conf");

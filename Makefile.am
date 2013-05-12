@@ -36,7 +36,7 @@ bin_PROGRAMS+=gearbox/core/gearbox_json
 lib_LTLIBRARIES+=gearbox/core/libgearbox_core.la
 
 gearbox_core_libgearbox_core_la_CXXFLAGS = $(YAJL_CFLAGS) $(CURL_CFLAGS) $(BOOST_CPPFLAGS) $(LOG4CXX_CFLAGS) $(UUID_CFLAGS)
-gearbox_core_libgearbox_core_la_LDFLAGS = $(YAJL_LIBS) $(CURL_LIBS) $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB) $(LOG4CXX_LIBS) $(BOOST_REGEX_LIB) -lcrypto $(UUID_LIBS) $(BOOST_IOSTREAMS_LIB)
+gearbox_core_libgearbox_core_la_LDFLAGS = $(YAJL_LIBS) $(CURL_LIBS) $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB) $(LOG4CXX_LIBS) $(BOOST_REGEX_LIB) $(CRYPTO_LIB) $(UUID_LIBS) $(BOOST_IOSTREAMS_LIB)
 gearbox_core_libgearbox_core_includes = \
 	gearbox/core/ConfigFile.h \
 	gearbox/core/Errors.h \
@@ -89,7 +89,7 @@ gearbox_core_gearbox_json_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB
 gearbox_core_gearbox_json_LDADD = gearbox/core/libgearbox_core.la
 
 ###############################################
-### gearbox/core
+### gearbox/job
 ###############################################
 lib_LTLIBRARIES+=gearbox/job/libgearbox_job.la
 
@@ -132,4 +132,21 @@ gearbox_job_libgearbox_job_la_SOURCES = $(gearbox_job_libgearbox_job_includes) \
     gearbox/job/StatusImplV1.cc \
     gearbox/job/StatusManager.cc \
     gearbox/job/TransientStatusImpl.cc \
+    $(NULL)
+
+###############################################
+### gearbox/store
+###############################################
+lib_LTLIBRARIES+=gearbox/store/libgearbox_store.la
+
+gearbox_store_libgearbox_store_la_CXXFLAGS = 
+gearbox_store_libgearbox_store_la_LDFLAGS = $(SOCI_CORE_LIB)
+gearbox_store_libgearbox_store_la_LIBADD = gearbox/core/libgearbox_core.la
+gearbox_store_libgearbox_store_includes = \
+    gearbox/store/dbconn.h \
+    $(NULL)
+
+gearbox_store_libgearbox_store_la_SOURCES = $(gearbox_store_libgearbox_store_includes) \
+	gearbox/store/dbconn.cc \
+	gearbox/store/LoggedStatement.cc \
     $(NULL)
