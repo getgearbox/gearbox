@@ -10,7 +10,6 @@
 #include <queue>
 #include <gearbox/core/Errors.h>
 #include <gearbox/core/Uri.h>
-#include <gearbox/scoreboard/Scoreboard.h>
 #include <gearbox/core/util.h>
 
 #include <gearbox/core/ConfigFile.h>
@@ -131,10 +130,6 @@ run_job (
     Worker::response_t resp = Worker::WORKER_SUCCESS;
     *ret_ptr = GEARMAN_SUCCESS;
 
-    // collect generic job metrics to the scoreboard ...
-    // ctime is 0 until we can get the insert_time for the job
-    JobScoreboard sb( args->cfg, args->name, 0 );    
-        
     Json content;
 
     JobPtr job_ptr;
@@ -326,7 +321,6 @@ run_job (
     }
 
     if( resp == Worker::WORKER_RETRY && job_ptr.get() ) {
-        sb.increment_counter("job", job_ptr->name(), "retry" );
         args->obj->job_manager().retry(*job_ptr);
     }
     
@@ -347,7 +341,6 @@ run_job (
 
     string outData = content.serialize();    
 
-    sb.set_status( sc );
     if( sc >=300 ) {
         _ERROR(args->name << " Failed! Returned: [" << outData << ']');
     }
@@ -423,17 +416,7 @@ Worker::Worker(const string & config) {
             sigaction (SIGTERM, &new_action, NULL);
     }
 
-    
     impl = new Private(config);
-    // dtor will not get called if ctor fails
-    // to catch and delete if needed
-    try {
-        Scoreboard::initialize(impl->cfg);
-    }
-    catch( ... ) {
-        delete impl;
-        throw;
-    }
 }
 
 Worker::~Worker() {
@@ -509,9 +492,6 @@ Worker::post_request(const Job & job) {
             next.job->run();
         }
     }
-
-    Scoreboard *sb = Scoreboard::get_scoreboard();
-    sb->sync();
 }
 
 void

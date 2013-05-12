@@ -1,12 +1,14 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
+#include <gearbox/core/logger.h>
+#include "stub/gearman.hh"
+
 #include <tap/trivial.h>
 #include <gearbox/core/Json.h>
 #include <gearbox/worker/Worker.h>
 #include <gearbox/core/Errors.h>
 #include <gearbox/job/StatusManager.h>
-#include <gearbox/core/logger.h>
 using namespace Gearbox;
 
 #include <gearbox/store/dbconn.h>
@@ -15,17 +17,15 @@ using namespace soci;
 #include <memory>
 using namespace std;
 
-#include "stub/gearman.hh"
-
 static std::string test_error;
 
-struct TestWorker : public Worker {
-    TestWorker( const std::string & config ) : Worker(config) {}
-    using Worker::register_handler;
-    using Worker::deregister_handler;
-    using Worker::max_requests;
+struct TestWorker : public Gearbox::Worker {
+    TestWorker( const std::string & config ) : Gearbox::Worker(config) {}
+    using Gearbox::Worker::register_handler;
+    using Gearbox::Worker::deregister_handler;
+    using Gearbox::Worker::max_requests;
 
-    Worker::response_t test( const Job & job, JobResponse & resp ) {
+    Gearbox::Worker::response_t test( const Job & job, JobResponse & resp ) {
         if( test_error == "Error" ) {
             gbTHROW( ERR_NOT_FOUND("testing Error") );
         }
@@ -40,14 +40,15 @@ struct TestWorker : public Worker {
             gbTHROW( runtime_error("runtime error") );
         }
         else if( test_error == "continue" ) {
-            return Worker::WORKER_CONTINUE;
+            return Gearbox::Worker::WORKER_CONTINUE;
         }
-        return Worker::WORKER_SUCCESS;
+        return Gearbox::Worker::WORKER_SUCCESS;
     }
 };
 
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(41);
     log_init("./unit.conf");
 
@@ -66,10 +67,10 @@ int main() {
     NOTHROW( w.reset( new TestWorker("./unit.conf") ) );
 
     error["gearman_worker_add_function"] = true;
-    THROWS( w->register_handler("do_test_component_resource_v1", static_cast<Worker::handler_t>(&TestWorker::test)), 
+    THROWS( w->register_handler("do_test_component_resource_v1", static_cast<Gearbox::Worker::handler_t>(&TestWorker::test)), 
             "INTERNAL_SERVER_ERROR [500]: gearman_worker_add_function: gearmand error" );
     error.clear();
-    NOTHROW( w->register_handler("do_test_component_resource_v1", static_cast<Worker::handler_t>(&TestWorker::test)) );
+    NOTHROW( w->register_handler("do_test_component_resource_v1", static_cast<Gearbox::Worker::handler_t>(&TestWorker::test)) );
 
     THROWS( w->deregister_handler("bogus"), "INTERNAL_SERVER_ERROR [500]: cannot unregister uknown handler: bogus" );
 
@@ -78,7 +79,7 @@ int main() {
     error.clear();
 
     NOTHROW( w->deregister_handler("do_test_component_resource_v1") );
-    NOTHROW( w->register_handler("do_test_component_resource_v1", static_cast<Worker::handler_t>(&TestWorker::test)) );
+    NOTHROW( w->register_handler("do_test_component_resource_v1", static_cast<Gearbox::Worker::handler_t>(&TestWorker::test)) );
 
     error["gearman_worker_work"] = true;
     THROWS( w->run(), "INTERNAL_SERVER_ERROR [500]: gearman_worker_work: gearmand error" );

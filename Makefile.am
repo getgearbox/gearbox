@@ -150,3 +150,19 @@ gearbox_store_libgearbox_store_la_SOURCES = $(gearbox_store_libgearbox_store_inc
 	gearbox/store/dbconn.cc \
 	gearbox/store/LoggedStatement.cc \
     $(NULL)
+
+###############################################
+### gearbox/worker
+###############################################
+lib_LTLIBRARIES+=gearbox/worker/libgearbox_worker.la
+
+gearbox_worker_libgearbox_worker_la_CXXFLAGS = 
+gearbox_worker_libgearbox_worker_la_LDFLAGS = $(SOCI_CORE_LIB)
+gearbox_worker_libgearbox_worker_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
+gearbox_worker_libgearbox_worker_includes = \
+    gearbox/worker/Worker.h \
+    $(NULL)
+
+gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker_includes) \
+	gearbox/worker/Worker.cc \
+    $(NULL)

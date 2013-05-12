@@ -12,6 +12,7 @@ using namespace Gearbox;
 namespace bfs=boost::filesystem;
 
 int main() {
+    chdir(TESTDIR);
     TEST_START(2)
     
     Json s;
@@ -20,8 +21,8 @@ int main() {
     bfs::directory_iterator end;
     for (; di != end; ++di ) {
         if( !bfs::is_directory(*di) ) {
-            cout << "# schema: " << di->string() << endl;
-            NOTHROW( s.parseFile( di->string() ) );
+            cout << "# schema: " << di->path().string() << endl;
+            NOTHROW( s.parseFile( di->path().string() ) );
         }
     }
     TEST_END;
