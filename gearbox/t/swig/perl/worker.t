@@ -1,4 +1,5 @@
-#!/home/y/bin/perl
+#!/usr/bin/env perl
+use lib $ENV{PWD}."/".($0 =~ m{(.*)/[^/]+$})[0];
 use strict;
 use warnings;
 

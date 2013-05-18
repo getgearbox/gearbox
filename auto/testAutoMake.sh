@@ -2,11 +2,14 @@
 
 function addTests {
     dir=$1
-    echo "TESTS += \\"
+    name=$(echo -n ${dir} | tr [:punct:][:space:] _)
+    echo "${name}_TESTS = \\"
     for test in $dir/*.t.cc; do
         echo "    ${test%.cc} \\"
     done
     echo "    \$(NULL)"
+    echo "TESTS += \$(${name}_TESTS)"
+    echo "check_PROGRAMS += \$(${name}_TESTS)"
     echo
 }
 
@@ -77,3 +80,20 @@ ${name}_SOURCES=$test
 
 EOF
 done
+
+echo "gearbox_t_swig_perl_TESTS = \\"
+for test in gearbox/t/swig/perl/*.t; do
+    echo "    ${test} \\"
+done
+echo "    \$(NULL)"
+echo
+echo "TESTS += \$(gearbox_t_swig_perl_TESTS)"
+cat <<EOF
+check_LTLIBRARIES += gearbox/t/swig/perl/libgearman_stub.la
+gearbox_t_swig_perl_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)
+gearbox_t_swig_perl_libgearman_stub_la_LDFLAGS = -rpath /dev/null -avoid-version \$(LOG4CXX_LIBS) \$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
+gearbox_t_swig_perl_libgearman_stub_la_SOURCES = \
+    gearbox/t/swig/perl/gearman_stub.cc \
+    \$(NONE)
+
+EOF

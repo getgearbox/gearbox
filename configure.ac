@@ -79,6 +79,24 @@ AC_CHECK_LIB([soci_core], [main], [
   SOCI_CORE_LIB=-lsoci_core
 ], [exit 1])
 
+
+AC_PROG_SWIG(2.0.0)
+
+# perl stuff
+AC_PATH_PROG([PERL_BIN], [perl])
+AC_ARG_VAR([PERL_ARCHNAME])
+PERL_ARCHNAME=`${PERL_BIN} -MConfig -e 'print $Config{archname}'`
+AC_ARG_VAR([PERL_ARCH])
+PERL_ARCH=`${PERL_BIN} -MConfig -e 'print $Config{archflags}'`
+AC_ARG_VAR([PERL_LDFLAGS])
+PERL_LDFLAGS=`${PERL_BIN} -MExtUtils::Embed -e ldopts`
+AC_ARG_VAR([PERL_CFLAGS])
+PERL_CFLAGS=`${PERL_BIN} -MExtUtils::Embed -e ccopts`
+AC_ARG_VAR([PERL_SITELIBDIR])
+PERL_SITELIBDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitelib}'
+AC_ARG_VAR([PERL_SITEARCHDIR])
+PERL_SITEARCHDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitearch}'
+
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
 

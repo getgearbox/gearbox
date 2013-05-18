@@ -11,8 +11,7 @@
 #include <gearbox/worker/Worker.h>
 #include <gearbox/core/Errors.h>
 #include <gearbox/core/logger.h>
-#include <gearbox/scoreboard/Scoreboard.h>
-#include "SwigWorker.h"
+#include <gearbox/swig/SwigWorker.h>
 
 using namespace Gearbox;
 %}
@@ -63,8 +62,6 @@ class HttpClient
 %rename(RealJobManager) JobManager;
 %include "gearbox/job/JobManager.h"
 %include "gearbox/job/StatusManager.h"
-%rename(RealScoreboard) Scoreboard;
-%include "gearbox/scoreboard/Scoreboard.h"
 
 namespace Gearbox {
     void log_init(const std::string & configFile);

@@ -5,13 +5,12 @@ ACLOCAL_AMFLAGS = -I m4 --install
 bin_PROGRAMS=
 lib_LTLIBRARIES=
 
+CLEANFILES=
 CFLAGS=-g
 CXXFLAGS=-g
 export DYLD_FORCE_FLAT_NAMESPACE=1
 
 LIBTAP=deps/libtap++-0.01/libtap++.la
-check_PROGRAMS = $(TESTS)
-check_LTLIBRARIES = $(LIBTAP)
 
 $(LIBTAP): deps/libtap++-0.01/tap++.C
 deps/libtap++-0.01/tap++.C:
@@ -22,6 +21,8 @@ deps_libtap___0_01_libtap___la_SOURCES = \
 	libtap++-0.01/tap++.h \
 	deps/libtap++-0.01/tap++.C
 
+check_LTLIBRARIES = $(LIBTAP)
+check_PROGRAMS = 
 TESTS =
 
 TestMakefile.am: auto/testAutoMake.sh
@@ -166,3 +167,32 @@ gearbox_worker_libgearbox_worker_includes = \
 gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker_includes) \
 	gearbox/worker/Worker.cc \
     $(NULL)
+
+###############################################
+### gearbox/swig/perl
+###############################################
+lib_LTLIBRARIES+=gearbox/swig/perl/libGearbox.la
+perllibdir=${PERL_SITELIBDIR}
+perllib_HEADERS = gearbox/swig/perl/lib/Gearbox/Errors.pm
+
+gearbox/swig/perl/lib/Gearbox/Errors.pm: gearbox/core/Errors.h
+	gearbox/swig/perl/genErrors > gearbox/swig/perl/lib/Gearbox/Errors.pm
+
+gearbox_swig_perl_libGearbox_la_CXXFLAGS = $(filter-out $(PERL_ARCH),$(PERL_CFLAGS))
+gearbox_swig_perl_libGearbox_la_LDFLAGS = -avoid-version -shared $(filter-out $(PERL_ARCH),$(PERL_LDFLAGS))
+gearbox_swig_perl_libGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
+gearbox_swig_perl_libGearbox_la_includes = \
+    gearbox/swig/perl/SwigGearbox_wrap.h \
+	gearbox/swig/SwigWorker.h \
+    $(NULL)
+
+gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_includes) \
+	gearbox/swig/perl/SwigGearbox_wrap.cc \
+	gearbox/swig/SwigWorker.cc \
+    $(NULL)
+
+gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/perl/perl.i gearbox/swig/perl/perlworker.i
+	$(SWIG) -perl -c++ -o gearbox/swig/perl/SwigGearbox_wrap.cc -outdir gearbox/swig/perl/lib -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
+
+CLEANFILES += gearbox/swig/perl/lib/Gearbox.pm gearbox/swig/perl/lib/Gearbox/Errors.pm gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h
+

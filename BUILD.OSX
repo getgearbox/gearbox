@@ -12,6 +12,9 @@ brew edit gearman
  -- change ["--without-mysql"] to ["--with-mysql=/usr/local/bin/mysql_config"]
 brew install gearman
 brew install soci --with-mysql --with-boost
+brew install swig
+sudo cpan install Archive::Tar
+sudo cpan install Test::Trivial
 
 INIT
 ====

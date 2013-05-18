@@ -48,8 +48,9 @@
   static void toJson(Json & json, SV * sv);
 
   static void toJsonString(Json & json, SV * sv) {
-      STRLEN len;
-      json = std::string(SvPV(sv,len),len);
+      STRLEN len; 
+      char * ptr = SvPV(sv,len);
+      json = std::string(ptr,len);
       return;
   }
 
@@ -91,17 +92,6 @@
       json.empty();
       return;
     case SVt_IV:
-    case SVt_PVIV:
-      json = static_cast<int64_t>(SvIV(sv));
-      return;
-    case SVt_NV:
-    case SVt_PVNV:
-      json = static_cast<double>(SvNV(sv));
-      return;
-    case SVt_PV:
-      toJsonString(json,sv);
-      return;
-    case SVt_RV:
       // this will probably be JSON::Boolean class
       if( sv_isobject(sv) ) {
         if( sv_derived_from(sv, "JSON::Boolean") ) {
@@ -113,6 +103,16 @@
       // and literaly deserialize the blessed reference
       // as a data-structure
       return toJson(json, SvRV(sv));
+    case SVt_PVIV:
+      json = static_cast<int64_t>(SvIV(sv));
+      return;
+    case SVt_NV:
+    case SVt_PVNV:
+      json = static_cast<double>(SvNV(sv));
+      return;
+    case SVt_PV:
+      toJsonString(json,sv);
+      return;
     case SVt_PVHV:
       toJsonObject(json,(HV*)sv);
       return;
@@ -234,19 +234,21 @@
 }
 
 %typemap(in) Gearbox::JobQueue & (JobQueue temp) {
-  AV * av = (AV*)SvRV($input);
-  $1 = &temp;
-  int len = av_len(av);
-  for( int i=0; i <= len; i++ ) {
-    SV ** levelsv = av_fetch(av,i,0);
-    AV * level = (AV*)SvRV(*levelsv);
-    int level_len = av_len(level);
-    temp.push_back(std::vector<JobPtr>());
-    for( int j=0; j <= level_len; j++ ) {
-      SV ** job = av_fetch(level,j,0);
-      Job * jptr;
-      SWIG_ConvertPtr(*job,(void**)&jptr,SWIGTYPE_p_Gearbox__Job,0);
-      temp[i].push_back(boost::shared_ptr<Job>(new Job(*jptr)));
+  {
+    AV * av = (AV*)SvRV($input);
+    $1 = &temp;
+    int len = av_len(av);
+    for( int i=0; i <= len; i++ ) {
+      SV ** levelsv = av_fetch(av,i,0);
+      AV * level = (AV*)SvRV(*levelsv);
+      int level_len = av_len(level);
+      temp.push_back(std::vector<JobPtr>());
+      for( int j=0; j <= level_len; j++ ) {
+        SV ** job = av_fetch(level,j,0);
+        Job * jptr;
+        SWIG_ConvertPtr(*job,(void**)&jptr,SWIGTYPE_p_Gearbox__Job,0);
+        temp[i].push_back(boost::shared_ptr<Job>(new Job(*jptr)));
+      }
     }
   }
 }
@@ -271,7 +273,8 @@
     char *key;
     while( NULL != (val = hv_iternextsv(hv,&key,&klen)) ) {
       STRLEN len;
-      temp[std::string(key,klen)] = std::string(SvPV(val,len),len);
+      char * ptr = SvPV(val,len);
+      temp[std::string(key,klen)] = std::string(ptr,len);
     }
   }
 %}
@@ -284,13 +287,16 @@
 
 // convert Perl SV* hash ref into Hash c++ object
 %typemap(in) const std::vector<std::string> & (AV * av, std::vector<std::string> temp) %{
-  av = (AV*)SvRV($input);
-  $1 = &temp;
-  int len = av_len(av);
-  for( int i=0; i <= len; i++ ) {
-    SV ** sv = av_fetch(av, i, 0);
-    STRLEN svlen;
-    temp.push_back(std::string(SvPV(*sv,svlen),svlen));
+  {
+    av = (AV*)SvRV($input);
+    $1 = &temp;
+    int len = av_len(av);
+    for( int i=0; i <= len; i++ ) {
+      SV ** sv = av_fetch(av, i, 0);
+      STRLEN svlen;
+      char * ptr = SvPV(*sv,svlen);
+      temp.push_back(std::string(ptr,svlen));
+    }
   }
 %}
 
@@ -314,9 +320,12 @@
 %}
 
 %typemap(in) const ConfigFile & (std::string filename, STRLEN len, std::auto_ptr<ConfigFile> cfptr) %{
-  filename.assign(SvPV($input,len), len);
-  cfptr.reset(new ConfigFile(filename));
-  $1 = cfptr.get();
+  {
+    char * ptr = SvPV($input,len);
+    filename.assign(ptr, len);
+    cfptr.reset(new ConfigFile(filename));
+    $1 = cfptr.get();
+  }
 %}
 
 // For functions that take a Uri ... accept a string from Perl
@@ -326,9 +335,12 @@
 %}
 
 %typemap(in) const Uri & (std::string uri, STRLEN len, std::auto_ptr<Uri> cfptr) %{
-  uri.assign(SvPV($input,len), len);
-  cfptr.reset(new Uri(uri));
-  $1 = cfptr.get();
+  {
+    char * ptr = SvPV($input,len);
+    uri.assign(ptr, len);
+    cfptr.reset(new Uri(uri));
+    $1 = cfptr.get();
+  }
 %}
 
 %typemap(in) const Json & (Json temp) %{

@@ -7,24 +7,35 @@
 # under which this project is licensed. 
 ######################################################################
 BEGIN {
-    $ENV{OBJDIR} ||= "i386-rhel4-gcc3";
-    $ENV{OBJDIR} = "i386-rhel4-gcc3" if $ENV{OBJDIR} = '.';
-    $ENV{OBJDIR} .= ".$ENV{MODE}" if $ENV{MODE};
-    my $PATH= join ";", map { "../../../$_/$ENV{OBJDIR}" } qw(core job worker scoreboard store);
+    use File::Basename;
+    use Cwd;
+    my $path = File::Basename::dirname(Cwd::realpath($0));
+    my $PATH= Cwd::realpath("$path/../../../swig/perl/.libs") . ":" . join ":", map { Cwd::realpath("$path/../../../$_/.libs") } qw(core job worker store);
+    
+    # $ENV{DYLD_LIBRARY_PATH} = "$path/.libs:$PATH";
+    # $ENV{LD_LIBRARY_PATH} = "$path/.libs:$PATH";
+    # print "DYLD_LIBRARY_PATH: $ENV{DYLD_LIBRARY_PATH}\n";
+    # require DynaLoader;
+    # @ISA = qw(DynaLoader);
+    # bootstrap setup;
+    
+    
     unless( $ENV{LD_LIBRARY_PATH} eq $PATH ) {
-        my $stub = "$ENV{OBJDIR}/libgearman_stub.so.0";
-        unless ( -f $stub ) {
-            system("make quick MODE=$ENV{MODE}>/dev/null 2>&1");
-        }
         $ENV{LD_LIBRARY_PATH} = $PATH;
+        my $stub = "$path/.libs/libgearman_stub.so";
         $ENV{LD_PRELOAD} = $stub;
+        # for OSX
+        $ENV{DYLD_LIBRARY_PATH} = $PATH;
+        $ENV{DYLD_INSERT_LIBRARIES} = "$path/.libs/libgearman_stub.dylib";
+        $ENV{DYLD_FORCE_FLAT_NAMESPACE} = 1;
         exec($0,@ARGV);
     }
+    push @INC, Cwd::realpath("$path/../../../swig/perl");
+    push @INC, Cwd::realpath("$path/../../../swig/perl/.libs");
+    push @INC, Cwd::realpath("$path/../../../swig/perl/lib");
+    $0 = Cwd::realpath($0);
+    chdir($path);
 }
-
-use lib "../../../swig/perl";
-use lib "../../../swig/perl/$ENV{OBJDIR}-perl58";
-use lib "../../../swig/perl/lib";
 
 use Error qw(:try);
 
