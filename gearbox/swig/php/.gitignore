@@ -1,0 +1,5 @@
+GearboxErrors.php
+SwigGearbox.php
+SwigGearbox_wrap.cc
+SwigGearbox_wrap.h
+php_SwigGearbox.h

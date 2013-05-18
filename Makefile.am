@@ -194,5 +194,46 @@ gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_include
 gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/perl/perl.i gearbox/swig/perl/perlworker.i
 	$(SWIG) -perl -c++ -o gearbox/swig/perl/SwigGearbox_wrap.cc -outdir gearbox/swig/perl/lib -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
 
-CLEANFILES += gearbox/swig/perl/lib/Gearbox.pm gearbox/swig/perl/lib/Gearbox/Errors.pm gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h
+CLEANFILES += \
+	gearbox/swig/perl/lib/Gearbox.pm \
+	gearbox/swig/perl/lib/Gearbox/Errors.pm \
+	gearbox/swig/perl/SwigGearbox_wrap.cc \
+	gearbox/swig/perl/SwigGearbox_wrap.h \
+	$(NULL)
+
+###############################################
+### gearbox/swig/php
+###############################################
+lib_LTLIBRARIES+=gearbox/swig/php/SwigGearbox.la
+
+gearbox_swig_php_SwigGearbox_la_CXXFLAGS = $(PHP_CFLAGS)
+gearbox_swig_php_SwigGearbox_la_LDFLAGS = -module -avoid-version -shared $(PHP_LDFLAGS)
+gearbox_swig_php_SwigGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
+gearbox_swig_php_SwigGearbox_la_includes = \
+    gearbox/swig/php/php_SwigGearbox.h \
+	gearbox/swig/SwigGearbox_wrap.h \
+	gearbox/swig/SwigWorker.h \
+    $(NULL)
+
+gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_libGearbox_includes) \
+	gearbox/swig/php/SwigGearbox_wrap.cc \
+	gearbox/swig/SwigWorker.cc \
+    $(NULL)
+
+gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/php/php.i
+	$(SWIG) -php -cppext cxx -c++ -o gearbox/swig/php/SwigGearbox_wrap.cc -outdir gearbox/swig/php -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
+	perl -pi -e 's/(SWIG_SetPointerZval\(.*?),\s+0\)/$$1, 2)/g' gearbox/swig/php/SwigGearbox_wrap.cc
+	perl -pi -e 's/Gearbox__//g' gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox.php
+	perl -pi -e 's/new RealJobManager/new JobManager/g' gearbox/swig/php/SwigGearbox.php
+	echo "<?php" > gearbox/swig/php/GearboxErrors.php
+	cat gearbox/core/Errors.h | $(PERL_BIN) -ne 's/DEFINE_ERROR\((\w+),(\d+)\);/class ERR_$$1 extends Exception {\n  public function __construct(\$$message) {\n    parent::__construct("ERR_$$1: ".\$$message,$$2);\n  }\n}\n\nclass ERR_CODE_$$2 extends ERR_$$1 {}\n/ && print' >> gearbox/swig/php/GearboxErrors.php
+	echo "?>" >> gearbox/swig/php/GearboxErrors.php
+
+CLEANFILES += \
+	gearbox/swig/php/SwigGearbox.php \
+	gearbox/swig/php/GearboxErrors.php \
+	gearbox/swig/php/SwigGearbox_wrap.cc \
+	gearbox/swig/php/SwigGearbox_wrap.h \
+	gearbox/swig/php/php_SwigGearbox.h \
+	$(NULL)
 

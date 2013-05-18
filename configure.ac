@@ -93,9 +93,16 @@ PERL_LDFLAGS=`${PERL_BIN} -MExtUtils::Embed -e ldopts`
 AC_ARG_VAR([PERL_CFLAGS])
 PERL_CFLAGS=`${PERL_BIN} -MExtUtils::Embed -e ccopts`
 AC_ARG_VAR([PERL_SITELIBDIR])
-PERL_SITELIBDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitelib}'
+PERL_SITELIBDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitelib}'`
 AC_ARG_VAR([PERL_SITEARCHDIR])
-PERL_SITEARCHDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitearch}'
+PERL_SITEARCHDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitearch}'`
+
+# php stuff
+AC_PATH_PROG([PHP_CONFIG], [php-config])
+AC_ARG_VAR([PHP_CFLAGS])
+PHP_CFLAGS=`${PHP_CONFIG} --includes`
+AC_ARG_VAR([PHP_LDFLAGS])
+PHP_LDFLAGS=`${PHP_CONFIG} --ldflags`
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])

@@ -57,6 +57,4 @@ class JobManager extends RealJobManager {
   }
 }
 
-class Scoreboard extends RealScoreboard {}
-
 ?>

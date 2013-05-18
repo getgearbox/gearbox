@@ -1,0 +1,2 @@
+to run php with local extension:
+php -d extension_dir=./.libs Gearbox.php
