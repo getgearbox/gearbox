@@ -99,10 +99,13 @@
           return;
         }
       }
-      // if it is an object we will just ignore the class
-      // and literaly deserialize the blessed reference
-      // as a data-structure
-      return toJson(json, SvRV(sv));
+      if( SvROK(sv) ) {
+        // if it is an object we will just ignore the class
+        // and literaly deserialize the blessed reference
+        // as a data-structure
+        return toJson(json, SvRV(sv));
+      }
+      // intentionally falling through ...
     case SVt_PVIV:
       json = static_cast<int64_t>(SvIV(sv));
       return;
