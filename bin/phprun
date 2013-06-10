@@ -1,0 +1,46 @@
+#!/bin/sh
+
+load_stubs=
+
+while getopts ":s" opt; do
+    case $opt in
+        s)
+            load_stubs=1
+            ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+basedir=$(dirname $(dirname $0))
+
+export LD_LIBRARY_PATH=$basedir/gearbox/core/.libs:$basedir/gearbox/store/.libs:$basedir/gearbox/worker/.libs:$basedir/gearbox/job/.libs
+export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
+
+test=$(basename $1)
+cd $(dirname $1)
+
+if [ -n "$load_stubs" ]; then
+    LD_LIBRARY_PATH=$basedir/gearbox/core/.libs
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$basedir/gearbox/job/.libs
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$basedir/gearbox/store/.libs
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$basedir/gearbox/worker/.libs
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$basedir/common/stub/.libs
+    
+    export LD_LIBRARY_PATH
+    export DYLD_LIBRARY_PATH=$LD_LIBRARY_PATH
+    export DYLD_FORCE_FLAT_NAMESPACE=1
+    
+    export LD_PRELOAD=$basedir/common/stub/.libs/libgearman_stub.so
+    export DYLD_INSERT_LIBRARIES=$basedir/common/stub/.libs/libgearman_stub.dylib
+fi
+
+opts="-d include_path=$basedir/gearbox/swig/php:$basedir/deps/test-more-php:$basedir/deps/test-trivial-php -d extension_dir=$basedir/gearbox/swig/php/.libs"
+if [ -n "$GDB" ]; then
+    tmpfile=/tmp/phprun.$$.gdb
+    trap "rm -r $tmpfile" EXIT
+    echo "run $opts \"$test\"" > $tmpfile
+    exec gdb -x $tmpfile $(which php)
+else 
+    exec php $opts "$test"
+fi
