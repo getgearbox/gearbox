@@ -10,7 +10,9 @@ BEGIN {
     use File::Basename;
     use Cwd;
     my $path = File::Basename::dirname(Cwd::realpath($0));
-    my $PATH= Cwd::realpath("$path/../../../swig/perl/.libs") . ":" . join ":", map { Cwd::realpath("$path/../../../$_/.libs") } qw(core job worker store);
+    my $stubpath = Cwd::realpath("$path/../../../../common/stub");
+
+    my $PATH= Cwd::realpath("$stubpath/.libs") . ":" . join ":", map { Cwd::realpath("$path/../../../$_/.libs") } qw(core job worker store);
     
     # $ENV{DYLD_LIBRARY_PATH} = "$path/.libs:$PATH";
     # $ENV{LD_LIBRARY_PATH} = "$path/.libs:$PATH";
@@ -22,11 +24,11 @@ BEGIN {
     
     unless( $ENV{LD_LIBRARY_PATH} eq $PATH ) {
         $ENV{LD_LIBRARY_PATH} = $PATH;
-        my $stub = "$path/.libs/libgearman_stub.so";
+        my $stub = "$stubpath/.libs/libgearman_stub.so";
         $ENV{LD_PRELOAD} = $stub;
         # for OSX
         $ENV{DYLD_LIBRARY_PATH} = $PATH;
-        $ENV{DYLD_INSERT_LIBRARIES} = "$path/.libs/libgearman_stub.dylib";
+        $ENV{DYLD_INSERT_LIBRARIES} = "$stubpath/.libs/libgearman_stub.dylib";
         $ENV{DYLD_FORCE_FLAT_NAMESPACE} = 1;
         exec($0,@ARGV);
     }

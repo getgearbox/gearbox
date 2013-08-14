@@ -1,6 +1,7 @@
 %{
 
 #include "php_Json_helper.h"
+#include "var_dump.h"
     static inline long exGetCode() {
         zval * codeval = zend_read_property (
             Z_OBJCE_P(EG(exception)),
@@ -26,6 +27,55 @@
         INIT_PZVAL(msgval);
         return Z_STRVAL_PP(&msgval);
     }
+
+    static void fromJson(Json & json, zval ** out) {
+      switch( json.type() ) {
+      case Json::UNDEF:
+        ZVAL_NULL(*out);
+        return;
+      case Json::BOOL:
+        ZVAL_BOOL(*out, json.as<bool>());
+        return;
+      case Json::INT:
+        ZVAL_LONG(*out, json.as<int64_t>());
+        return;
+      case Json::DOUBLE:
+        ZVAL_DOUBLE(*out, json.as<double>());
+        return;
+      case Json::STRING: {
+        std::string & str = json.as<std::string>();
+        ZVAL_STRINGL(*out, str.c_str(), str.size(), 1);
+        return;
+      }
+      case Json::OBJECT: {
+        array_init(*out);
+        Json::Object & obj = json.as<Json::Object>();
+        Json::Object::iterator i = obj.begin();
+        Json::Object::iterator e = obj.end();
+        for( ; i != e; ++i ) {
+          zval * data = 0;
+          MAKE_STD_ZVAL(data);
+          fromJson(*(i->second), &data);
+          zend_hash_add(HASH_OF(*out), (char*)i->first.c_str(), i->first.size()+1, &data, sizeof(zval*), NULL);
+        }
+        return;
+      }
+      case Json::ARRAY: {
+        array_init(*out);
+        for( int i=0; i < json.length(); ++i ) {
+          zval * data = 0;
+          MAKE_STD_ZVAL(data);
+          fromJson(json[i], &data);
+          zend_hash_next_index_insert( HASH_OF(*out), &data, sizeof(zval*), NULL );
+        }
+        return;
+      }
+      }
+    }
+%}
+
+%typemap(typecheck) const std::vector<std::string> & %{
+  $1 = Z_TYPE_PP($input) == IS_ARRAY ? 1 : 0;
 %}
 
 // convert PHP native array to std::vector<std::string>
@@ -58,13 +108,31 @@
     }
 }
 
-%typemap(out) JobPtr {
-  Job * j = new Job(*($1.get()));
-  SWIG_SetPointerZval($result, (void *)j, SWIGTYPE_p_Gearbox__Job, 2);
+%typemap(out) const JobPtr & {
+  if( $1->get() ) {
+    SWIG_SetPointerZval($result, (void *)new Job(*$1->get()), SWIGTYPE_p_Gearbox__Job, 2);
+  }
+  else {
+    ZVAL_NULL($result);
+  }
 }
+
+%typemap(out) JobPtr {
+  if( $1.get() ) {
+    SWIG_SetPointerZval($result, (void *)new Job(*$1.get()), SWIGTYPE_p_Gearbox__Job, 2);
+  }
+  else {
+    ZVAL_NULL($result);
+  }
+}
+
 %typemap(out) Gearbox::JobPtr {
-  Job * j = new Job(*($1.get()));
-  SWIG_SetPointerZval($result, (void *)j, SWIGTYPE_p_Gearbox__Job, 2);
+  if( $1.get() ) {
+    SWIG_SetPointerZval($result, (void *)new Job(*$1.get()), SWIGTYPE_p_Gearbox__Job, 2);
+  }
+  else {
+    ZVAL_NULL($result);
+  }
 }
 
 %typemap(out) Gearbox::JobQueue {
@@ -114,6 +182,14 @@
 
 %typemap(typecheck) const Json & %{
   $1 = 1;
+%}
+
+%typemap(typecheck) zval * %{
+  $1 = 1;
+%}
+
+%typemap(in) zval * %{
+  $1 = *$input;
 %}
 
 // For functions that take a Hash ... accept a string from PHP
@@ -209,6 +285,10 @@
   $1 = &temp;
 %}
 
+%typemap(out) const Json & (std::string temp) %{
+  fromJson(*$1, &$result);
+%}
+
 %exception %{
   try { $action  }
   catch(const Error & err) {
@@ -227,6 +307,7 @@
         const_cast<char*>(err.what()),
         err.code()
       );
+      return;
     }
     else {
       // found class name so throw gearbox ERR_* exception
@@ -235,6 +316,7 @@
         const_cast<char*>(err.what()),
         err.code()
       );
+      return;
     }
   }
   catch(const std::exception & err) {
@@ -245,6 +327,7 @@
       const_cast<char*>(err.what()),
       500
     );
+    return;
   }
 %}
 

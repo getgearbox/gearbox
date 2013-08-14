@@ -93,4 +93,6 @@ class SwigWorker {
 
 #if defined(SWIGPERL)
   %include "./perl/perlworker.i"
+#elif defined(SWIGPHP)
+  %include "./php/phpworker.i"
 #endif

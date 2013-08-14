@@ -21,13 +21,16 @@ deps_libtap___0_01_libtap___la_SOURCES = \
 	libtap++-0.01/tap++.h \
 	deps/libtap++-0.01/tap++.C
 
+test-more-php/Test-More-OO.php: deps/Test-More-PHP-0.2.tar.gz
+	cd deps && tar xzf Test-More-PHP-0.2.tar.gz
+
+check_HEADERS = test-more-php/Test-More-OO.php
 check_LTLIBRARIES = $(LIBTAP)
 check_PROGRAMS = 
 TESTS =
 
 TestMakefile.am: auto/testAutoMake.sh
 	auto/testAutoMake.sh > TestMakefile.am
-
 include TestMakefile.am
 
 ###############################################
@@ -220,13 +223,14 @@ gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_libGearbox_includes
 	gearbox/swig/SwigWorker.cc \
     $(NULL)
 
-gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/php/php.i
-	$(SWIG) -php -cppext cxx -c++ -o gearbox/swig/php/SwigGearbox_wrap.cc -outdir gearbox/swig/php -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
+gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/php/php.i gearbox/swig/php/phpworker.i
+	$(SWIG) -php -cppext cxx -c++ -prefix "Gearbox" -o gearbox/swig/php/SwigGearbox_wrap.cc -outdir gearbox/swig/php -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
 	perl -pi -e 's/(SWIG_SetPointerZval\(.*?),\s+0\)/$$1, 2)/g' gearbox/swig/php/SwigGearbox_wrap.cc
 	perl -pi -e 's/Gearbox__//g' gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox.php
 	perl -pi -e 's/new RealJobManager/new JobManager/g' gearbox/swig/php/SwigGearbox.php
 	echo "<?php" > gearbox/swig/php/GearboxErrors.php
-	cat gearbox/core/Errors.h | $(PERL_BIN) -ne 's/DEFINE_ERROR\((\w+),(\d+)\);/class ERR_$$1 extends Exception {\n  public function __construct(\$$message) {\n    parent::__construct("ERR_$$1: ".\$$message,$$2);\n  }\n}\n\nclass ERR_CODE_$$2 extends ERR_$$1 {}\n/ && print' >> gearbox/swig/php/GearboxErrors.php
+	echo 'class GearboxError extends Exception {\n  function getName() { return $$this->name; }\n}\n' >> gearbox/swig/php/GearboxErrors.php
+	cat gearbox/core/Errors.h | $(PERL_BIN) -ne 's/DEFINE_ERROR\((\w+),(\d+)\);/class ERR_$$1 extends GearboxError {\n  protected \$$name = "$$1";\n  public function __construct(\$$message) {\n    parent::__construct("ERR_$$1: ".\$$message,$$2);\n  }\n}\n\nclass ERR_CODE_$$2 extends ERR_$$1 {}\n/ && print' >> gearbox/swig/php/GearboxErrors.php
 	echo "?>" >> gearbox/swig/php/GearboxErrors.php
 
 CLEANFILES += \

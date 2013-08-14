@@ -81,6 +81,16 @@ ${name}_SOURCES=$test
 EOF
 done
 
+cat <<EOF
+check_LTLIBRARIES += common/stub/libgearman_stub.la
+common_stub_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)
+common_stub_libgearman_stub_la_LDFLAGS = -rpath /dev/null -avoid-version \$(LOG4CXX_LIBS) \$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
+common_stub_libgearman_stub_la_SOURCES = \
+    common/stub/gearman_stub.cc \
+    \$(NONE)
+
+EOF
+
 echo "gearbox_t_swig_perl_TESTS = \\"
 for test in gearbox/t/swig/perl/*.t; do
     echo "    ${test} \\"
@@ -88,12 +98,13 @@ done
 echo "    \$(NULL)"
 echo
 echo "TESTS += \$(gearbox_t_swig_perl_TESTS)"
-cat <<EOF
-check_LTLIBRARIES += gearbox/t/swig/perl/libgearman_stub.la
-gearbox_t_swig_perl_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)
-gearbox_t_swig_perl_libgearman_stub_la_LDFLAGS = -rpath /dev/null -avoid-version \$(LOG4CXX_LIBS) \$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
-gearbox_t_swig_perl_libgearman_stub_la_SOURCES = \
-    gearbox/t/swig/perl/gearman_stub.cc \
-    \$(NONE)
 
-EOF
+echo "gearbox_t_swig_php_TESTS = \\"
+for test in gearbox/t/swig/php/*.t; do
+    echo "    ${test} \\"
+done
+echo "    \$(NULL)"
+echo
+echo "TESTS += \$(gearbox_t_swig_php_TESTS)"
+
+echo "export PATH=$PATH:\$(abs_top_srcdir)/bin"

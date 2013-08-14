@@ -3,23 +3,21 @@
 require_once("SwigGearbox.php");
 require_once("GearboxErrors.php");
 
-class Worker extends SwigWorker {
-   private $handlers = array();
-   function register_handler( $job, $function=NULL ) {
-     if( is_null($function) ) {
-       $this->handlers[$job] = $job;
-     }
-     else {
-       $this->handlers[$job] = $function;
-     }
-     parent::register_handler($job);
-   }
-  
+class GearboxWorker extends GearboxPhpWorker {
+  function __construct( $config ) {
+    parent::__construct( $config );
+    $this->set_self($this);
+  }
+
    function do_dispatch( $job, $resp ) {
      $method = $job->name();
      if( array_key_exists($method, $this->handlers) ) {
        $method = $this->handlers[$method];
      }
+     if( !is_string($method) ) {
+       return $method($job,$resp);
+     }
+     
      if( method_exists($this, $method) ) {
        return call_user_func( array($this, $method), $job, $resp );
      }
@@ -38,11 +36,9 @@ class Worker extends SwigWorker {
      default: SwigWorker_afterwards($this->_cPtr,$job,$name_or_delay,$delay); break;
      }
    }
-
-
 };
 
-class JobManager extends RealJobManager {
+class GearboxJobManager extends GearboxRealJobManager {
   function job_queue_apply($queue, $function, $data) {
     foreach( $queue as $level ) {
       foreach ( $level as $job ) {
