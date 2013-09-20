@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "config.h"
+
 extern "C" {
     uid_t test_uid;
     uid_t test_euid;
@@ -38,17 +40,17 @@ int main()
 
     test_uid = 1234;
     test_euid = 0;
-    THROWS( run("/usr/bin/true foo"), security_log_msg );
+    THROWS( run(TRUE_BIN " foo"), security_log_msg );
 
     test_uid = 0;
     test_euid = 1234;
-    THROWS( run("/usr/bin/true foo"), security_log_msg );
+    THROWS( run(TRUE_BIN " foo"), security_log_msg );
 
     test_uid = test_euid = 0;
-    THROWS( run("/usr/bin/true foo"), security_log_msg );
+    THROWS( run(TRUE_BIN" foo"), security_log_msg );
 
     Cmd cmd;
-    NOTHROW( run( cmd << "/usr/bin/true" << "foo" ) );
+    NOTHROW( run( cmd << TRUE_BIN << "foo" ) );
 
     TEST_END;
 }

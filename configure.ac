@@ -43,6 +43,14 @@ if test -z "${FALSE_BIN}"; then
 fi
 AC_DEFINE_UNQUOTED([FALSE_BIN], ["${FALSE_BIN}"], [path to false binary])
 
+AC_ARG_VAR([TRUE_BIN])
+AC_PATH_PROG([TRUE_BIN],   [true])
+if test -z "${TRUE_BIN}"; then
+   echo "true command not found, required for tests"
+   exit 1
+fi
+AC_DEFINE_UNQUOTED([TRUE_BIN], ["${TRUE_BIN}"], [path to true binary])
+
 AC_DEFINE_UNQUOTED([SYSCONFDIR], ["`test "${prefix}" = "NONE" && prefix=; eval echo ${sysconfdir}`"], [path to system configuration files])
 AC_DEFINE_UNQUOTED([DATADIR], ["`test "${prefix}" = "NONE" && prefix=; eval echo ${datarootdir}`"], [path to data directory])
 AC_DEFINE_UNQUOTED([PLUGINSDIR], ["`test "${exec_prefix}" = "NONE" && exec_prefix=${prefix}; test "${exec_prefix}" = "NONE" && exec_prefix=; eval echo ${libexecdir}/gearbox/plugins`"], [path to data directory])
