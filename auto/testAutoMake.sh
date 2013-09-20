@@ -17,7 +17,7 @@ function amName {
     echo -n ${1%.cc} | tr [:punct:][:space:] _
 }
 
-test_CXXFLAGS="-Icommon -Itools -Ideps/libtap++-0.1"
+test_CXXFLAGS="-Icommon -Itools -Ideps/libtap++-0.01"
 
 addTests gearbox/t/core
 for test in gearbox/t/core/*.t.cc; do
