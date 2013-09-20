@@ -84,6 +84,7 @@ done
 cat <<EOF
 check_LTLIBRARIES += common/stub/libgearman_stub.la
 common_stub_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)
+common_stub_libgearman_stub_la_LIBADD = gearbox/core/libgearbox_core.la
 common_stub_libgearman_stub_la_LDFLAGS = -rpath /dev/null -avoid-version \$(LOG4CXX_LIBS) \$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
 common_stub_libgearman_stub_la_SOURCES = \
     common/stub/gearman_stub.cc \

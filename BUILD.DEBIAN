@@ -2,3 +2,7 @@ sudo apt-get install autoconf libtool libgearman-dev libboost1.53 liblog4cxx10-d
 sudo add-apt-repository ppa:jtaylor/jtaylor
 sudo apt-get update
 sudo apt-get install libsoci3.1-dev libsoci-core3.1 libsoci-mysql3.1 libsoci-sqlite3-3.1
+sudo apt-get install libjson-perl liblog-log4perl-perl liblog-dispatch-perl sqlite3
+sudo cpan install Test::Trivial
+
+export PATH=/usr/lib/ccache:$PATH
