@@ -7,7 +7,7 @@ lib_LTLIBRARIES=
 
 CLEANFILES=
 CFLAGS=-g
-CXXFLAGS=-g
+CXXFLAGS=-g -fpermissive
 export DYLD_FORCE_FLAT_NAMESPACE=1
 
 LIBTAP=deps/libtap++-0.01/libtap++.la

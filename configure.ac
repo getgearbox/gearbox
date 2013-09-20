@@ -125,7 +125,7 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([dup2 floor gettimeofday memset mkfifo select socket strerror])
 
-AM_INIT_AUTOMAKE([1.13 subdir-objects no-define foreign])
+AM_INIT_AUTOMAKE([1.11 subdir-objects no-define foreign])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
