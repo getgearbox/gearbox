@@ -21,10 +21,12 @@ deps_libtap___0_01_libtap___la_SOURCES = \
 	libtap++-0.01/tap++.h \
 	deps/libtap++-0.01/tap++.C
 
+if WITH_PHP
 test-more-php/Test-More-OO.php: deps/Test-More-PHP-0.2.tar.gz
 	cd deps && tar xzf Test-More-PHP-0.2.tar.gz
 
 check_HEADERS = test-more-php/Test-More-OO.php
+endif
 check_LTLIBRARIES = $(LIBTAP)
 check_PROGRAMS = 
 TESTS =
@@ -204,6 +206,7 @@ CLEANFILES += \
 	gearbox/swig/perl/SwigGearbox_wrap.h \
 	$(NULL)
 
+if WITH_PHP
 ###############################################
 ### gearbox/swig/php
 ###############################################
@@ -240,4 +243,4 @@ CLEANFILES += \
 	gearbox/swig/php/SwigGearbox_wrap.h \
 	gearbox/swig/php/php_SwigGearbox.h \
 	$(NULL)
-
+endif

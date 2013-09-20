@@ -99,6 +99,7 @@ echo "    \$(NULL)"
 echo
 echo "TESTS += \$(gearbox_t_swig_perl_TESTS)"
 
+echo "if WITH_PHP"
 echo "gearbox_t_swig_php_TESTS = \\"
 for test in gearbox/t/swig/php/*.t; do
     echo "    ${test} \\"
@@ -106,5 +107,6 @@ done
 echo "    \$(NULL)"
 echo
 echo "TESTS += \$(gearbox_t_swig_php_TESTS)"
+echo "endif"
 
 echo "export PATH=$PATH:\$(abs_top_srcdir)/bin"

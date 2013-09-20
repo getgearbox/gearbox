@@ -106,11 +106,14 @@ AC_ARG_VAR([PERL_SITEARCHDIR])
 PERL_SITEARCHDIR=`${PERL_BIN} -MConfig -e 'print $Config{sitearch}'`
 
 # php stuff
-AC_PATH_PROG([PHP_CONFIG], [php-config])
-AC_ARG_VAR([PHP_CFLAGS])
-PHP_CFLAGS=`${PHP_CONFIG} --includes`
-AC_ARG_VAR([PHP_LDFLAGS])
-PHP_LDFLAGS=`${PHP_CONFIG} --ldflags`
+AC_ARG_WITH([php], AS_HELP_STRING([--with-php], [enable building with php]), [
+  AC_PATH_PROG([PHP_CONFIG], [php-config])
+  AC_ARG_VAR([PHP_CFLAGS])
+  PHP_CFLAGS=`${PHP_CONFIG} --includes`
+  AC_ARG_VAR([PHP_LDFLAGS])
+  PHP_LDFLAGS=`${PHP_CONFIG} --ldflags`
+],[])
+AM_CONDITIONAL([WITH_PHP], [test x$with_php = xtrue])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
