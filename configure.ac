@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.63])
 AC_INIT([gearbox], [0.1], [gearbox@corybennett.org])
 AC_CONFIG_SRCDIR([apache/mod_gearbox/mod_gearbox.cc])
 AC_CONFIG_MACRO_DIR([m4])
@@ -119,7 +119,7 @@ AM_CONDITIONAL([WITH_PHP], [test x$with_php = xtrue])
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
+AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT32_T
 AC_TYPE_INT64_T
