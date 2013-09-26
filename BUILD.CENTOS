@@ -1,0 +1,67 @@
+These instructions worked under Oracle Linux 6.3, which should be the same
+as RHEL 6.3 or CentOS 6.3.
+
+SETUP
+=====
+sudo yum install -y automake libtool libuuid-devel curl-devel openssl-devel \
+                    perl-devel php-devel 
+# these are available from EPEL
+sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3
+
+install boost >= 1.49
+=====================
+sudo yum install -y bzip2-devel
+wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.bz2/download
+tar xvfj boost_1_54_0.tar.bz2
+cd boost_1_54_0
+./bootstrap.sh
+sudo ./b2 --with-exception --with-program_options --with-system --with-filesystem --with-graph --with-regex --with-iostreams install --prefix=/usr
+
+install gearman
+===============
+sudo yum install -y libevent-devel
+wget https://launchpad.net/gearmand/1.0/1.0.6/+download/gearmand-1.0.6.tar.gz
+tar xvfz gearmand-1.0.6.tar.gz
+cd gearmand-1.0.6
+./configure
+make && sudo make install
+
+install yajl >= 2.0
+===================
+sudo yum install -y cmake
+wget http://github.com/lloyd/yajl/tarball/2.0.1 -O yajl-2.0.1.tar.gz
+tar xvfz yajl-2.0.1.tar.gz
+cd lloyd-yajl-f4b2b1a
+./configure
+make && sudo make install
+
+install swig >= 2.0
+==================
+sudo yum install -y pcre-devel
+wget http://downloads.sourceforge.net/project/swig/swig/swig-2.0.11/swig-2.0.11.tar.gz
+tar xvfz swig-2.0.11.tar.gz
+cd swig-2.0.11
+./configure
+make && sudo make install
+
+install perl modules
+====================
+sudo yum install -y cpan perl-Log-Log4perl perl-Archive-Tar perl-JSON \
+                    perl-Log-Dispatch perl-ExtUtils-Embed
+sudo cpan Test::Trivial 
+
+INIT
+=====
+./autogen.sh
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig/
+CXX="ccache g++" CC="ccache gcc" YAJL_LIBS="-L/usr/local/lib -lyajl" \
+    CPPFLAGS=-I/usr/lib64/perl5/CORE/ YAJL_CFLAGS=-I/usr/local/include \
+    ./configure 
+
+BUILD
+=====
+make check
+
+Note that two test in gearbox/t/swig/perl/status.t fail due to issues with
+$status->meta().  It may be related to the version of swig we're using here, but
+I haven't diagnosed the problem yet.
