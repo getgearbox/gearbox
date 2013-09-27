@@ -177,8 +177,6 @@ gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker
 ############################################################
 ### workers/gearbox - workers for internal gearbox services
 ############################################################
-bin_PROGRAMS+=workers/gearbox/workerGearbox
-bin_PROGRAMS+=workers/gearbox/delayDaemon
 
 lib_LTLIBRARIES+=workers/gearbox/libworker_gearbox.la
 
@@ -195,13 +193,45 @@ workers_gearbox_libworker_gearbox_la_SOURCES = \
 workers_gearbox_libworker_gearbox_la_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB)
 workers_gearbox_libworker_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la
 
+bin_PROGRAMS+=workers/gearbox/workerGearbox
 workers_gearbox_workerGearbox_SOURCES = workers/gearbox/workerGearboxMain.cc
 workers_gearbox_workerGearbox_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 workers_gearbox_workerGearbox_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la workers/gearbox/libworker_gearbox.la
 
+bin_PROGRAMS+=workers/gearbox/delayDaemon
 workers_gearbox_delayDaemon_SOURCES = workers/gearbox/delayDaemon.cc
 workers_gearbox_delayDaemon_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
 workers_gearbox_delayDaemon_LDADD = workers/gearbox/libworker_gearbox.la
+
+bin_PROGRAMS+=workers/test-basic/workerTestBasic
+workers_test_basic_workerTestBasic_SOURCES = workers/test-basic/WorkerTestBasic.h workers/test-basic/WorkerTestBasic.cc workers/test-basic/workerTestBasicMain.cc
+workers_test_basic_workerTestBasic_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_basic_workerTestBasic_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+bin_PROGRAMS+=workers/test-agents/workerTestAgents
+workers_test_agents_workerTestAgents_SOURCES = workers/test-agents/WorkerTestAgents.h workers/test-agents/WorkerTestAgents.cc workers/test-agents/workerTestAgentsMain.cc
+workers_test_agents_workerTestAgents_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_agents_workerTestAgents_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+bin_PROGRAMS+=workers/test-cancel/workerTestCancel
+workers_test_cancel_workerTestCancel_SOURCES = workers/test-cancel/WorkerTestCancel.h workers/test-cancel/WorkerTestCancel.cc workers/test-cancel/workerTestCancelMain.cc
+workers_test_cancel_workerTestCancel_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_cancel_workerTestCancel_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+bin_PROGRAMS+=workers/test-chained/workerTestChained
+workers_test_chained_workerTestChained_SOURCES = workers/test-chained/WorkerTestChained.h workers/test-chained/WorkerTestChained.cc workers/test-chained/workerTestChainedMain.cc
+workers_test_chained_workerTestChained_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_chained_workerTestChained_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+bin_PROGRAMS+=workers/test-delay/workerTestDelay
+workers_test_delay_workerTestDelay_SOURCES = workers/test-delay/WorkerTestDelay.h workers/test-delay/WorkerTestDelay.cc workers/test-delay/workerTestDelayMain.cc
+workers_test_delay_workerTestDelay_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_delay_workerTestDelay_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+bin_PROGRAMS+=workers/test-sync/workerTestSync
+workers_test_sync_workerTestSync_SOURCES = workers/test-sync/WorkerTestSync.h workers/test-sync/WorkerTestSync.cc workers/test-sync/workerTestSyncMain.cc
+workers_test_sync_workerTestSync_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB)
+workers_test_sync_workerTestSync_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
 
 ###############################################
 ### gearbox/swig/perl
