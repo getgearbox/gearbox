@@ -7,13 +7,19 @@
 #include <gearbox/core/logger.h>
 #include <workers/gearbox/WorkerGearbox.h>
 #include <gearbox/core/JsonSchema.h>
+#include <libgen.h>
+#include <unistd.h>
 
 using namespace Gearbox;
 
 using std::string;
 
-int main () {
+int main(int argc, char *argv[]) {
     TEST_START(71);
+
+    string basedir = string(dirname(argv[0])) + "/../";
+    chdir(basedir.c_str());
+
     log_init("./unit.conf");
     OK( run("./mkdb") == 0 );
 

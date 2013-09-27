@@ -81,6 +81,18 @@ ${name}_SOURCES=$test
 EOF
 done
 
+addTests workers/t/gearbox
+for test in workers/t/gearbox/*.t.cc; do
+    name=$(amName $test)
+    cat <<EOF
+${name}_CXXFLAGS=${test_CXXFLAGS} -DTESTDIR='"\$(abs_top_srcdir)/workers/t/gearbox"'
+${name}_LDFLAGS=\$(BOOST_LDFLAGS) \$(BOOST_SYSTEM_LIB)
+${name}_LDADD=\$(LIBTAP) gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la gearbox/core/libgearbox_core.la workers/gearbox/libworker_gearbox.la
+${name}_SOURCES=$test
+
+EOF
+done
+
 cat <<EOF
 check_LTLIBRARIES += common/stub/libgearman_stub.la
 common_stub_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)

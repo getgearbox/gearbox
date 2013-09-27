@@ -11,6 +11,8 @@ using namespace Gearbox;
 #include <signal.h>
 #include <limits.h>
 #include <sys/wait.h>
+#include <libgen.h>
+#include <unistd.h>
 
 #include <workers/gearbox/WorkerGearbox.h>
 #include <workers/gearbox/DelayProcessor.h>
@@ -21,8 +23,12 @@ using namespace Gearbox;
 using std::string;
 using namespace soci;
 
-int main () {
+int main(int argc, char *argv[]) {
     TEST_START(12);
+
+    string basedir = string(dirname(argv[0])) + "/../";
+    chdir(basedir.c_str());
+
     log_init("./unit.conf");
     OK( run("./mkdb") == 0 );
 //    db_init("./unit.conf");

@@ -173,6 +173,36 @@ gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker
 	gearbox/worker/Worker.cc \
     $(NULL)
 
+
+############################################################
+### workers/gearbox - workers for internal gearbox services
+############################################################
+bin_PROGRAMS+=workers/gearbox/workerGearbox
+bin_PROGRAMS+=workers/gearbox/delayDaemon
+
+lib_LTLIBRARIES+=workers/gearbox/libworker_gearbox.la
+
+workers_gearbox_libworker_gearbox_includes = \
+	workers/gearbox/WorkerGearbox.h \
+	workers/gearbox/DelayProcessor.h \
+	$(NULL)
+
+workers_gearbox_libworker_gearbox_la_SOURCES = \
+	$(workers_gearbox_libworker_gearbox_includes) \
+	workers/gearbox/WorkerGearbox.cc \
+    workers/gearbox/DelayProcessor.cc \
+	$(NULL)
+workers_gearbox_libworker_gearbox_la_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB)
+workers_gearbox_libworker_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la
+
+workers_gearbox_workerGearbox_SOURCES = workers/gearbox/workerGearboxMain.cc
+workers_gearbox_workerGearbox_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
+workers_gearbox_workerGearbox_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la workers/gearbox/libworker_gearbox.la
+
+workers_gearbox_delayDaemon_SOURCES = workers/gearbox/delayDaemon.cc
+workers_gearbox_delayDaemon_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
+workers_gearbox_delayDaemon_LDADD = workers/gearbox/libworker_gearbox.la
+
 ###############################################
 ### gearbox/swig/perl
 ###############################################
@@ -244,3 +274,4 @@ CLEANFILES += \
 	gearbox/swig/php/php_SwigGearbox.h \
 	$(NULL)
 endif
+
