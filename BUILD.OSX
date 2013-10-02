@@ -13,6 +13,9 @@ brew edit gearman
 brew install gearman
 brew install soci --with-mysql --with-boost
 brew install swig
+brew install pkg-config
+brew install yajl
+brew install curl
 sudo cpan install Archive::Tar
 sudo cpan install Test::Trivial
 sudo cpan install JSON
@@ -21,7 +24,7 @@ sudo cpan install Log::Dispatch
 INIT
 ====
 export PATH=/usr/local/Cellar/ccache/3.1.9/libexec:$PATH
-export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/opt/ossp-uuid/lib/pkgconfig
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/opt/ossp-uuid/lib/pkgconfig:/usr/local/Cellar/curl/7.32.0/lib/pkgconfig/
 ./autogen.sh
 ./configure
 
