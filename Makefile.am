@@ -305,3 +305,12 @@ CLEANFILES += \
 	$(NULL)
 endif
 
+###############################################
+### apache module mod_gearbox
+###############################################
+lib_LTLIBRARIES+=apache/mod_gearbox/mod_gearbox.la
+
+apache_mod_gearbox_mod_gearbox_la_CXXFLAGS = ${APACHE_CFLAGS}
+apache_mod_gearbox_mod_gearbox_la_LDFLAGS = ${APR_LDFLAGS} -module
+apache_mod_gearbox_mod_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la
+apache_mod_gearbox_mod_gearbox_la_SOURCES = apache/mod_gearbox/mod_gearbox.cc

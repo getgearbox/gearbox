@@ -3,6 +3,16 @@
 
 #include <gearbox/core/ConfigFile.h>
 
+#ifdef HAVE_CONFIG_H
+// Apache's ap_config_auto.h and gearbox's config.h conflict.
+// This is questionable workaround.  Alternatives?
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
+#endif
+
 #define LOGCAT "gearbox.httpd"
 #include <gearbox/core/logger.h>
 #include "log4cxx/propertyconfigurator.h"
@@ -166,7 +176,7 @@ static const char *cmd_gearbox_config_file(cmd_parms *cmd, void *mconfig, const 
         }
         std::string subpath = path.substr(0,ix);
         char * path_prefix = (char*)apr_pcalloc(cmd->pool, sizeof(char) * subpath.size() + 1);
-        strlcpy(path_prefix, subpath.c_str(), subpath.size()+1);
+        Gearbox::strlcpy(path_prefix, subpath.c_str(), subpath.size()+1);
         cfg->path_prefix = path_prefix;
         break;
     }
