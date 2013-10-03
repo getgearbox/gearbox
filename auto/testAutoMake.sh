@@ -93,6 +93,17 @@ ${name}_SOURCES=$test
 EOF
 done
 
+addTests plugins/status/t/sql
+for test in plugins/status/t/sql/*.t.cc; do
+    name=$(amName $test)
+    cat <<EOF
+${name}_CXXFLAGS=${test_CXXFLAGS} -DTESTDIR='"\$(abs_top_srcdir)/plugins/status/t/sql"'
+${name}_LDADD=\$(LIBTAP) gearbox/job/libgearbox_job.la gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la
+${name}_SOURCES=$test
+
+EOF
+done
+
 cat <<EOF
 check_LTLIBRARIES += common/stub/libgearman_stub.la
 common_stub_libgearman_stub_la_CXXFLAGS = ${test_CXXFLAGS} \$(LOG4CXX_CFLAGS)

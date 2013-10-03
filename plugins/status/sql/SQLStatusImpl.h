@@ -14,8 +14,8 @@ extern "C" {
 
 namespace Gearbox {
     class SQLStatusImpl : public StatusImplV1 {
-        typedef StatusImplV1 super;
     public:
+        typedef StatusImplV1 super;
         SQLStatusImpl(const ConfigFile & cfg);
 
         SQLStatusImpl(const SQLStatusImpl &);

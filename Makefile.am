@@ -314,3 +314,13 @@ apache_mod_gearbox_mod_gearbox_la_CXXFLAGS = ${APACHE_CFLAGS}
 apache_mod_gearbox_mod_gearbox_la_LDFLAGS = ${APR_LDFLAGS} -module
 apache_mod_gearbox_mod_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la
 apache_mod_gearbox_mod_gearbox_la_SOURCES = apache/mod_gearbox/mod_gearbox.cc
+
+###############################################
+### plugins/status/sql
+###############################################
+lib_LTLIBRARIES+=plugins/status/sql/sql_status.la
+
+plugins_status_sql_sql_status_la_LDFLAGS = $(BOOST_LDFLAGS) $(SOCI_CORE_LIB) -module
+plugins_status_sql_sql_status_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
+
+plugins_status_sql_sql_status_la_SOURCES = plugins/status/sql/SQLStatusImpl.cc

@@ -28,14 +28,14 @@ HttpClient::GET(const Uri & uri, std::string & content ) {
     oss << uri.scheme() << "://" << uri.hostname() << '_' << uri.port() << "/" << path;
     std::string url = oss.str();
 
-    bfs::path infile = bfs::path("get") / bfs::path( url.substr(url.find('/',6)+1 ), bfs::no_check );
+    bfs::path infile = bfs::path("get") / bfs::path( url.substr(url.find('/',6)+1 ));
     
     if( bfs::exists(infile) && bfs::is_directory(infile) ) {
         infile /= "index";
     }
     if( ! bfs::exists(infile) ) {
         // if not in ./get look in ./put to see if we just "uploaded" it
-        infile = bfs::path("put") / bfs::path( url.substr(url.find('/',6)+1 ), bfs::no_check );
+        infile = bfs::path("put") / bfs::path( url.substr(url.find('/',6)+1 ));
         if( !bfs::exists(infile) ) {
             // if this is a status, just make up a success response
 
@@ -76,13 +76,13 @@ HttpClient::GET(const Uri & uri, const boost::filesystem::path & file ) {
     oss << uri.scheme() << "://" << uri.hostname() << '_' << uri.port() << "/" << uri.path();
     std::string url = oss.str();
 
-    bfs::path infile = bfs::path("get") / bfs::path( url.substr(url.find('/',6)+1 ), bfs::no_check );
+    bfs::path infile = bfs::path("get") / bfs::path( url.substr(url.find('/',6)+1 ));
     if( bfs::exists(infile) && bfs::is_directory(infile) ) {
         infile /= "index";
     }
     if( ! bfs::exists(infile) ) {
         // if not in ./get look in ./put to see if we just "uploaded" it
-        infile = bfs::path("put") / bfs::path( url.substr(url.find('/',6)+1 ), bfs::no_check );
+        infile = bfs::path("put") / bfs::path( url.substr(url.find('/',6)+1 ));
         if( !bfs::exists(infile) ) {
             return HttpResponse(404);
         }

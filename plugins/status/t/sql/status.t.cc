@@ -1,24 +1,27 @@
 // Copyright (c) 2012, Yahoo! Inc.  All rights reserved.
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
-    #include <tap/trivial.h>
+#include <tap/trivial.h>
 
 #include <gearbox/core/logger.h>
 #include <gearbox/core/util.h>
 #include <gearbox/store/dbconn.h>
 #include <gearbox/job/StatusManager.h>
-#include <gearbox/scoreboard/Scoreboard.h>
 #include <gearbox/core/Errors.h>
 #include <stub/GET.hh>
+#include <libgen.h>
+#include <unistd.h>
 
 using namespace Gearbox;
-
-int main() {
+int main(int argc, char *argv[]) {
     TEST_START(125);
-    log_init( UNITPREFIX "unit.conf");
+
+    std::string basedir = std::string(dirname(argv[0])) + "/../";
+    chdir(basedir.c_str());
+
+    log_init("unit.conf");
     OK( run("./mkdb") == 0 );
-    ConfigFile cfg(UNITPREFIX "unit.conf");
-    Scoreboard::initialize(cfg);
+    ConfigFile cfg("unit.conf");
     db_init( cfg.get_json("status"), "status");
 
     // SQL backed status tests
