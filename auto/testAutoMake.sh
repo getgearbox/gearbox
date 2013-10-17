@@ -98,6 +98,7 @@ for test in plugins/status/t/sql/*.t.cc; do
     name=$(amName $test)
     cat <<EOF
 ${name}_CXXFLAGS=${test_CXXFLAGS} -DTESTDIR='"\$(abs_top_srcdir)/plugins/status/t/sql"'
+${name}_LDFLAGS=\$(BOOST_SYSTEM_LIB)
 ${name}_LDADD=\$(LIBTAP) gearbox/job/libgearbox_job.la gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la
 ${name}_SOURCES=$test
 
