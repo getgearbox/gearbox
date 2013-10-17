@@ -1,0 +1,8 @@
+language: cpp
+
+install:
+  - source BUILD.DEBIAN
+
+script: 
+  - ./configure && make && make check 
+
