@@ -49,7 +49,7 @@ Where options are:
   -f|--file=FILENAME      Json config file to read
   -k|--key=KEY            Key in the config file that has info about daemons
   -s|--service_dir=DIR    Where to store our generated files
-  -S|--supervised_dir=DIR The directory that supervise is monitoring (default /services)
+  -S|--supervised_dir=DIR The directory that supervise is monitoring (default /service)
   -p|--prefix=PREFIX      Prefix to use for naming service entries
   -v|--verbose            Display debugging info
   -h|--help               Print this message
@@ -67,12 +67,12 @@ foo.json
       "user"    : "%{user}"  },
     { "name"    : "gearmand",
       "command" : "/usr/sbin/gearmand"
-// default count is 1 and user is root
+      // default count is 1 and user is root
     }
   ], "other_keys_we_ignore" : "stuff"
 }
 
-$0 --file=foo.json --key=daemons --servicedir=/var/gearbox-svcs --prefix=gearbox-
+$0 --file=foo.json --key=daemons --service_dir=/var/gearbox-svcs --prefix=gearbox-
 EOT
     exit $err;
 }
