@@ -4,5 +4,6 @@ install:
   - source BUILD.DEBIAN
 
 script: 
+  - pwd
   - ./configure && make && make check 
 
