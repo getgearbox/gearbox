@@ -6,5 +6,5 @@ install:
 script: 
   - pwd
   - ls -la
-  - ./configure && make && make check 
+  - ./autogen.sh && ./configure && make && make check 
 
