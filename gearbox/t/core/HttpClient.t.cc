@@ -12,6 +12,26 @@ using namespace Gearbox;
 #include <boost/filesystem/path.hpp>
 namespace bfs=boost::filesystem;
 
+// Drops line if started with :comment_start:
+std::string 
+remove_comments(const std::string & s, const std::string comment_start = "#") {
+    std::string no_comments;
+    std::string line;
+    std::istringstream iss(s);
+
+    while (std::getline(iss, line)) {
+        bool is_comment = (line.size() > 0) && 
+                          (line.substr(0, comment_start.size()) == comment_start);
+
+        if (!is_comment) {
+            no_comments.append(line);
+        }
+    
+    }
+
+    return no_comments;
+}
+
 int main() {
     chdir(TESTDIR);
     TEST_START(53);
@@ -137,7 +157,7 @@ int main() {
     hc.set_cookiejar("./http/requests/cookiejar");
     NOTHROW( hr = hc.GET(uri + "/cookies", result) );
     hc.write_cookiejar();
-    IS( slurp("./http/requests/cookiejar"), slurp("./http/expect/cookiejar") );
+    IS( remove_comments(slurp("./http/requests/cookiejar")), remove_comments(slurp("./http/expect/cookiejar")) );
     
     TEST_END;
 }
