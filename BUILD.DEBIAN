@@ -1,5 +1,23 @@
+#!/bin/bash
+
+function install_boost() {
+    local BOOST=boost_1_54_0
+    local BOOST_OUTPUT=${BOOST}.tar.bz2
+    local BOOST_DOWNLOAD_URL='http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.54.0%2F&ts=1382092729&use_mirror=heanet'
+
+    sudo apt-get install libbz2-dev -y
+    wget --output-document=${BOOST_OUTPUT} ${BOOST_DOWNLOAD_URL}
+    tar --bzip2 -xf ${BOOST_OUTPUT}
+    pushd ${BOOST}
+    ./bootstrap.sh
+    sudo ./b2 --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
+    popd
+}
+
+install_boost
+
 sudo apt-get install cpanminus -y
-sudo apt-get install autoconf libtool libgearman-dev libboost1.53 liblog4cxx10-dev libyajl-dev libcurl4-openssl-dev ccache swig libperl-dev php5-dev -y
+sudo apt-get install autoconf libtool libgearman-dev liblog4cxx10-dev libyajl-dev libcurl4-openssl-dev ccache swig libperl-dev php5-dev -y
 sudo add-apt-repository ppa:jtaylor/jtaylor -y
 sudo apt-get update
 sudo apt-get install libsoci3.1-dev libsoci-core3.1 libsoci-mysql3.1 libsoci-sqlite3-3.1 -y

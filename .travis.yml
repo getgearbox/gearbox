@@ -4,7 +4,5 @@ install:
   - source BUILD.DEBIAN
 
 script: 
-  - pwd
-  - ls -la
   - ./autogen.sh && ./configure && make && make check 
 
