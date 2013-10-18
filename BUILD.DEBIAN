@@ -1,8 +1,78 @@
-sudo apt-get install autoconf libtool libgearman-dev libboost1.53 liblog4cxx10-dev libyajl-dev libcurl4-openssl-dev ccache swig libperl-dev php5-dev
-sudo add-apt-repository ppa:jtaylor/jtaylor
-sudo apt-get update
-sudo apt-get install libsoci3.1-dev libsoci-core3.1 libsoci-mysql3.1 libsoci-sqlite3-3.1
-sudo apt-get install libjson-perl liblog-log4perl-perl liblog-dispatch-perl sqlite3
-sudo cpan install Test::Trivial
+#!/bin/bash
+
+function no_output_execution() {
+    local COMMAND="${*}"
+    local LOGFILE=$(mktemp)
+
+    echo "Executing ${COMMAND}"
+    echo "Please wait..."
+    echo "${COMMAND} > ${LOGFILE} 2>&1" | bash
+    if [ $? -eq 0 ]; then
+        echo "${COMMAND} succeeded"
+        rm -f ${LOGFILE}
+    else
+        echo "${COMMAND} failed"
+        cat ${LOGFILE}
+        rm -f ${LOGFILE}
+        exit 1
+    fi
+}
+
+function install_yajl() {
+    local YAJL_PC_CONTENTS=$( cat <<EOF
+prefix=/usr
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: Yet Another JSON Library
+Description: A Portable JSON parsing and serialization library in ANSI C
+Version: 2.0.1
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -lyajl
+EOF
+    )
+
+    local YAJL_GZ=yajl.tar.gz
+    wget --output-document=${YAJL_GZ} http://github.com/lloyd/yajl/tarball/2.0.1
+    tar -xf ${YAJL_GZ}
+    pushd lloyd-yajl-*
+    no_output_execution ./configure -p /usr
+    no_output_execution make
+    no_output_execution sudo make install
+    popd
+
+    echo "$YAJL_PC_CONTENTS" > yajl.pc
+    sudo cp -f yajl.pc /usr/lib/pkgconfig/yajl.pc
+}
+
+function install_boost() {
+    local BOOST=boost_1_54_0
+    local BOOST_OUTPUT=${BOOST}.tar.bz2
+    local BOOST_DOWNLOAD_URL='http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.54.0%2F&ts=1382092729&use_mirror=heanet'
+
+    no_output_execution sudo apt-get install libbz2-dev -y
+    wget --output-document=${BOOST_OUTPUT} ${BOOST_DOWNLOAD_URL}
+    tar --bzip2 -xf ${BOOST_OUTPUT}
+    pushd ${BOOST}
+    no_output_execution ./bootstrap.sh
+    no_output_execution sudo ./b2 --with-program_options --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
+    popd
+}
+
+no_output_execution sudo apt-get update --fix-missing
+
+install_yajl
+install_boost
+
+no_output_execution sudo apt-get install apache2 apache2-prefork-dev -y
+no_output_execution sudo apt-get install cpanminus -y
+no_output_execution sudo apt-get install autoconf libtool libgearman-dev liblog4cxx10-dev libcurl4-openssl-dev ccache swig libperl-dev php5-dev -y
+no_output_execution sudo add-apt-repository ppa:jtaylor/jtaylor -y
+no_output_execution sudo apt-get update
+no_output_execution sudo apt-get install libsoci3.1-dev libsoci-core3.1 libsoci-mysql3.1 libsoci-sqlite3-3.1 -y
+no_output_execution sudo apt-get install libjson-perl liblog-log4perl-perl liblog-dispatch-perl sqlite3 -y
+
+no_output_execution sudo cpanm HTTP::Daemon
+no_output_execution sudo cpanm Test::Trivial
 
 export PATH=/usr/lib/ccache:$PATH
