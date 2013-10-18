@@ -1,5 +1,20 @@
 #!/bin/bash
 
+function no_output_execution() {
+    local COMMAND="${*}"
+    local LOGFILE=command.log
+
+    echo "Executing ${COMMAND}"
+    echo "${COMMAND} > ${LOGFILE} 2>&1" | bash
+    if [ $? -eq 0 ]; then
+        echo "${COMMAND} succeeded"
+    else
+        echo "${COMMAND} failed"
+        cat ${LOGFILE}
+        exit 1
+    fi
+}
+
 function install_yajl() {
     YAJL_PC_CONTENTS=$( cat <<EOF
 prefix=/usr
@@ -18,10 +33,10 @@ EOF
     sudo cp -f yajl.pc /usr/lib/pkgconfig/yajl.pc
 
     local YAJL_GZ=yajl.tar.gz
-    wget --output-document=${YAJL_GZ} http://github.com/lloyd/yajl/tarball/2.0.1
+    no_output_execution wget --output-document=${YAJL_GZ} http://github.com/lloyd/yajl/tarball/2.0.1
     tar -xf ${YAJL_GZ}
     pushd lloyd-yajl-*
-    ./configure -p /usr && make && sudo make install
+    no_output_execution ./configure -p /usr && make && sudo make install
     popd
 }
 
@@ -31,11 +46,11 @@ function install_boost() {
     local BOOST_DOWNLOAD_URL='http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost%2F1.54.0%2F&ts=1382092729&use_mirror=heanet'
 
     sudo apt-get install libbz2-dev -y
-    wget --output-document=${BOOST_OUTPUT} ${BOOST_DOWNLOAD_URL}
+    no_output_execution wget --output-document=${BOOST_OUTPUT} ${BOOST_DOWNLOAD_URL}
     tar --bzip2 -xf ${BOOST_OUTPUT}
     pushd ${BOOST}
-    ./bootstrap.sh
-    sudo ./b2 --with-program_options --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
+    no_output_execution ./bootstrap.sh
+    no_output_execution sudo ./b2 --with-program_options --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
     popd
 }
 
