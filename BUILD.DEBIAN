@@ -10,7 +10,7 @@ function install_boost() {
     tar --bzip2 -xf ${BOOST_OUTPUT}
     pushd ${BOOST}
     ./bootstrap.sh
-    sudo ./b2 --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
+    sudo ./b2 --with-program_options --with-system --with-iostreams --with-graph --with-filesystem --prefix=/usr install
     popd
 }
 
