@@ -1,7 +1,7 @@
 language: cpp
 
 install:
-  - source BUILD.DEBIAN
+  - ./BUILD.DEBIAN
 
 script: 
   - ./autogen.sh && ./configure && make && make check 
