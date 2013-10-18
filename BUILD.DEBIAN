@@ -1,6 +1,22 @@
 #!/bin/bash
 
 function install_yajl() {
+    YAJL_PC_CONTENTS=$( cat <<EOF
+prefix=/usr
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: Yet Another JSON Library
+Description: A Portable JSON parsing and serialization library in ANSI C
+Version: 2.0.1
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -lyajl
+EOF
+    )
+
+    echo "$YAJL_PC_CONTENTS" > yajl.pc
+    sudo cp -f yajl.pc /usr/lib/pkgconfig/yajl.pc
+
     local YAJL_GZ=yajl.tar.gz
     wget --output-document=${YAJL_GZ} http://github.com/lloyd/yajl/tarball/2.0.1
     tar -xf ${YAJL_GZ}
@@ -28,6 +44,7 @@ sudo apt-get update --fix-missing
 install_yajl
 install_boost
 
+sudo apt-get install apache2 apache2-prefork-dev -y
 sudo apt-get install cpanminus -y
 sudo apt-get install autoconf libtool libgearman-dev liblog4cxx10-dev libcurl4-openssl-dev ccache swig libperl-dev php5-dev -y
 sudo add-apt-repository ppa:jtaylor/jtaylor -y
