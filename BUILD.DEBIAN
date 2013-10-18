@@ -14,6 +14,8 @@ function install_boost() {
     popd
 }
 
+sudo apt-get update --fix-missing
+
 install_boost
 
 sudo apt-get install cpanminus -y
