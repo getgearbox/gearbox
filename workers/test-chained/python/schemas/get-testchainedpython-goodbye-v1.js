@@ -1,0 +1,1 @@
+../../schemas/get-testchained-goodbye-v1.js

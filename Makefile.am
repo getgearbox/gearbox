@@ -61,7 +61,7 @@ CLEANFILES += \
 
 clean-local:
 	-rm -rf deps/PyTAP/
-	-find . -type d '.test-handler.d' -print0 | \
+	-find . -type d -name '.test-handlers.d' -print0 | \
 		xargs --no-run-if-empty --verbose --null rm -rv
 
 distclean-local:
@@ -391,13 +391,21 @@ install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync
+#
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-agents-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-basic-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-cancel-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync-perl
+#
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-agents-python
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-basic-python
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-cancel-python
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained-python
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay-python
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync-python
+#
 	$(mkinstalldirs) $(DESTDIR)/var/log/gearbox
 
 bin_PROGRAMS+=workers/test-basic/workerTestBasic
@@ -438,6 +446,10 @@ dist_schemapkgdata_DATA += \
 	workers/test-agents/perl/schemas/get-testagentsperl-thing-v1.js \
 	workers/test-agents/perl/schemas/delete-testagentsperl-thing-v1.js \
 	workers/test-agents/perl/schemas/create-testagentsperl-thing-v1.js \
+	workers/test-agents/python/schemas/get-testagentspython-thing-v1.js \
+	workers/test-agents/python/schemas/delete-testagentspython-thing-v1.js \
+	workers/test-agents/python/schemas/create-testagentspython-thing-v1.js \
+	\
 	workers/test-basic/schemas/update-testbasic-thing-v1.js \
 	workers/test-basic/schemas/get-testbasic-thing-v1.js \
 	workers/test-basic/schemas/delete-testbasic-thing-v1.js \
@@ -450,10 +462,14 @@ dist_schemapkgdata_DATA += \
 	workers/test-basic/python/schemas/get-testbasicpython-thing-v1.js \
 	workers/test-basic/python/schemas/delete-testbasicpython-thing-v1.js \
 	workers/test-basic/python/schemas/create-testbasicpython-thing-v1.js \
+	\
 	workers/test-cancel/schemas/update-testcancel-thing-v1.js \
 	workers/test-cancel/schemas/create-testcancel-continuation-v1.js \
 	workers/test-cancel/perl/schemas/update-testcancelperl-thing-v1.js \
 	workers/test-cancel/perl/schemas/create-testcancelperl-continuation-v1.js \
+	workers/test-cancel/python/schemas/update-testcancelpython-thing-v1.js \
+	workers/test-cancel/python/schemas/create-testcancelpython-continuation-v1.js \
+	\
 	workers/test-chained/schemas/get-testchained-thing-v1.js \
 	workers/test-chained/schemas/get-testchained-hello-v1.js \
 	workers/test-chained/schemas/get-testchained-hello1-v1.js \
@@ -474,12 +490,27 @@ dist_schemapkgdata_DATA += \
 	workers/test-chained/perl/schemas/create-testchainedperl-service2-v1.js \
 	workers/test-chained/perl/schemas/create-testchainedperl-hello2-v1.js \
 	workers/test-chained/perl/schemas/create-testchainedperl-goodbye-v1.js \
+	workers/test-chained/python/schemas/get-testchainedpython-thing-v1.js \
+	workers/test-chained/python/schemas/get-testchainedpython-hello-v1.js \
+	workers/test-chained/python/schemas/get-testchainedpython-hello1-v1.js \
+	workers/test-chained/python/schemas/get-testchainedpython-goodbye-v1.js \
+	workers/test-chained/python/schemas/delete-testchainedpython-thing-v1.js \
+	workers/test-chained/python/schemas/delete-testchainedpython-service2-v1.js \
+	workers/test-chained/python/schemas/create-testchainedpython-thing-v1.js \
+	workers/test-chained/python/schemas/create-testchainedpython-service2-v1.js \
+	workers/test-chained/python/schemas/create-testchainedpython-hello2-v1.js \
+	workers/test-chained/python/schemas/create-testchainedpython-goodbye-v1.js \
+	\
 	workers/test-delay/schemas/get-testdelay-counter-v1.js \
 	workers/test-delay/schemas/delete-testdelay-counter-v1.js \
 	workers/test-delay/schemas/create-testdelay-counter-v1.js \
 	workers/test-delay/perl/schemas/get-testdelayperl-counter-v1.js \
 	workers/test-delay/perl/schemas/delete-testdelayperl-counter-v1.js \
 	workers/test-delay/perl/schemas/create-testdelayperl-counter-v1.js \
+	workers/test-delay/python/schemas/get-testdelaypython-counter-v1.js \
+	workers/test-delay/python/schemas/delete-testdelaypython-counter-v1.js \
+	workers/test-delay/python/schemas/create-testdelaypython-counter-v1.js \
+	\
 	workers/test-sync/schemas/update-testsync-thing-v1.js \
 	workers/test-sync/schemas/get-testsync-thing-v1.js \
 	workers/test-sync/schemas/delete-testsync-thing-v1.js \
@@ -488,8 +519,11 @@ dist_schemapkgdata_DATA += \
 	workers/test-sync/perl/schemas/get-testsyncperl-thing-v1.js \
 	workers/test-sync/perl/schemas/delete-testsyncperl-thing-v1.js \
 	workers/test-sync/perl/schemas/create-testsyncperl-thing-v1.js \
+	workers/test-sync/python/schemas/update-testsyncpython-thing-v1.js \
+	workers/test-sync/python/schemas/get-testsyncpython-thing-v1.js \
+	workers/test-sync/python/schemas/delete-testsyncpython-thing-v1.js \
+	workers/test-sync/python/schemas/create-testsyncpython-thing-v1.js \
 	$(NULL)
-
 
 initdsysconfdir = ${sysconfdir}/init.d/
 dist_initdsysconf_DATA = \
@@ -504,7 +538,13 @@ dist_bin_SCRIPTS = \
 	workers/test-chained/perl/workerTestChained.pl \
 	workers/test-delay/perl/workerTestDelay.pl \
 	workers/test-sync/perl/workerTestSync.pl \
+	\
+	workers/test-agents/python/workerTestAgents.py \
 	workers/test-basic/python/workerTestBasic.py \
+	workers/test-cancel/python/workerTestCancel.py \
+	workers/test-chained/python/workerTestChained.py \
+	workers/test-delay/python/workerTestDelay.py \
+	workers/test-sync/python/workerTestSync.py \
 	$(NULL)
 
 dist_gbsysconf_DATA += \
@@ -512,17 +552,28 @@ dist_gbsysconf_DATA += \
 	workers/test-agents/conf/test-agents-agents.conf \
 	workers/test-agents/perl/conf/test-agents-perl.conf \
 	workers/test-agents/perl/conf/test-agents-perl-agents.conf \
+	workers/test-agents/python/conf/test-agents-python.conf \
+	workers/test-agents/python/conf/test-agents-python-agents.conf \
+	\
 	workers/test-basic/conf/test-basic.conf \
 	workers/test-basic/perl/conf/test-basic-perl.conf \
-	workers/test-basic/python/conf/test-basic-py.conf \
+	workers/test-basic/python/conf/test-basic-python.conf \
+	\
 	workers/test-cancel/conf/test-cancel.conf \
 	workers/test-cancel/perl/conf/test-cancel-perl.conf \
+	workers/test-cancel/python/conf/test-cancel-python.conf \
+	\
 	workers/test-chained/conf/test-chained.conf \
 	workers/test-chained/perl/conf/test-chained-perl.conf \
+	workers/test-chained/python/conf/test-chained-python.conf \
+	\
 	workers/test-delay/conf/test-delay.conf \
 	workers/test-delay/perl/conf/test-delay-perl.conf \
+	workers/test-delay/python/conf/test-delay-python.conf \
+	\
 	workers/test-sync/conf/test-sync.conf \
 	workers/test-sync/perl/conf/test-sync-perl.conf \
+	workers/test-sync/python/conf/test-sync-python.conf \
 	$(NULL)
 
 workers/.test-handlers.d/%:
@@ -531,20 +582,28 @@ workers/.test-handlers.d/%:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/WorkerTestCancel.cc && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/WorkerTestChained.cc && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/WorkerTestDelay.cc && \
-	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/WorkerTestSync.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/WorkerTestSync.cc
+
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-agents/perl/workerTestAgents.pl && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/perl/workerTestBasic.pl && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/perl/workerTestCancel.pl && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/perl/workerTestChained.pl && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/perl/workerTestDelay.pl && \
-	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/perl/workerTestSync.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/perl/workerTestSync.pl
+
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-agents/php/workerTestAgents.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/php/workerTestBasic.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/php/workerTestCancel.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/php/workerTestChained.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/php/workerTestDelay.php && \
-	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php && \
-	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/python/workerTestBasic.py
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php
+
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-agents/python/workerTestAgents.py && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/python/workerTestBasic.py && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/python/workerTestCancel.py && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/python/workerTestChained.py && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/python/workerTestDelay.py && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/python/workerTestSync.py
 
 testhandlersdir = ${sysconfdir}/gearbox/test-workers-handlers.d/
 dist_testhandlers_DATA = workers/.test-handlers.d/*
@@ -623,6 +682,11 @@ gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig
 	echo 'class GearboxError extends Exception {\n  function getName() { return $$this->name; }\n}\n' >> gearbox/swig/php/GearboxErrors.php
 	cat gearbox/core/Errors.h | $(PERL_BIN) -ne 's/DEFINE_ERROR\((\w+),(\d+)\);/class ERR_$$1 extends GearboxError {\n  protected \$$name = "$$1";\n  public function __construct(\$$message) {\n    parent::__construct("ERR_$$1: ".\$$message,$$2);\n  }\n}\n\nclass ERR_CODE_$$2 extends ERR_$$1 {}\n/ && print' >> gearbox/swig/php/GearboxErrors.php
 	echo "?>" >> gearbox/swig/php/GearboxErrors.php
+else
+# hack so "make dist" is happy when we disable php
+gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h:
+	touch $@
+endif
 
 CLEANFILES += \
 	gearbox/swig/php/SwigGearbox.php \
@@ -631,11 +695,6 @@ CLEANFILES += \
 	gearbox/swig/php/SwigGearbox_wrap.h \
 	gearbox/swig/php/php_SwigGearbox.h \
 	$(NULL)
-else
-# hack so "make dist" is happy when we disable php
-gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h:
-	touch $@
-endif
 
 ###############################################
 ### gearbox/swig/python
@@ -700,17 +759,27 @@ dist_gbconflogger_DATA += apache/mod_gearbox/httpd-logger.conf
 dist_apacheconfd_DATA += \
 	workers/test-agents/conf/httpd-test-agents.conf \
 	workers/test-agents/perl/conf/httpd-test-agents-perl.conf \
+	workers/test-agents/python/conf/httpd-test-agents-python.conf \
+	\
 	workers/test-basic/conf/httpd-test-basic.conf \
 	workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
-	workers/test-basic/python/conf/httpd-test-basic-py.conf \
+	workers/test-basic/python/conf/httpd-test-basic-python.conf \
+	\
 	workers/test-cancel/conf/httpd-test-cancel.conf \
 	workers/test-cancel/perl/conf/httpd-test-cancel-perl.conf \
+	workers/test-cancel/python/conf/httpd-test-cancel-python.conf \
+	\
 	workers/test-chained/conf/httpd-test-chained.conf \
 	workers/test-chained/perl/conf/httpd-test-chained-perl.conf \
+	workers/test-chained/python/conf/httpd-test-chained-python.conf \
+	\
 	workers/test-delay/conf/httpd-test-delay.conf \
 	workers/test-delay/perl/conf/httpd-test-delay-perl.conf \
+	workers/test-delay/python/conf/httpd-test-delay-python.conf \
+	\
 	workers/test-sync/conf/httpd-test-sync.conf \
 	workers/test-sync/perl/conf/httpd-test-sync-perl.conf \
+	workers/test-sync/python/conf/httpd-test-sync-python.conf \
 	$(NULL)
 
 ###############################################

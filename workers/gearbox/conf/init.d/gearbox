@@ -6,6 +6,8 @@
 # Get function from functions library
 . /etc/init.d/functions
 
+BASEDIR=/var/gearbox/gearbox-workers
+
 export PATH=$PATH:/command
 create() {
     # separate out create into it's own function and call it at rpm install
@@ -16,7 +18,7 @@ create() {
     gearbox-svc-builder --file=/etc/gearbox/gearbox.conf \
                         --key=daemons \
                         --prefix=gearbox- \
-                        --service_dir=/var/gearbox/gearbox-workers
+                        --service_dir=$BASEDIR
 }
 
 start() {
@@ -24,51 +26,62 @@ start() {
     # files have changed
     create
 
-    # if we stopped it with svc -d (in the stop function below) start it
-    # with svc -u
-    svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
-    # when grep matches it returns 0, when it doesn't match it returns nonzero
-    if [[ $? -eq 0 ]]; then
-        action "Waiting for svscan to spawn supervise for new services" sleep 5
-        action "Starting gearbox services: " \
-            svc -u /var/gearbox/gearbox-workers/*
+    # if we stopped it with svc -d (in the stop function) start it with svc -u
+    if svstat $BASEDIR/* | grep -q down; then
+        action "Waiting 5 secs for svscan to spawn supervise for new services" \
+            sleep 5
+        action "Starting gearbox services: " svc -u $BASEDIR/*
     fi
 }
 
 status() {
     shopt -s nullglob
-    workers=(/var/gearbox/gearbox-workers/*)
+    workers=($BASEDIR/*)
+
     if [ ${#workers[@]} -gt 0 ]; then
-        svstat ${workers[*]}
+        svstat ${workers[*]} | grep -q down
+        SV_STATUS=$?
+        if [[ $SV_STATUS -eq 0 ]]; then
+            echo "worker(s) down..."
+            svstat ${workers[*]} | grep down | sed 's/^/    /'
+            exit 1
+        fi
     else
-        echo "no files in /var/gearbox/gearbox-workers..."
+        echo "no files in $BASEDIR..."
         exit 1
     fi
 }
 
 stop() {
-    action "Stopping gearbox services: " svc -d /var/gearbox/gearbox-workers/*
+    shopt -s nullglob
+    workers=($BASEDIR/*)
+    if [ ${#workers[@]} -gt 0 ]; then
+        action "Stopping gearbox services: " svc -d ${workers[*]}
+    else
+        echo "no files in $BASEDIR..."
+        exit 1
+    fi
 }
 
 delete() {
-    # check if services are in starting mode. We need to allow them to start
-    # completely for cleanup in delete operation
-    svstat /var/gearbox/gearbox-workers/* | grep "unable to open supervise" 2>&1 > /dev/null
-
-    # if any service is not created completely, we would wait for them to be created
-    if [[ $? -eq 0 ]]; then
-        action "Waiting for supervise to be spawned for new services" sleep 5
+    # check if services are in starting mode. We need to allow them to
+    # start completely for cleanup in delete operation
+    if svstat $BASEDIR/* | \
+        grep -q "unable to open supervise"; then
+        # any service is not created completely, wait for them to be created
+        action  "Waiting 5 secs for supervise to be spawned for new services" \
+            sleep 5
     fi
 
     # Create an empty daemons json string
     echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
 
     action "Deleting gearbox services: " \
-    gearbox-svc-builder --file=/tmp/empty-daemons.conf \
-                        --key=daemons \
-                        --prefix=gearbox- \
-                        --service_dir=/var/gearbox/gearbox-workers
-    rm /tmp/empty-daemons.conf
+        gearbox-svc-builder --file=/tmp/empty-daemons.conf \
+                --key=daemons \
+                --prefix=gearbox- \
+                --service_dir=$BASEDIR
+    rm -f /tmp/empty-daemons.conf
 }
 
 case "$1" in
@@ -86,6 +99,7 @@ case "$1" in
         ;;
     restart|reload)
         stop
+        sleep 1
         start
         ;;
     status)

@@ -180,10 +180,10 @@ case "$1" in
         ;;
   restart|reload)
         stop
+        sleep 1
         start
         ;;
   *)
         echo $"Usage: $0 {create|start|stop|restart|reload|delete|status}"
         exit 1
 esac
-exit 0
