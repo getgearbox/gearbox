@@ -2,6 +2,8 @@
     %module(directors="1") SwigGearbox
 #elif defined(SWIGPERL)
     %module Gearbox
+#elif defined(SWIGPYTHON)
+    %module(directors="1") gearbox
 #endif
 
 %{
@@ -22,15 +24,17 @@ using namespace Gearbox;
   %include "./php/php.i"
 #elif defined(SWIGPERL)
   %include "./perl/perl.i"
+#elif defined(SWIGPYTHON)
+  %include "./python/python.i"
 #else
-  #error "only php or perl languages are supported!"
+  #error "only php, perl and python languages are supported!"
 #endif
 
 // ignore these since they arent needed and conflict with php
 %ignore operator =;
 
 #if __WORDSIZE == 64
-typedef long int		int64_t;
+typedef long int        int64_t;
 #else
 typedef long long int   int64_t;
 #endif
@@ -95,4 +99,6 @@ class SwigWorker {
   %include "./perl/perlworker.i"
 #elif defined(SWIGPHP)
   %include "./php/phpworker.i"
+#elif defined(SWIGPYTHON)
+  %include "./python/pythonworker.i"
 #endif

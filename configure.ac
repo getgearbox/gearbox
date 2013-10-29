@@ -119,6 +119,7 @@ AC_CHECK_LIB([soci_core], [main], [
 
 
 AC_PROG_SWIG(2.0.0)
+SWIG_ENABLE_CXX
 
 # perl stuff
 AC_PATH_PROG([PERL_BIN], [perl])
@@ -144,6 +145,10 @@ AC_ARG_WITH([php], AS_HELP_STRING([--with-php], [enable building with php]), [
   PHP_LDFLAGS=`${PHP_CONFIG} --ldflags`
 ],[])
 AM_CONDITIONAL([WITH_PHP], [test x$with_php = xtrue])
+
+# python stuff
+SWIG_PYTHON
+
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])

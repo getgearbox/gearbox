@@ -14,7 +14,39 @@ while( $Errors =~ /DEFINE_ERROR\((\w+),(\d+)\)/g ) {
     $CODE{$1} = $2;
 }
 
-print <<EOM;
+if ($ARGV[0] eq "python") {
+    genPythonErrors();
+} else {
+    genPerlErrors();
+}
+
+
+sub genPythonErrors {
+    print <<EOM;
+class Error(Exception):
+    def __init__(self, msg, code, name):
+        self.msg = msg
+        self.name = name
+        self.code = code
+        super(Error, self).__init__(msg)
+
+EOM
+
+    for my $class (@ERR) {
+        print <<EOM;
+class ERR_$class(Error):
+    def __init__(self, msg):
+        return super(ERR_$class, self).__init__(msg, $CODE{$class}, "$class")
+
+class ERR_CODE_$CODE{$class}(ERR_$class):
+    pass
+
+EOM
+    }
+}
+
+sub genPerlErrors {
+    print <<EOM;
 package Gearbox::Error;
 use overload
     '""' => \\&msg,
@@ -30,8 +62,8 @@ sub msg { shift->{msg} }
 
 EOM
 
-for my $class (@ERR) {
-    print <<EOM;
+    for my $class (@ERR) {
+        print <<EOM;
 package ERR_$class;
 use base qw(Gearbox::Error);
 sub new { return \$_[0]->SUPER::new("$class",$CODE{$class},"ERR_$class: \$_[1]") }
@@ -40,6 +72,7 @@ package ERR_CODE_$CODE{$class};
 use base qw(ERR_$class);
 
 EOM
-}
+    }
 
-print "1;\n";
+    print "1;\n";
+}

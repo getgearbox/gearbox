@@ -134,4 +134,12 @@ echo
 echo "TESTS += \$(gearbox_t_swig_php_TESTS)"
 echo "endif"
 
+echo "gearbox_t_swig_python_TESTS = \\"
+for test in gearbox/t/swig/python/*.t; do
+    echo "    ${test} \\"
+done
+echo "    \$(NULL)"
+echo
+echo "TESTS += \$(gearbox_t_swig_python_TESTS)"
+
 echo "export PATH=$PATH:\$(abs_top_srcdir)/bin"
