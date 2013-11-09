@@ -9,7 +9,7 @@ use IO::Socket::INET;
 
 my %opts;
 GetOptions(
-    'config' => \$opts{config}, 
+    'config=s' => \$opts{config}, 
     'all'  => \$opts{all}, # how all worker functions, even those not running
     'pending' => \$opts{pending}, # pending only
     'delay' => \$opts{delay}, # delay only
