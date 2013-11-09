@@ -18,15 +18,20 @@ deps/libtap++-0.01/tap++.C:
 # need bogus -rpath to force shared library
 deps_libtap___0_01_libtap___la_LDFLAGS = -rpath /dev/null
 deps_libtap___0_01_libtap___la_SOURCES = \
-	libtap++-0.01/tap++.h \
+	deps/libtap++-0.01/tap++.h \
 	deps/libtap++-0.01/tap++.C
 
-check_HEADERS =
+dist_check_SCRIPTS =
 if WITH_PHP
-test-more-php/Test-More-OO.php: deps/Test-More-PHP-0.2.tar.gz
+deps/test-more-php/Test-More-OO.php: deps/Test-More-PHP-0.2.tar.gz
 	cd deps && tar xzf Test-More-PHP-0.2.tar.gz
 
-check_HEADERS += test-more-php/Test-More-OO.php
+dist_check_SCRIPTS += deps/test-more-php/Test-More-OO.php
+else
+# hack so "make dist" is happy when we disable php
+deps/test-more-php/Test-More-OO.php:
+	mkdir -p deps/test-more-php/
+	touch $@
 endif
 
 deps/PyTAP.tar.gz:
@@ -34,7 +39,7 @@ deps/PyTAP.tar.gz:
 
 deps/PyTAP: deps/PyTAP.tar.gz
 	cd deps && tar xfz PyTAP.tar.gz && mv rjbs-PyTAP-48060b1 PyTAP
-check_HEADERS += deps/PyTAP
+dist_check_SCRIPTS += deps/PyTAP
 
 check_LTLIBRARIES = $(LIBTAP)
 check_PROGRAMS =
@@ -256,11 +261,10 @@ gearbox_swig_perl_libGearbox_la_CXXFLAGS = $(filter-out $(PERL_ARCH),$(PERL_CFLA
 gearbox_swig_perl_libGearbox_la_LDFLAGS = -avoid-version -shared $(filter-out $(PERL_ARCH),$(PERL_LDFLAGS))
 gearbox_swig_perl_libGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
 gearbox_swig_perl_libGearbox_la_includes = \
-    gearbox/swig/perl/SwigGearbox_wrap.h \
 	gearbox/swig/SwigWorker.h \
     $(NULL)
 
-gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_includes) \
+gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_la_includes) \
 	gearbox/swig/perl/SwigGearbox_wrap.cc \
 	gearbox/swig/SwigWorker.cc \
     $(NULL)
@@ -286,11 +290,12 @@ gearbox_swig_php_SwigGearbox_la_LDFLAGS = -module -avoid-version -shared $(PHP_L
 gearbox_swig_php_SwigGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
 gearbox_swig_php_SwigGearbox_la_includes = \
     gearbox/swig/php/php_SwigGearbox.h \
-	gearbox/swig/SwigGearbox_wrap.h \
+	gearbox/swig/php/php_Json_helper.h \
+	gearbox/swig/php/SwigGearbox_wrap.h \
 	gearbox/swig/SwigWorker.h \
     $(NULL)
 
-gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_libGearbox_includes) \
+gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_SwigGearbox_la_includes) \
 	gearbox/swig/php/SwigGearbox_wrap.cc \
 	gearbox/swig/SwigWorker.cc \
     $(NULL)
@@ -312,6 +317,10 @@ CLEANFILES += \
 	gearbox/swig/php/SwigGearbox_wrap.h \
 	gearbox/swig/php/php_SwigGearbox.h \
 	$(NULL)
+else
+# hack so "make dist" is happy when we disable php
+gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h:
+	touch $@
 endif
 
 ###############################################
@@ -327,7 +336,7 @@ gearbox_swig_python__gearbox_la_includes = \
 	gearbox/swig/SwigWorker.h \
     $(NULL)
 
-gearbox_swig_python__gearbox_la_SOURCES = $(gearbox_swig_python_libGearbox_includes) \
+gearbox_swig_python__gearbox_la_SOURCES = $(gearbox_swig_python__gearbox_la_includes) \
     gearbox/swig/python/SwigGearbox_wrap.cc \
 	gearbox/swig/SwigWorker.cc \
     $(NULL)
@@ -369,4 +378,21 @@ lib_LTLIBRARIES+=plugins/status/sql/sql_status.la
 plugins_status_sql_sql_status_la_LDFLAGS = $(BOOST_LDFLAGS) $(SOCI_CORE_LIB) -module
 plugins_status_sql_sql_status_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
 
-plugins_status_sql_sql_status_la_SOURCES = plugins/status/sql/SQLStatusImpl.cc
+plugins_status_sql_sql_status_la_SOURCES = \
+	plugins/status/sql/SQLStatusImpl.cc \
+	plugins/status/sql/SQLStatusImpl.h
+
+EXTRA_DIST = \
+	LICENSE \
+	LICENSE.Artistic \
+	autogen.sh \
+	auto/testAutoMake.sh \
+	gearbox/swig/perl/perl.i \
+	gearbox/swig/perl/perlworker.i \
+	gearbox/swig/php/php.i \
+	gearbox/swig/php/phpworker.i \
+	gearbox/swig/python/errors.i \
+	gearbox/swig/python/python.i \
+	gearbox/swig/python/pythonworker.i \
+	gearbox/swig/SwigGearbox.i \
+	gearbox/swig/perl/genErrors
