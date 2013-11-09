@@ -1,44 +1,60 @@
-# code from mod_auth_openid (https://github.com/timfel/mod_auth_openid/)
-# which in turn has
-# some code taken from mod_python's (http://www.modpython.org/) configure.in
+# ===========================================================================
+#       http://www.gnu.org/software/autoconf-archive/ax_with_apxs.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_WITH_APXS([value-if-not-found], [path])
+#
+# DESCRIPTION
+#
+#   Locates an installed apxs binary, placing the result in the precious
+#   variable $APXS. Accepts a preset $APXS, then --with-apxs, and failing
+#   that searches for apxs in the given path (which defaults to the system
+#   path). If apxs is found, $APXS is set to the full path of the binary;
+#   otherwise it is set to VALUE-IF-NOT-FOUND, which defaults to apxs.
+#
+#   Example:
+#
+#     AX_WITH_APXS(missing)
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Dustin J. Mitchell <dustin@cs.uchicago.edu>
+#
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
+
+#serial 10
 
 AC_DEFUN([AX_WITH_APXS],
 [
+  AC_ARG_VAR([APXS])
 
-# check for --with-apxs
-AC_MSG_CHECKING(for --with-apxs)
-AC_ARG_WITH(apxs, AC_HELP_STRING([--with-apxs=PATH], [Path to apxs]),
-[
-  if test -x "$withval"
+  dnl unless APXS was supplied to us (as a precious variable)
+  if test -z "$APXS"
   then
-    AC_MSG_RESULT([$withval executable, good])
-    APXS=$withval
-  else
-    echo
-    AC_MSG_ERROR([$withval not found or not executable])
-  fi
-],
-AC_MSG_RESULT(no))
-
-# find apxs
-if test -z "$APXS"; then
-  AC_PATH_PROGS([APXS],[apxs2 apxs],[false],[${PATH}:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin])
-  test "${APXS}" = "false" && AC_MSG_ERROR([failed to find apxs. Try using --with-apxs])
-fi
-
-  # check Apache version
-  AC_MSG_CHECKING(Apache version)
-  HTTPD="`${APXS} -q SBINDIR`/`${APXS} -q TARGET`"
-  if test ! -x "$HTTPD"; then
-    AC_MSG_ERROR($APXS says that your apache binary lives at $HTTPD but that file isn't executable.  Specify the correct apxs location with --with-apxs)
-  fi
-  ver=`$HTTPD -v | /usr/bin/awk '/version/ {print $3}' | /usr/bin/awk -F/ '{print $2}'`
-  AC_MSG_RESULT($ver)
-
-  # make sure version begins with 2
-  if test -z "`$HTTPD -v | egrep 'Server version: Apache/2'`"; then
-    AC_MSG_ERROR([mod_auth_openid only works with Apache 2. The one you have seems to be $ver.])
+    AC_MSG_CHECKING(for --with-apxs)
+    AC_ARG_WITH(apxs,
+                AS_HELP_STRING([--with-apxs=APXS],
+                               [absolute path name of apxs executable]),
+                [ if test "$withval" != "yes"
+                  then
+                    APXS="$withval"
+                    AC_MSG_RESULT($withval)
+                  else
+                    AC_MSG_RESULT(no)
+                  fi
+                ],
+                [ AC_MSG_RESULT(no)
+                ])
   fi
 
-AC_SUBST(APXS)
+  dnl if it's still not found, check the paths, or use the fallback
+  if test -z "$APXS"
+  then
+    AC_PATH_PROG([APXS], apxs, m4_ifval([$1],[$1],[apxs]), $2)
+  fi
 ])
