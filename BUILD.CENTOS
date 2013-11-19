@@ -4,7 +4,8 @@ as RHEL 6.3 or CentOS 6.3.
 SETUP
 =====
 sudo yum install -y automake libtool libuuid-devel curl-devel openssl-devel \
-                    perl-devel php-devel boost boost-devel httpd-devel
+                    perl-devel php-devel boost boost-devel httpd-devel \
+                    perl-ExtUtils-Embed
 # these are available from EPEL
 sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3 \
                     libgearman libgearman-devel

@@ -1,0 +1,36 @@
+# vim:ft=automake
+
+rpm-build: common/build/$(PACKAGE).spec clean-rpm
+	$(MAKE) $(AM_MAKEFLAGS) dist
+	@rm -f *.rpm
+	@rm -f ~/rpmbuild/RPMS/x86_64/$(PACKAGE)-$(VERSION)*.rpm
+	@rm -f ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)*.rpm
+	@mkdir -p ~/rpmbuild/BUILD/
+	@mkdir -p ~/rpmbuild/RPMS/i386/
+	@mkdir -p ~/rpmbuild/RPMS/i686/
+	@mkdir -p ~/rpmbuild/RPMS/noarch/
+	@mkdir -p ~/rpmbuild/RPMS/x86_64/
+	@mkdir -p ~/rpmbuild/SOURCES/
+	@mkdir -p ~/rpmbuild/SPECS/
+	@mkdir -p ~/rpmbuild/SRPMS/
+	@cp $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
+	@rpmbuild -ba common/build/$(PACKAGE).spec
+	@cp ~/rpmbuild/RPMS/x86_64/$(PACKAGE)*-$(VERSION)*.rpm .
+	@cp ~/rpmbuild/RPMS/x86_64/mod_gearbox-$(VERSION)*.rpm .
+	@cp ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)*.rpm .
+
+rpm-sign: rpm-build
+	@rpm --addsign *.rpm
+	@rpm --checksig *.rpm
+
+clean-rpm:
+	@rm -f *.tar.gz
+	@rm -f *.src.rpm
+	@rm -f *.rpm
+
+rpm: clean-rpm common/build/$(PACKAGE).spec rpm-build
+
+release: rpm rpm-sign
+
+auto-rpmbuild:
+	@auto-br-rpmbuild -ba common/build/gearbox.spec

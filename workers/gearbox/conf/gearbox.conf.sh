@@ -1,15 +1,17 @@
 #!/bin/sh
 bindir=/usr/bin
-sbindir=/usr/bin
+sbindir=/usr/sbin
 libdir=/usr/lib
 
 [ -n "$gearman_db_type" ] && db_type=$gearman_db_type
 
 if [ "$db_type" = "mysql" ]; then
-    persistence="-q libdrizzle --libdrizzle-user=%{gearman.db_user} --libdrizzle-password=\\\"\$(pw=\\\"%{gearman.db_pass}\\\" && [ \\\"\${pw:0:8}\\\" = \\\"keydb://\\\" ] && keydbgetkey \${pw:8} || echo -n \$pw)\\\" --libdrizzle-db=%{gearman.db_name} --libdrizzle-host=%{gearman.db_host} --libdrizzle-port=%{gearman.db_port} \$([ -n \\\"%{gearman.db_sock}\\\" ] && echo \\\"--libdrizzle-uds=%{gearman.db_sock}\\\") --libdrizzle-table=%{gearman.db_table} --libdrizzle-mysql"
+    persistence="-q mysql --mysql-user=%{gearman.db_user} --mysql-password=%{gearman.db_pass} --mysql-db=%{gearman.db_name} --mysql-host=%{gearman.db_host} --mysql-port=%{gearman.db_port} --mysql-table=%{gearman.db_table}"
 else
-    persistence="-q libsqlite3 --libsqlite3-table=%{gearman.db_table} --libsqlite3-db=%{gearman.db_name}"
+    persistence="-q libsqlite3 --libsqlite3-table=%{gearman.db_table} --libsqlite3-db=%{gearman.db_name} --store-queue-on-shutdown"
 fi
+
+[ -n "$config_dir" ] || config_dir=$ROOT/etc/gearbox/config.d
 
 [ -n "$async_workers" ] || async_workers=2
 [ -n "$sync_workers" ] || sync_workers=10
@@ -28,27 +30,28 @@ cat <<EOF
 {
     "component" : "gearbox",
     "allow_unknown_jobs": $allow_unknown_jobs,
+    "config_dir": "$config_dir",
 
     "daemons" : [{
         "name" : "gearmand",
         "logname" : "%{name}",
-        "command" : "$ENV $sbindir/gearmand -v $persistence --user=%{gearbox.user} --listen=localhost --port=%{gearman.port} --time-order"
+        "command" : "$ENV $sbindir/gearmand --verbose WARNING $persistence --user=%{gearbox.user} --listen=localhost --port=%{gearman.port}"
     }, {
         "name" : "sync-worker",
         "logname": "%{component}",
-        "command" : "$ENV $bindir/workerGearbox --config $ROOT/conf/gearbox/gearbox.conf --no-async --max-requests=5000",
+        "command" : "$ENV $bindir/workerGearbox --config $ROOT/etc/gearbox/gearbox.conf --no-async --max-requests=5000",
         "count" : $sync_workers,
         "user" : "%{gearbox.user}"
     }, {
         "name" : "async-worker",
         "logname": "%{component}",
-        "command" : "$ENV $bindir/workerGearbox --config $ROOT/conf/gearbox/gearbox.conf --no-sync --max-requests=5000",
+        "command" : "$ENV $bindir/workerGearbox --config $ROOT/etc/gearbox/gearbox.conf --no-sync --max-requests=5000",
         "count" : $async_workers,
         "user" : "%{gearbox.user}"
     }, {
         "name" : "delay",
         "logname": "%{name}",
-        "command" : "$ENV $bindir/delayDaemon --config $ROOT/conf/gearbox/gearbox.conf",
+        "command" : "$ENV $bindir/delayDaemon --config $ROOT/etc/gearbox/gearbox.conf",
         "count" : 1,
         "user" : "%{gearbox.user}"
     }]

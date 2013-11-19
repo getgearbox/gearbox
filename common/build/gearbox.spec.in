@@ -1,0 +1,458 @@
+Summary: Gearbox - Framework for asynchronous job dispatching
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+License: Apache
+Group: System Environment/Libraries
+BuildRequires: chrpath
+URL: http://getgearbox.org
+
+Packager: Jay Buffington <me@jaybuff.com>
+
+Source: https://github.com/getgearbox/gearbox/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+
+%description
+Gearbox is a framework that is designed to build RESTful web services to
+orchestrate a distributed system using job management.
+
+You create an API that describes resources which have states. When a user
+creates, updates or deletes a resource a job is inserted to be asynchronously
+processed by a worker (the part you write) and a status object is returned to
+the caller. The status object tracks the progress of that job so the caller can
+know when the resources is created, updated or deleted. Reads are also jobs
+worked on workers, but they are synchronous and don't use a status object.
+
+# ============ core ============
+
+%package core
+Summary: Gearbox core
+Group: Development/Libraries
+
+%description core
+Gearbox core libraries
+
+%files core
+%defattr(-,root,root,-)
+%{_bindir}/gearbox_json
+%{_libdir}/libgearbox_core.a
+%{_libdir}/libgearbox_core.la
+%{_libdir}/libgearbox_core.so
+%{_libdir}/libgearbox_core.so.1
+%{_libdir}/libgearbox_core.so.1.0.0
+
+# ============ core-devel ============
+
+%package core-devel
+Summary: Gearbox core header files
+Group: Development/Libraries
+Requires: gearbox-core
+
+%description core-devel
+Gearbox core header files
+
+%files core-devel
+%defattr(-,root,root,-)
+%{_includedir}/gearbox/core/ConfigFile.h
+%{_includedir}/gearbox/core/Errors.h
+%{_includedir}/gearbox/core/File.h
+%{_includedir}/gearbox/core/Hash.h
+%{_includedir}/gearbox/core/HttpClient.h
+%{_includedir}/gearbox/core/Json.h
+%{_includedir}/gearbox/core/JsonGenerator.h
+%{_includedir}/gearbox/core/JsonParser.h
+%{_includedir}/gearbox/core/JsonPrivate.h
+%{_includedir}/gearbox/core/JsonSchema.h
+%{_includedir}/gearbox/core/Pipe.h
+%{_includedir}/gearbox/core/Plugin.h
+%{_includedir}/gearbox/core/REST.h
+%{_includedir}/gearbox/core/SystemPair.h
+%{_includedir}/gearbox/core/TempDir.h
+%{_includedir}/gearbox/core/TempFile.h
+%{_includedir}/gearbox/core/Uri.h
+%{_includedir}/gearbox/core/logger.h
+%{_includedir}/gearbox/core/strlcpy.h
+%{_includedir}/gearbox/core/util.h
+
+# ============ store =============
+
+%package store
+Summary: Gearbox store
+Group: Development/Libraries
+
+%description store
+Gearbox store libraries
+
+%files store
+%defattr(-,root,root,-)
+%{_libdir}/libgearbox_store.a
+%{_libdir}/libgearbox_store.la
+%{_libdir}/libgearbox_store.so
+%{_libdir}/libgearbox_store.so.1
+%{_libdir}/libgearbox_store.so.1.0.0
+
+# ============ store-devel ============
+
+%package store-devel
+Summary: Gearbox store header files
+Group: Development/Libraries
+Requires: gearbox-store
+
+%description store-devel
+Gearbox store header files
+
+%files store-devel
+%defattr(-,root,root,-)
+%{_includedir}/gearbox/store/dbconn.h
+
+# ============ job =============
+
+%package job
+Summary: gearbox job
+Group: Development/Libraries
+
+%description job
+gearbox job libraries
+
+%files job
+%defattr(-,root,root,-)
+%{_libdir}/libgearbox_job.a
+%{_libdir}/libgearbox_job.la
+%{_libdir}/libgearbox_job.so
+%{_libdir}/libgearbox_job.so.1
+%{_libdir}/libgearbox_job.so.1.0.0
+
+# ============ job-devel ============
+
+%package job-devel
+Summary: Gearbox job header files
+Group: Development/Libraries
+Requires: gearbox-job
+
+%description job-devel
+Gearbox job header files
+
+%files job-devel
+%defattr(-,root,root,-)
+%{_includedir}/gearbox/job/GearmanJobImpl.h
+%{_includedir}/gearbox/job/Job.h
+%{_includedir}/gearbox/job/JobImpl.h
+%{_includedir}/gearbox/job/JobManager.h
+%{_includedir}/gearbox/job/JobResponse.h
+%{_includedir}/gearbox/job/JobStatusImpl.h
+%{_includedir}/gearbox/job/JsonStatusImpl.h
+%{_includedir}/gearbox/job/RestJobImpl.h
+%{_includedir}/gearbox/job/Status.h
+%{_includedir}/gearbox/job/StatusCollection.h
+%{_includedir}/gearbox/job/StatusCollectionImpl.h
+%{_includedir}/gearbox/job/StatusCollectionImplV1.h
+%{_includedir}/gearbox/job/StatusImpl.h
+%{_includedir}/gearbox/job/StatusImplV1.h
+%{_includedir}/gearbox/job/StatusManager.h
+%{_includedir}/gearbox/job/TransientStatusImpl.h
+
+
+# ============ worker =============
+
+%package worker
+Summary: gearbox worker
+Group: Development/Libraries
+
+%description worker
+gearbox worker libraries
+
+%files worker
+%defattr(-,root,root,-)
+%{_libdir}/libgearbox_worker.a
+%{_libdir}/libgearbox_worker.la
+%{_libdir}/libgearbox_worker.so
+%{_libdir}/libgearbox_worker.so.1
+%{_libdir}/libgearbox_worker.so.1.0.0
+
+# ============ worker-devel ============
+
+%package worker-devel
+Summary: Gearbox worker header files
+Group: Development/Libraries
+Requires: gearbox-worker
+
+%description worker-devel
+Gearbox worker header files
+
+%files worker-devel
+%defattr(-,root,root,-)
+%{_includedir}/gearbox/worker/Worker.h
+
+
+# ============ daemons =============
+
+%package daemons
+Summary: Gearbox daemons
+Group: Development/Libraries
+
+%description daemons
+Gearbox daemons libraries
+
+%files daemons
+%defattr(-,root,root,-)
+%{_bindir}/delayDaemon
+%{_bindir}/workerGearbox
+%{_libdir}/libworker_gearbox.a
+%{_libdir}/libworker_gearbox.la
+%{_libdir}/libworker_gearbox.so
+%{_libdir}/libworker_gearbox.so.0
+%{_libdir}/libworker_gearbox.so.0.0.0
+%{_sysconfdir}/gearbox/gearbox-handlers.d/*
+%{_localstatedir}/gearbox/db/counters/
+%{_datadir}/gearbox/schemas/create-delay-job-v1.js
+%{_datadir}/gearbox/schemas/create-global-status-v1.js
+%{_datadir}/gearbox/schemas/get-global-status-response-v1.js
+%{_datadir}/gearbox/schemas/get-global-status-v1.js
+%{_datadir}/gearbox/schemas/update-global-status-v1.js
+
+# ============ daemons-config =============
+
+%package daemons-config
+Summary: Sample configuration for gearbox-daemons
+Group: Development/Libraries
+Requires: gearbox-dbsetup cronolog gearbox-svc-builder gearbox-daemons
+
+%description daemons-config
+Sample configuration for gearbox-daemons
+
+%files daemons-config
+%defattr(-,root,root,-)
+%{_sysconfdir}/gearbox/config.d/delay.conf
+%{_sysconfdir}/gearbox/config.d/gearbox.conf
+%{_sysconfdir}/gearbox/config.d/gearman.conf
+%{_sysconfdir}/gearbox/config.d/log.conf
+%{_sysconfdir}/gearbox/config.d/status.conf
+%{_sysconfdir}/gearbox/gearbox.conf
+%{_sysconfdir}/gearbox/logger/gearbox-logger.conf
+%attr(0755,nobody,nobody) %dir /var/log/gearbox
+%attr(0755,nobody,nobody) %dir /var/gearbox/
+%attr(0755,nobody,nobody) %dir /var/gearbox/db/
+%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/2.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/2.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/3.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/3.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/4.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/4.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/5.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/5.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/6.sql
+%{_datadir}/gearbox/gearbox_daemons/delay-migration/6.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/delay.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/10.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/10.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/11.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/11.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/2.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/2.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/3.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/3.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/4.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/4.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/5.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/5.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/6.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/6.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/7.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/7.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/8.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/8.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/9.sql
+%{_datadir}/gearbox/gearbox_daemons/status-migration/9.undo.sql
+%{_datadir}/gearbox/gearbox_daemons/status.sql
+
+%post daemons-config
+%{_libexecdir}/gearbox/dbsetup -c %{_sysconfdir}/gearbox/config.d/status.conf %{_datadir}/gearbox/gearbox_daemons/status.sql
+%{_libexecdir}/gearbox/dbsetup -c %{_sysconfdir}/gearbox/config.d/delay.conf %{_datadir}/gearbox/gearbox_daemons/delay.sql
+/etc/init.d/gearbox create
+
+%preun daemons-config
+/etc/init.d/gearbox delete
+
+# ============ mod_gearbox =============
+
+%package -n mod_gearbox
+Summary: gearbox apache module
+Group: Development/Libraries
+
+%description -n mod_gearbox
+apache module for gearbox
+
+%files -n mod_gearbox
+%defattr(-,root,root,-)
+%{_libdir}/httpd/modules/mod_gearbox.a
+%{_libdir}/httpd/modules/mod_gearbox.la
+%{_libdir}/httpd/modules/mod_gearbox.so
+%{_libdir}/httpd/modules/mod_gearbox.so.1
+%{_libdir}/httpd/modules/mod_gearbox.so.1.0.0
+%{_sysconfdir}/httpd/conf.d/gearbox.conf
+
+# ============ status-plugin-sql =============
+
+%package status-plugin-sql
+Summary: Gearbox status-plugin-sql
+Group: Development/Libraries
+
+%description status-plugin-sql
+Gearbox status-plugin-sql
+
+%files status-plugin-sql
+%defattr(-,root,root,-)
+%{_libdir}/sql_status.a
+%{_libdir}/sql_status.la
+%{_libdir}/sql_status.so
+%{_libdir}/sql_status.so.1
+%{_libdir}/sql_status.so.1.0.0
+
+# ============ perl-lib =============
+
+%package perl-lib
+Summary: Gearbox perl libraries
+Group: Development/Libraries
+Provides: perl(Gearbox::Errors)
+
+%description perl-lib
+Gearbox perl-lib libraries
+
+
+%files perl-lib
+%defattr(-,root,root,-)
+%{perl_sitearch}/libGearbox.la
+%{perl_sitearch}/libGearbox.so
+%{perl_sitelib}/Gearbox.pm
+%{perl_sitelib}/Gearbox/ConfigFile.pm
+%{perl_sitelib}/Gearbox/Errors.pm
+%{perl_sitelib}/Gearbox/JobManager.pm
+%{perl_sitelib}/Gearbox/Logger.pm
+%{perl_sitelib}/Gearbox/StatusManager.pm
+%{perl_sitelib}/Gearbox/Worker.pm
+
+# ============ python-lib =============
+
+%package python-lib
+Summary: Gearbox python libraries
+Group: Development/Libraries
+
+%description python-lib
+Gearbox python-lib libraries
+
+%files python-lib
+%defattr(-,root,root,-)
+%{python_sitearch}/_gearbox.la
+%{python_sitearch}/_gearbox.so
+%{python_sitelib}/gearbox.py
+
+# ============ tools =============
+
+%package tools
+Summary: Gearbox tools
+Group: Development/Tools
+Requires: perl-Template-Toolkit gearbox-perl-lib perl-DBD-SQLite perl-DBD-MySQL
+
+%description tools
+Gearbox tools
+
+%files tools
+%defattr(-,root,root,-)
+%{_bindir}/gbq
+%{_bindir}/gbtrace
+%{_datadir}/gearbox/gbtrace/templates/*
+
+# ============ dbsetup =============
+
+%package dbsetup
+Summary: Gearbox dbsetup
+Group: Development/Tools
+
+%description dbsetup
+Gearbox dbsetup
+
+%files dbsetup
+%defattr(-,root,root,-)
+%{_libexecdir}/gearbox/dbsetup
+
+# ============ svc-builder =============
+
+%package svc-builder
+Summary: Gearbox svc-builder
+Group: Development/Tools
+Requires: daemontools
+
+%description svc-builder
+Gearbox tools
+
+%files svc-builder
+%defattr(-,root,root,-)
+%{_bindir}/gearbox-svc-builder
+%{perl_sitelib}/Gearbox/Service/Builder.pm
+%{perl_sitelib}/Gearbox/Service/Entry.pm
+%{perl_sitelib}/Gearbox/Utils.pm
+
+# ============ test-workers =============
+
+%package test-workers
+Summary: Gearbox test-workers
+Group: Development/Libraries
+
+%description test-workers
+Gearbox test workers
+
+%files test-workers
+%defattr(-,root,root,-)
+%{_bindir}/workerTestBasic
+%{_bindir}/workerTestAgents
+%{_bindir}/workerTestCancel
+%{_bindir}/workerTestChained
+%{_bindir}/workerTestDelay
+%{_bindir}/workerTestSync
+
+%prep
+%setup -q
+./autogen.sh
+
+%configure
+
+%build
+%{__make} %{?_smp_mflags}
+
+%install
+%{__rm} -rf %{buildroot}
+%{__make} install DESTDIR="%{buildroot}" AM_INSTALL_PROGRAM_FLAGS=""
+mkdir -p $RPM_BUILD_ROOT/
+
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/delayDaemon
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gearbox_json
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerGearbox
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestBasic
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestAgents
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestCancel
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestChained
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestDelay
+chrpath --delete $RPM_BUILD_ROOT%{_bindir}/workerTestSync
+chrpath --delete $RPM_BUILD_ROOT%{perl_sitearch}/libGearbox.so
+chrpath --delete $RPM_BUILD_ROOT%{python_sitearch}/_gearbox.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgearbox_job.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgearbox_store.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgearbox_worker.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libworker_gearbox.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/httpd/modules/mod_gearbox.so
+chrpath --delete $RPM_BUILD_ROOT%{_libdir}/sql_status.so
+
+%check
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+
+%changelog
+* Sat Nov 9 2013 Jay Buffington <me@jaybuff.com> - 0.1
+- Initial package

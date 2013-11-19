@@ -1,3 +1,4 @@
+*.rpm
 .deps
 .dirstamp
 TestMakefile.am

@@ -43,7 +43,6 @@ cat <<EOM
     "db_pass" : "$db_pass",
     "db_admin_pass": "$db_admin_pass",
     "db_host" : "$db_host",
-    "db_port" : $db_port,
-    "db_sock" : "$db_sock"
+    "db_port" : $db_port
 }
 EOM

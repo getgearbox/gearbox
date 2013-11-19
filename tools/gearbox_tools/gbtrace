@@ -101,7 +101,7 @@ do {
         }
         
         my $config = {
-            INCLUDE_PATH => "/etc/gearbox/templates:$ENV{HOME}/.gearbox/templates",
+            INCLUDE_PATH => "/usr/share/gearbox/gbtrace/templates:$ENV{HOME}/.gearbox/templates",
             INTERPOLATE  => 1,               # expand "$var" in plain text
             EVAL_PERL    => 1,               # evaluate Perl code blocks
             ABSOLUTE     => 1,               # allow absolute paths for templates

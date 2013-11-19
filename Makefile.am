@@ -13,7 +13,7 @@ export DYLD_FORCE_FLAT_NAMESPACE=1
 LIBTAP=deps/libtap++-0.01/libtap++.la
 
 $(LIBTAP): deps/libtap++-0.01/tap++.C
-deps/libtap++-0.01/tap++.C:
+deps/libtap++-0.01/tap++.h:
 	cd deps && tar xzf libtap-0.01.tar.gz
 # need bogus -rpath to force shared library
 deps_libtap___0_01_libtap___la_LDFLAGS = -rpath /dev/null
@@ -38,8 +38,17 @@ deps/PyTAP.tar.gz:
 	curl -s https://github.com/rjbs/pytap/tarball/48060b13351979c54cf482629ee41cdeafa4933f -L -o deps/PyTAP.tar.gz
 
 deps/PyTAP: deps/PyTAP.tar.gz
+	-rm -rf deps/PyTAP
 	cd deps && tar xfz PyTAP.tar.gz && mv rjbs-PyTAP-48060b1 PyTAP
+
 dist_check_SCRIPTS += deps/PyTAP
+
+CLEANFILES += \
+	deps/PyTAP.tar.gz \
+	$(NULL)
+
+clean-local:
+	-rm -rf deps/PyTAP/
 
 check_LTLIBRARIES = $(LIBTAP)
 check_PROGRAMS =
@@ -56,7 +65,7 @@ bin_PROGRAMS+=gearbox/core/gearbox_json
 lib_LTLIBRARIES+=gearbox/core/libgearbox_core.la
 
 gearbox_core_libgearbox_core_la_CXXFLAGS = $(YAJL_CFLAGS) $(CURL_CFLAGS) $(BOOST_CPPFLAGS) $(LOG4CXX_CFLAGS) $(UUID_CFLAGS)
-gearbox_core_libgearbox_core_la_LDFLAGS = $(YAJL_LIBS) $(CURL_LIBS) $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB) $(LOG4CXX_LIBS) $(BOOST_REGEX_LIB) $(CRYPTO_LIB) $(UUID_LIBS) $(BOOST_IOSTREAMS_LIB)
+gearbox_core_libgearbox_core_la_LDFLAGS = $(YAJL_LIBS) $(CURL_LIBS) $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB) $(LOG4CXX_LIBS) $(BOOST_REGEX_LIB) $(CRYPTO_LIB) $(UUID_LIBS) $(BOOST_IOSTREAMS_LIB) -version-info $(GEARBOX_CORE_LIBRARY_VERSION)
 gearbox_core_libgearbox_core_includes = \
 	gearbox/core/ConfigFile.h \
 	gearbox/core/Errors.h \
@@ -79,6 +88,9 @@ gearbox_core_libgearbox_core_includes = \
     gearbox/core/Uri.h \
     gearbox/core/util.h \
 	$(NULL)
+
+coreincludedir = ${pkgincludedir}/core
+coreinclude_HEADERS = $(gearbox_core_libgearbox_core_includes)
 
 gearbox_core_libgearbox_core_la_SOURCES = $(gearbox_core_libgearbox_core_includes) \
     gearbox/core/ConfigFile.cc \
@@ -114,7 +126,7 @@ gearbox_core_gearbox_json_LDADD = gearbox/core/libgearbox_core.la
 lib_LTLIBRARIES+=gearbox/job/libgearbox_job.la
 
 gearbox_job_libgearbox_job_la_CXXFLAGS = $(GEARMAN_CFLAGS)
-gearbox_job_libgearbox_job_la_LDFLAGS = $(GEARMAN_LIBS) $(BOOST_LDFLAGS) $(BOOST_GRAPH_LIB)
+gearbox_job_libgearbox_job_la_LDFLAGS = $(GEARMAN_LIBS) $(BOOST_LDFLAGS) $(BOOST_GRAPH_LIB) -version-info $(GEARBOX_JOB_LIBRARY_VERSION)
 gearbox_job_libgearbox_job_la_LIBADD = gearbox/core/libgearbox_core.la
 gearbox_job_libgearbox_job_includes = \
     gearbox/job/GearmanJobImpl.h \
@@ -134,6 +146,9 @@ gearbox_job_libgearbox_job_includes = \
     gearbox/job/StatusManager.h \
     gearbox/job/TransientStatusImpl.h \
     $(NULL)
+
+jobincludedir = ${pkgincludedir}/job
+jobinclude_HEADERS = $(gearbox_job_libgearbox_job_includes)
 
 gearbox_job_libgearbox_job_la_SOURCES = $(gearbox_job_libgearbox_job_includes) \
     gearbox/job/GearmanJobImpl.cc \
@@ -160,11 +175,14 @@ gearbox_job_libgearbox_job_la_SOURCES = $(gearbox_job_libgearbox_job_includes) \
 lib_LTLIBRARIES+=gearbox/store/libgearbox_store.la
 
 gearbox_store_libgearbox_store_la_CXXFLAGS =
-gearbox_store_libgearbox_store_la_LDFLAGS = $(SOCI_CORE_LIB)
+gearbox_store_libgearbox_store_la_LDFLAGS = $(SOCI_CORE_LIB) -version-info $(GEARBOX_STORE_LIBRARY_VERSION)
 gearbox_store_libgearbox_store_la_LIBADD = gearbox/core/libgearbox_core.la
 gearbox_store_libgearbox_store_includes = \
     gearbox/store/dbconn.h \
     $(NULL)
+
+storeincludedir = ${pkgincludedir}/store
+storeinclude_HEADERS = $(gearbox_store_libgearbox_store_includes)
 
 gearbox_store_libgearbox_store_la_SOURCES = $(gearbox_store_libgearbox_store_includes) \
 	gearbox/store/dbconn.cc \
@@ -177,11 +195,14 @@ gearbox_store_libgearbox_store_la_SOURCES = $(gearbox_store_libgearbox_store_inc
 lib_LTLIBRARIES+=gearbox/worker/libgearbox_worker.la
 
 gearbox_worker_libgearbox_worker_la_CXXFLAGS =
-gearbox_worker_libgearbox_worker_la_LDFLAGS = $(SOCI_CORE_LIB)
+gearbox_worker_libgearbox_worker_la_LDFLAGS = $(SOCI_CORE_LIB) -version-info $(GEARBOX_WORKER_LIBRARY_VERSION)
 gearbox_worker_libgearbox_worker_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
 gearbox_worker_libgearbox_worker_includes = \
     gearbox/worker/Worker.h \
     $(NULL)
+
+workerincludedir = ${pkgincludedir}/worker
+workerinclude_HEADERS = $(gearbox_worker_libgearbox_worker_includes)
 
 gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker_includes) \
 	gearbox/worker/Worker.cc \
@@ -217,6 +238,136 @@ workers_gearbox_delayDaemon_SOURCES = workers/gearbox/delayDaemon.cc
 workers_gearbox_delayDaemon_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_SYSTEM_LIB)
 workers_gearbox_delayDaemon_LDADD = workers/gearbox/libworker_gearbox.la
 
+schemapkgdatadir = ${pkgdatadir}/schemas/
+dist_schemapkgdata_DATA = \
+	workers/gearbox/schemas/create-delay-job-v1.js \
+	workers/gearbox/schemas/create-global-status-v1.js \
+	workers/gearbox/schemas/get-global-status-response-v1.js \
+	workers/gearbox/schemas/get-global-status-v1.js \
+	workers/gearbox/schemas/update-global-status-v1.js \
+	$(NULL)
+
+# configuration for daemons
+workers/gearbox/conf/config.d/%.conf : workers/gearbox/conf/config.d/%.conf.sh
+	$< > $@
+
+workers/gearbox/conf/%.conf : workers/gearbox/conf/%.conf.sh
+	$< > $@
+
+gbsysconfdir = ${sysconfdir}/gearbox/
+dist_gbsysconf_DATA = \
+	workers/gearbox/conf/gearbox.conf \
+	$(NULL)
+
+gbconfloggerdir = ${sysconfdir}/gearbox/logger
+dist_gbconflogger_DATA = workers/gearbox/conf/logger/gearbox-logger.conf
+
+gbconfigddir = ${gbsysconfdir}/config.d
+dist_gbconfigd_DATA = \
+	workers/gearbox/conf/config.d/delay.conf \
+	workers/gearbox/conf/config.d/gearbox.conf \
+	workers/gearbox/conf/config.d/gearman.conf \
+	workers/gearbox/conf/config.d/log.conf \
+	workers/gearbox/conf/config.d/status.conf \
+	$(NULL)
+
+initdsysconfdir = ${sysconfdir}/init.d/
+dist_initdsysconf_DATA = workers/gearbox/conf/init.d/gearbox
+
+# $< > $@ means execute the source into the target
+# e.g. workers/gearbox/sql/status.sql.sh > workers/gearbox/sql/status.sql
+workers/gearbox/sql/%.sql : workers/gearbox/sql/%.sql.sh
+	$< > $@
+
+workers/gearbox/sql/%-migration/%.sql :  workers/gearbox/sql/%-migration/%.sql.sh
+	$< > $@
+
+gbsqldir = ${pkgdatadir}/gearbox_daemons/
+dist_gbsql_DATA = \
+	workers/gearbox/sql/status.sql \
+	workers/gearbox/sql/delay.sql
+
+gbsqlstatusmigratedir = ${gbsqldir}/status-migration
+dist_gbsqlstatusmigrate_DATA = \
+	workers/gearbox/sql/status-migration/2.sql \
+	workers/gearbox/sql/status-migration/2.undo.sql \
+	workers/gearbox/sql/status-migration/3.sql \
+	workers/gearbox/sql/status-migration/3.undo.sql \
+	workers/gearbox/sql/status-migration/4.sql \
+	workers/gearbox/sql/status-migration/4.undo.sql \
+	workers/gearbox/sql/status-migration/5.sql \
+	workers/gearbox/sql/status-migration/5.undo.sql \
+	workers/gearbox/sql/status-migration/6.sql \
+	workers/gearbox/sql/status-migration/6.undo.sql \
+	workers/gearbox/sql/status-migration/7.sql \
+	workers/gearbox/sql/status-migration/7.undo.sql \
+	workers/gearbox/sql/status-migration/8.sql \
+	workers/gearbox/sql/status-migration/8.undo.sql \
+	workers/gearbox/sql/status-migration/9.sql \
+	workers/gearbox/sql/status-migration/9.undo.sql \
+	workers/gearbox/sql/status-migration/10.sql \
+	workers/gearbox/sql/status-migration/10.undo.sql \
+	workers/gearbox/sql/status-migration/11.sql \
+	workers/gearbox/sql/status-migration/11.undo.sql
+
+gbsqldelaymigratedir = ${gbsqldir}/delay-migration
+dist_gbsqldelaymigrate_DATA = \
+	workers/gearbox/sql/delay-migration/2.sql \
+	workers/gearbox/sql/delay-migration/2.undo.sql \
+	workers/gearbox/sql/delay-migration/3.sql \
+	workers/gearbox/sql/delay-migration/3.undo.sql \
+	workers/gearbox/sql/delay-migration/4.sql \
+	workers/gearbox/sql/delay-migration/4.undo.sql \
+	workers/gearbox/sql/delay-migration/5.sql \
+	workers/gearbox/sql/delay-migration/5.undo.sql \
+	workers/gearbox/sql/delay-migration/6.sql \
+	workers/gearbox/sql/delay-migration/6.undo.sql
+
+CLEANFILES += \
+	workers/gearbox/conf/config.d/delay.conf \
+	workers/gearbox/conf/config.d/gearbox.conf \
+	workers/gearbox/conf/config.d/gearman.conf \
+	workers/gearbox/conf/config.d/log.conf \
+	workers/gearbox/conf/config.d/status.conf \
+	workers/gearbox/conf/gearbox.conf \
+	workers/gearbox/sql/delay.sql \
+	workers/gearbox/sql/status.sql \
+	workers/gearbox/sql/delay-migration/3.undo.sql \
+	workers/gearbox/sql/delay-migration/4.sql \
+	workers/gearbox/sql/delay-migration/4.undo.sql \
+	workers/gearbox/sql/delay-migration/5.sql \
+	workers/gearbox/sql/delay-migration/5.undo.sql \
+	workers/gearbox/sql/delay-migration/6.sql \
+	workers/gearbox/sql/delay-migration/6.undo.sql \
+	workers/gearbox/sql/status-migration/10.sql \
+	workers/gearbox/sql/status-migration/10.undo.sql \
+	workers/gearbox/sql/status-migration/11.sql \
+	workers/gearbox/sql/status-migration/11.undo.sql \
+	workers/gearbox/sql/status-migration/3.sql \
+	workers/gearbox/sql/status-migration/3.undo.sql \
+	workers/gearbox/sql/status-migration/4.sql \
+	workers/gearbox/sql/status-migration/5.sql \
+	workers/gearbox/sql/status-migration/5.undo.sql \
+	workers/gearbox/sql/status-migration/6.undo.sql \
+	workers/gearbox/sql/status-migration/7.sql \
+	workers/gearbox/sql/status-migration/7.undo.sql \
+	workers/gearbox/sql/status-migration/8.sql \
+	workers/gearbox/sql/status-migration/8.undo.sql \
+	workers/gearbox/sql/status-migration/9.sql \
+	workers/gearbox/sql/status-migration/9.undo.sql \
+	$(NULL)
+
+
+# on install generate the handlers dir and directories needed by gearbox daemons
+install-data-hook:
+	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gearbox/gearbox-handlers.d/
+	@for handler in  `$(srcdir)/common/build/print_handlers < $(srcdir)/workers/gearbox/WorkerGearbox.cc`; do \
+		$(LN_S) /dev/null $(DESTDIR)$(sysconfdir)/gearbox/gearbox-handlers.d/$$handler; \
+	done
+
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/counters
+	$(mkinstalldirs) $(DESTDIR)/var/log/gearbox
+
 bin_PROGRAMS+=workers/test-basic/workerTestBasic
 workers_test_basic_workerTestBasic_SOURCES = workers/test-basic/WorkerTestBasic.h workers/test-basic/WorkerTestBasic.cc workers/test-basic/workerTestBasicMain.cc
 workers_test_basic_workerTestBasic_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_SYSTEM_LIB)
@@ -250,9 +401,21 @@ workers_test_sync_workerTestSync_LDADD = gearbox/core/libgearbox_core.la gearbox
 ###############################################
 ### gearbox/swig/perl
 ###############################################
-lib_LTLIBRARIES+=gearbox/swig/perl/libGearbox.la
+perlarchlibdir = ${PERL_SITEARCHDIR}
+perlarchlib_LTLIBRARIES=gearbox/swig/perl/libGearbox.la
+
 perllibdir=${PERL_SITELIBDIR}
-perllib_HEADERS = gearbox/swig/perl/lib/Gearbox/Errors.pm
+perllib_HEADERS = \
+	gearbox/swig/perl/lib/Gearbox.pm
+
+gbperllibdir = ${perllibdir}/Gearbox
+gbperllib_HEADERS = \
+	gearbox/swig/perl/lib/Gearbox/ConfigFile.pm \
+	gearbox/swig/perl/lib/Gearbox/Errors.pm \
+	gearbox/swig/perl/lib/Gearbox/JobManager.pm \
+	gearbox/swig/perl/lib/Gearbox/Logger.pm \
+	gearbox/swig/perl/lib/Gearbox/StatusManager.pm \
+	gearbox/swig/perl/lib/Gearbox/Worker.pm
 
 gearbox/swig/perl/lib/Gearbox/Errors.pm: gearbox/core/Errors.h
 	gearbox/swig/perl/genErrors > gearbox/swig/perl/lib/Gearbox/Errors.pm
@@ -269,7 +432,7 @@ gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_la_incl
 	gearbox/swig/SwigWorker.cc \
     $(NULL)
 
-gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/perl/perl.i gearbox/swig/perl/perlworker.i
+gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h gearbox/swig/perl/lib/Gearbox.pm: gearbox/swig/SwigGearbox.i gearbox/swig/perl/perl.i gearbox/swig/perl/perlworker.i
 	$(SWIG) -perl -c++ -o gearbox/swig/perl/SwigGearbox_wrap.cc -outdir gearbox/swig/perl/lib -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
 
 CLEANFILES += \
@@ -289,15 +452,15 @@ gearbox_swig_php_SwigGearbox_la_CXXFLAGS = $(PHP_CFLAGS)
 gearbox_swig_php_SwigGearbox_la_LDFLAGS = -module -avoid-version -shared $(PHP_LDFLAGS)
 gearbox_swig_php_SwigGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
 gearbox_swig_php_SwigGearbox_la_includes = \
-    gearbox/swig/php/php_SwigGearbox.h \
+	gearbox/swig/php/php_SwigGearbox.h \
 	gearbox/swig/php/php_Json_helper.h \
 	gearbox/swig/php/SwigGearbox_wrap.h \
 	gearbox/swig/SwigWorker.h \
-    $(NULL)
+	$(NULL)
 
 gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_SwigGearbox_la_includes) \
-	gearbox/swig/php/SwigGearbox_wrap.cc \
-	gearbox/swig/SwigWorker.cc \
+   gearbox/swig/php/SwigGearbox_wrap.cc \
+   gearbox/swig/SwigWorker.cc \
     $(NULL)
 
 gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/php/php.i gearbox/swig/php/phpworker.i
@@ -326,7 +489,11 @@ endif
 ###############################################
 ### gearbox/swig/python
 ###############################################
-lib_LTLIBRARIES+=gearbox/swig/python/_gearbox.la
+pythonarchlibdir=${PYTHON_SITEARCHDIR}
+pythonarchlib_LTLIBRARIES = gearbox/swig/python/_gearbox.la
+
+pythonlibdir = ${PYTHON_SITE_PKG}
+pythonlib_HEADERS = gearbox/swig/python/lib/gearbox.py
 
 gearbox_swig_python__gearbox_la_CPPFLAGS = $(SWIG_PYTHON_CPPFLAGS)
 gearbox_swig_python__gearbox_la_LDFLAGS = -module -avoid-version -shared $(SWIG_PYTHON_LIBS)
@@ -357,30 +524,56 @@ CLEANFILES += \
     gearbox/swig/python/lib/gearbox.pyc \
     gearbox/swig/python/SwigGearbox_wrap.cc \
     gearbox/swig/python/SwigGearbox_wrap.h \
+	gearbox/t/swig/python/setup.pyc \
     $(NULL)
-
 
 ###############################################
 ### apache module mod_gearbox
 ###############################################
-lib_LTLIBRARIES+=apache/mod_gearbox/mod_gearbox.la
+apachemoddir = ${APACHE_LIBEXECDIR}
+apachemod_LTLIBRARIES=apache/mod_gearbox/mod_gearbox.la
 
 apache_mod_gearbox_mod_gearbox_la_CXXFLAGS = ${APACHE_CFLAGS}
-apache_mod_gearbox_mod_gearbox_la_LDFLAGS = ${APR_LDFLAGS} -module
+apache_mod_gearbox_mod_gearbox_la_LDFLAGS = ${APR_LDFLAGS} -module -version-info $(MOD_GEARBOX_LIBRARY_VERSION)
 apache_mod_gearbox_mod_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la
 apache_mod_gearbox_mod_gearbox_la_SOURCES = apache/mod_gearbox/mod_gearbox.cc
+
+apacheconfddir = ${APACHE_CONFD_DIR}
+dist_apacheconfd_DATA = apache/mod_gearbox/gearbox.conf
 
 ###############################################
 ### plugins/status/sql
 ###############################################
 lib_LTLIBRARIES+=plugins/status/sql/sql_status.la
 
-plugins_status_sql_sql_status_la_LDFLAGS = $(BOOST_LDFLAGS) $(SOCI_CORE_LIB) -module
+plugins_status_sql_sql_status_la_LDFLAGS = $(BOOST_LDFLAGS) $(SOCI_CORE_LIB) -module -version-info $(GEARBOX_SQL_STATUS_PLUGIN_LIBRARY_VERSION)
 plugins_status_sql_sql_status_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
 
 plugins_status_sql_sql_status_la_SOURCES = \
 	plugins/status/sql/SQLStatusImpl.cc \
 	plugins/status/sql/SQLStatusImpl.h
+
+###############################################
+### tools
+###############################################
+dist_bin_SCRIPTS = \
+	tools/gearbox_tools/gbtrace \
+	tools/gearbox_tools/gbq \
+	tools/svcbuilder/bin/gearbox-svc-builder
+
+tmplpkgdatadir = ${pkgdatadir}/gbtrace/templates
+dist_tmplpkgdata_DATA = tools/gearbox_tools/templates/trace.tt
+
+gbperllib_HEADERS += \
+	tools/svcbuilder/lib/Gearbox/Utils.pm
+
+svcperllibdir = ${gbperllibdir}/Service
+svcperllib_HEADERS = \
+	tools/svcbuilder/lib/Gearbox/Service/Builder.pm \
+	tools/svcbuilder/lib/Gearbox/Service/Entry.pm
+
+gblibexecdir = ${libexecdir}/gearbox
+dist_gblibexec_SCRIPTS = common/sql/dbsetup
 
 EXTRA_DIST = \
 	LICENSE \
@@ -395,4 +588,7 @@ EXTRA_DIST = \
 	gearbox/swig/python/python.i \
 	gearbox/swig/python/pythonworker.i \
 	gearbox/swig/SwigGearbox.i \
-	gearbox/swig/perl/genErrors
+	gearbox/swig/perl/genErrors \
+	common
+
+include rpm.am

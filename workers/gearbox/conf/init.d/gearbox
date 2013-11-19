@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# chkconfig: 35 90 12
+# description: gearbox services
+#
+# Get function from functions library
+. /etc/init.d/functions
+
+export PATH=$PATH:/command
+create() {
+        # separate out create into it's own function and call it at rpm install
+        # time as well as start time so that changes to config files will
+        # modify the daemontools run scripts when you call 'service gearbox
+        # restart'
+        action "Creating gearbox services: " \
+        gearbox-svc-builder --file=/etc/gearbox/gearbox.conf \
+                            --key=daemons \
+                            --prefix=gearbox- \
+                            --service_dir=/var/gearbox/gearbox-workers
+}
+
+start() {
+        # call create to rewrite the daemontools run files in case the config
+        # files have changed
+        create
+
+        # if we stopped it with svc -d (in the stop function below) start it
+        # with svc -u
+        /usr/local/bin/svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
+        # when grep matches it returns 0, when it doesn't match it returns nonzero
+        if [[ $? -eq 0 ]]; then
+            action "Waiting for svscan to spawn supervise for new services" sleep 5
+            action "Starting gearbox services: " \
+                svc -u /var/gearbox/gearbox-workers/*
+        fi
+}
+
+stop() {
+        action "Stopping gearbox services: " svc -d /var/gearbox/gearbox-workers/*
+}
+
+delete() {
+        echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
+        action "Deleting gearbox services: " \
+        gearbox-svc-builder --file=/tmp/empty-daemons.conf \
+                            --key=daemons \
+                            --prefix=gearbox- \
+                            --service_dir=/var/gearbox/gearbox-workers
+        rm /tmp/empty-daemons.conf
+}
+
+case "$1" in
+  create)
+        create
+        ;;
+  start)
+        start
+        ;;
+  delete)
+        delete
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {create|start|stop|restart|reload|delete}"
+        exit 1
+esac
+exit 0

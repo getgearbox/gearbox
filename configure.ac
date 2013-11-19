@@ -92,8 +92,8 @@ AX_WITH_APXS()
 AC_ARG_WITH(apr_config, AC_HELP_STRING([[--with-apr-config=FILE]], [Path to apr-config program]),
 			[ apr_config="$withval" ],
 			[AC_PATH_PROGS(apr_config,
-				[apr-config apr-0-config apr-1-config], 
-				[no], 
+				[apr-config apr-0-config apr-1-config],
+				[no],
 				[$PATH:/usr/sbin/:/usr/local/apache2/bin]
 			)]
 )
@@ -112,6 +112,12 @@ AC_SUBST(APR_LDFLAGS)
 
 APACHE_CFLAGS="-I`${APXS} -q INCLUDEDIR` -I`${apr_config} --includedir`"
 AC_SUBST(APACHE_CFLAGS)
+
+AC_ARG_VAR([APACHE_LIBEXECDIR], Install directory for apache modules)
+APACHE_LIBEXECDIR=`${APXS} -q LIBEXECDIR`
+
+AC_ARG_VAR([APACHE_CONFD_DIR], Included apache configuration directory)
+APACHE_CONFD_DIR=${sysconfdir}/httpd/conf.d/
 
 # soci
 AC_CHECK_LIB([soci_core], [main], [
@@ -149,8 +155,41 @@ AC_ARG_WITH([php], AS_HELP_STRING([--with-php], [enable building with php]), [
 AM_CONDITIONAL([WITH_PHP], [test x$with_php = xtrue])
 
 # python stuff
-SWIG_PYTHON
 
+# this is really only tested with 2.6.  If you know it works or doesn't work
+# with other versions, please send me a patch.
+AC_PYTHON_DEVEL([>= '2.6'])
+
+SWIG_PYTHON
+AC_ARG_VAR([PYTHON_SITEARCHDIR])
+PYTHON_SITEARCHDIR=`${PYTHON} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(True))"`
+
+# library versioning
+
+GEARBOX_CORE_LIBRARY_VERSION=1:0:0
+#                       | | |
+#                +------+ | +---+
+#                |        |     |
+#             current:revision:age
+#                |        |     |
+#                |        |     +- increment if interfaces have been added
+#                |        |        set to zero if interfaces have been removed
+#                |        |        or changed
+#                |        +- increment if source code has changed
+#                |           set to zero if current is incremented
+#                +- increment if interfaces have been added, removed or changed
+AC_SUBST([GEARBOX_CORE_LIBRARY_VERSION])
+
+GEARBOX_STORE_LIBRARY_VERSION=1:0:0
+AC_SUBST([GEARBOX_STORE_LIBRARY_VERSION])
+GEARBOX_WORKER_LIBRARY_VERSION=1:0:0
+AC_SUBST([GEARBOX_WORKER_LIBRARY_VERSION])
+GEARBOX_JOB_LIBRARY_VERSION=1:0:0
+AC_SUBST([GEARBOX_JOB_LIBRARY_VERSION])
+MOD_GEARBOX_LIBRARY_VERSION=1:0:0
+AC_SUBST([MOD_GEARBOX_LIBRARY_VERSION])
+GEARBOX_SQL_STATUS_PLUGIN_LIBRARY_VERSION=1:0:0
+AC_SUBST([GEARBOX_SQL_STATUS_PLUGIN_LIBRARY_VERSION])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h stdint.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h unistd.h])
@@ -175,7 +214,5 @@ AC_CHECK_FUNCS([dup2 floor gettimeofday memset mkfifo select socket strerror])
 
 AM_INIT_AUTOMAKE([1.11 subdir-objects no-define foreign])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile common/build/gearbox.spec])
 AC_OUTPUT
-
-
