@@ -12,11 +12,9 @@ sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3 \
 install yajl >= 2.0
 ===================
 sudo yum install -y cmake
-wget http://github.com/lloyd/yajl/tarball/2.0.1 -O yajl-2.0.1.tar.gz
-tar xvfz yajl-2.0.1.tar.gz
-cd lloyd-yajl-f4b2b1a
-./configure
-make && sudo make install
+wget ftp://ftp.icm.edu.pl/vol/rzm2/linux-fedora-secondary/updates/testing/17/SRPMS/yajl-2.0.4-1.fc17.src.rpm
+rpmbuild --rebuild yajl-2.0.4-1.fc17.src.rpm
+sudo yum install ~/rpmbuild/RPMS/x86_64/yajl*
 
 install swig >= 2.0
 ==================
@@ -29,14 +27,17 @@ make && sudo make install
 
 install perl modules
 ====================
-sudo yum install -y cpan perl-Log-Log4perl perl-Archive-Tar perl-JSON \
-                    perl-Log-Dispatch perl-ExtUtils-Embed
-sudo cpan Test::Trivial 
+sudo yum install -y cpan perl-Log-Log4perl perl-JSON perl-Log-Dispatch \
+                         perl-ExtUtils-Embed
+
+# Archive::Tar must be >= 1.74 or you will run into this bug:
+# https://rt.cpan.org/Public/Bug/Display.html?id=64038
+sudo cpan Archive::Tar Test::Trivial
 
 INIT
 =====
 ./autogen.sh
-CXX="ccache g++" CC="ccache gcc" CPPFLAGS=-I/usr/lib64/perl5/CORE/ ./configure 
+CXX="ccache g++" CC="ccache gcc" CPPFLAGS=-I/usr/lib64/perl5/CORE/ ./configure
 
 BUILD
 =====
