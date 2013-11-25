@@ -6,6 +6,7 @@
 
 #include <limits>
 #include <string>
+#include <stdio.h>
 
 #include <boost/lexical_cast.hpp>
 
