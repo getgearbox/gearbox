@@ -26,6 +26,7 @@
 #include <boost/graph/topological_sort.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
 namespace bfs=boost::filesystem;
 
 namespace Gearbox {
@@ -136,7 +137,11 @@ namespace Gearbox {
                     for ( bfs::directory_iterator itr( job_dirs[i] );
                           itr != end;
                           ++itr ) {
+#if (BOOST_VERSION >= 104600)
                         std::string job = itr->path().filename().string();
+#else
+                        std::string job = itr->leaf();
+#endif
                         size_t s = job.find( "do_", 0 );
                         if ( s < std::string::npos ) {
                             s = job.find("_", s);

@@ -58,7 +58,9 @@ AC_DEFINE_UNQUOTED([PLUGINSDIR], ["`test "${exec_prefix}" = "NONE" && exec_prefi
 
 AC_DEFINE_UNQUOTED([SHLIB_EXT], ["`eval echo ${shrext_cmds}`"], [shared libary extension])
 
-AX_BOOST_BASE([1.49], [], [exit -1])
+# boost 1.41 has been verified to work.  Gearbox may work with versions as old
+# as 1.34 (which is when boost filesystem version 2 was released)
+AX_BOOST_BASE([1.41], [], [exit -1])
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM

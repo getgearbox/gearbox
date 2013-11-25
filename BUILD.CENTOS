@@ -4,27 +4,10 @@ as RHEL 6.3 or CentOS 6.3.
 SETUP
 =====
 sudo yum install -y automake libtool libuuid-devel curl-devel openssl-devel \
-                    perl-devel php-devel 
+                    perl-devel php-devel boost boost-devel httpd-devel
 # these are available from EPEL
-sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3
-
-install boost >= 1.49
-=====================
-sudo yum install -y bzip2-devel
-wget http://sourceforge.net/projects/boost/files/boost/1.54.0/boost_1_54_0.tar.bz2/download
-tar xvfj boost_1_54_0.tar.bz2
-cd boost_1_54_0
-./bootstrap.sh
-sudo ./b2 --with-exception --with-program_options --with-system --with-filesystem --with-graph --with-regex --with-iostreams install --prefix=/usr
-
-install gearman
-===============
-sudo yum install -y libevent-devel
-wget https://launchpad.net/gearmand/1.0/1.0.6/+download/gearmand-1.0.6.tar.gz
-tar xvfz gearmand-1.0.6.tar.gz
-cd gearmand-1.0.6
-./configure
-make && sudo make install
+sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3 \
+                    libgearman libgearman-devel
 
 install yajl >= 2.0
 ===================
@@ -53,10 +36,7 @@ sudo cpan Test::Trivial
 INIT
 =====
 ./autogen.sh
-export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig/
-CXX="ccache g++" CC="ccache gcc" YAJL_LIBS="-L/usr/local/lib -lyajl" \
-    CPPFLAGS=-I/usr/lib64/perl5/CORE/ YAJL_CFLAGS=-I/usr/local/include \
-    ./configure 
+CXX="ccache g++" CC="ccache gcc" CPPFLAGS=-I/usr/lib64/perl5/CORE/ ./configure 
 
 BUILD
 =====

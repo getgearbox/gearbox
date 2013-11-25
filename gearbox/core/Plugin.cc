@@ -6,6 +6,7 @@
 #include <gearbox/core/logger.h>
 #include <gearbox/core/Errors.h>
 #include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
 #include <map>
 #include <stdexcept>
 #include <dlfcn.h>
@@ -63,8 +64,13 @@ Plugins Plugin::loadAll( const bfs::path & pluginDir )  {
         bfs::directory_iterator dit(pluginDir);
         int extlen = strlen(SHLIB_EXT);
         for( ; dit != dend; ++dit ) {
+#if (BOOST_VERSION >= 104600)
             string file = dit->path().string();
             string name = dit->path().filename().string();
+#else
+            string file = dit->string();
+            string name = dit->leaf();
+#endif
             if( file.substr( file.size() - extlen ) == SHLIB_EXT ) {
                 // chop off the ".so"
                 name.erase(name.size() - extlen, extlen);

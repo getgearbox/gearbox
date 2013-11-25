@@ -19,6 +19,7 @@ namespace bios=boost::iostreams;
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/version.hpp>
 
 namespace bfs=boost::filesystem;
 
@@ -48,7 +49,11 @@ namespace Gearbox {
             lseek(fd, 0, SEEK_SET);
         }
         
+#if (BOOST_VERSION >= 104400)
         bios::stream<bios::file_descriptor_source> f(fd, boost::iostreams::close_handle); // will close fd
+#else
+        bios::stream<bios::file_descriptor_source> f(fd, true); // will close fd
+#endif
         if ( !f.is_open() ) {
             gbTHROW( ERR_LIBC("Could not open fd") );
         }
