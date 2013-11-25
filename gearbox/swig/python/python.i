@@ -148,7 +148,7 @@ namespace std {
     std::string pkg("ERR_");
     pkg += err.name();
     char * cstr = new char [pkg.length()+1];
-    std::strcpy (cstr, pkg.c_str());
+    strcpy (cstr, pkg.c_str());
     PyObject *exc = PyErr_NewException( cstr, NULL, NULL );
     delete[] cstr;
     PyErr_SetString( exc, err.what() );

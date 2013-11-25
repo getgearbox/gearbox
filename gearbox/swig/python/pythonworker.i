@@ -138,7 +138,7 @@
       // print a traceback to stderr
       if ( errtb ) {
         char *cstr = new char [6+1];
-        std::strcpy(cstr, "stderr");
+        strcpy(cstr, "stderr");
         PyObject *f = PySys_GetObject(cstr);
         delete[] cstr;
 
