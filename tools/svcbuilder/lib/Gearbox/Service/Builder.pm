@@ -85,9 +85,15 @@ sub generate {
         }
 
         # let's make sure all /service entries are created
-        symlink( "$sdir/$name" => "$super_dir/$name" )
-            unless -e "$super_dir/$name";
+        unless ( -e "$super_dir/$name" ) {
+            unless ( symlink( "$sdir/$name" => "$super_dir/$name" ) ) {
+                croak("failed to create symlink \"$sdir/$name\" => \"$super_dir/$name\"");
+            }
+        }
     }
+
+    # return 0 on success (used for process exit code)
+    return 0;
 }
 
 sub parseJson {
