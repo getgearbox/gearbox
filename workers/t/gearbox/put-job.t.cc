@@ -6,7 +6,6 @@
 #include <gearbox/core/JsonSchema.h>
 #include <gearbox/core/util.h>
 #include <gearbox/store/dbconn.h>
-using namespace Gearbox;
 
 #include <signal.h>
 #include <limits.h>
@@ -19,7 +18,6 @@ using namespace Gearbox;
 
 #include <stub/gearman.hh>
 
-using namespace Gearbox;
 using std::string;
 using namespace soci;
 
@@ -29,36 +27,36 @@ int main(int argc, char *argv[]) {
     string basedir = string(dirname(argv[0])) + "/../";
     chdir(basedir.c_str());
 
-    log_init("./unit.conf");
-    OK( run("./mkdb") == 0 );
+    Gearbox::log_init("./unit.conf");
+    OK( Gearbox::run("./mkdb") == 0 );
 //    db_init("./unit.conf");
     
-    WorkerGearbox w("./unit.conf");
-    DelayProcessor d("./unit.conf");
-    ConfigFile cfg("./unit.conf");
+    Gearbox::WorkerGearbox w("./unit.conf");
+    Gearbox::DelayProcessor d("./unit.conf");
+    Gearbox::ConfigFile cfg("./unit.conf");
     d.initfifo();
     
 
-    JsonSchema createSchema;
+    Gearbox::JsonSchema createSchema;
     createSchema.parseFile("../../gearbox/schemas/create-delay-job-v1.js");
 
     time_t now = time(NULL);
-    Json in, out;
+    Gearbox::Json in, out;
     
-    Json req;
+    Gearbox::Json req;
     req["time"] = now + 2;
     req["name"] = "do_put_doer_thing_v1";
-    req["envelope"].parse( slurp("./job.js") );
+    req["envelope"].parse( Gearbox::slurp("./job.js") );
 
     w.status_manager().create("s-1234","create","http://host:4080/thing/v1/thing/t-1234");
     
     NOTHROW( req.validate(&createSchema) );
 
-    JobManager jm(cfg);
-    JobPtr job = jm.job("do_put_delay_job_v1");
+    Gearbox::JobManager jm(cfg);
+    Gearbox::JobPtr job = jm.job("do_put_delay_job_v1");
     job->content(req.serialize());
 
-    JobResponse resp;
+    Gearbox::JobResponse resp;
     
     NOTHROW( w.do_put_delay_job_v1(*job,resp) );
 
@@ -80,8 +78,8 @@ int main(int argc, char *argv[]) {
     
     IS( id, 1 );
     IS( name, "do_put_doer_thing_v1" );
-    Json input;
-    input.parse(slurp("./job.js"));
+    Gearbox::Json input;
+    input.parse(Gearbox::slurp("./job.js"));
     IS( envelope, input.serialize() );
     IS( t, now + 2 );
     OK( ctime > 0 );
