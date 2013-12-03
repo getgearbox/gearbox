@@ -1,0 +1,19 @@
+Setup run time dependencies for gbq
+===================================
+o export PERL5LIB=~/gearbox/gearbox/swig/perl/lib:~/gearbox/gearbox/swig/perl/.libs/
+o sudo apt-get install libdbi-perl
+o sudo apt-get install libdbd-sqlite3-perl libdbd-mysql-perl
+o ./gbq [--all]
+
+Setup run time dependencies for gbtrace
+=======================================
+o sudo apt-get install libwww-perl
+o sudo apt-get install libtemplate-perl
+o Run gbtrace on a URI. For example:
+  gbtrace http://localhost/testbasic/v1/status/s-42s084tyhyhcpfbkvkf7rkbjwc
+
+Note that gbtrace specifies template via --template=<> attribute in the command line. 
+An example template is at templates/trace.tt. 
+Specify this path via --template param, or copy this file to /etc/gearbox/templates or 
+$HOME/.gearbox/templates.
+
