@@ -32,7 +32,7 @@ PLAN(39)
 IS( str(THROWS( lambda: Worker("bogusfile.conf") )), "config file 'bogusfile.conf' is not a file" )
 
 worker = (OK( TestWorker("./unit.conf") ))[1]
-IS( str(THROWS( lambda: worker.set_self("foo") )), "set_self argument must be an instance of Worker" )
+IS( str(THROWS( lambda: worker.set_self("foo") )), "set_self() arg 1 must be an instance of Worker")
 
 jm = (OK( worker.job_manager() ))[1]
 NOTHROW( lambda: jm.base_uri("http://localhost:4080/test/v1") )
