@@ -1,15 +1,6 @@
 These instructions worked under Oracle Linux 6.3, which should be the same
 as RHEL 6.3 or CentOS 6.3.
 
-SETUP
-=====
-sudo yum install -y automake libtool libuuid-devel curl-devel openssl-devel \
-                    perl-devel php-devel boost boost-devel httpd-devel \
-                    perl-ExtUtils-Embed
-# these are available from EPEL
-sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql soci-sqlite3 \
-                    libgearman libgearman-devel
-
 install yajl >= 2.0
 ===================
 sudo yum install -y cmake
@@ -26,11 +17,9 @@ cd swig-2.0.11
 ./configure
 make && sudo make install
 
-install perl modules
-====================
-sudo yum install -y cpan perl-Log-Log4perl perl-JSON perl-Log-Dispatch \
-                         perl-ExtUtils-Embed
-
+install Test::Trivial perl module
+=================================
+sudo yum install -y cpan
 # Archive::Tar must be >= 1.74 or you will run into this bug:
 # https://rt.cpan.org/Public/Bug/Display.html?id=64038
 sudo cpan Archive::Tar Test::Trivial
@@ -38,7 +27,8 @@ sudo cpan Archive::Tar Test::Trivial
 INIT
 =====
 ./autogen.sh
-CXX="ccache g++" CC="ccache gcc" CPPFLAGS=-I/usr/lib64/perl5/CORE/ ./configure
+./configure
+make deps
 
 BUILD
 =====

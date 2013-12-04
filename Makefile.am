@@ -592,3 +592,21 @@ EXTRA_DIST = \
 	common
 
 include rpm.am
+
+.PHONY: deps
+deps:
+	if [[ ! -e /etc/redhat-release ]]; then \
+		echo "'make deps' only knows how to install build dependencies for redhat"; \
+		exit 1; \
+	fi
+	@echo "# These packages come from the base repo:"
+	sudo yum install -y automake libtool libuuid-devel curl-devel \
+						openssl-devel perl-devel php-devel boost \
+						boost-devel httpd-devel chrpath perl-ExtUtils-Embed \
+						perl-JSON perl-libwww-perl
+	@echo "# These packages come from EPEL:"
+	sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql \
+						soci-sqlite3 libgearman libgearman-devel \
+						perl-Log-Log4perl perl-Log-Dispatch
+	@echo "# You'll have to find these packages yourself.  See BUILD.CENTOS"
+	sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial
