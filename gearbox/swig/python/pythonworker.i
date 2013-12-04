@@ -204,9 +204,13 @@ public:
 %pythoncode %{
 
 from os.path import isfile
+import signal
 
 class Worker(PythonWorker):
     def __init__(self, config):
+        # Allow ctrl-C to work
+        # See https://mail.python.org/pipermail/cplusplus-sig/2012-December/016858.html
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
         if ( not isfile(config) ):
             raise IOError("config file '%s' is not a file" % config)
         super(Worker, self).__init__(config)
