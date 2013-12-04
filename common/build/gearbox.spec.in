@@ -279,6 +279,7 @@ Sample configuration for gearbox-daemons
 %package -n mod_gearbox
 Summary: gearbox apache module
 Group: Development/Libraries
+Requires: httpd
 
 %description -n mod_gearbox
 apache module for gearbox
