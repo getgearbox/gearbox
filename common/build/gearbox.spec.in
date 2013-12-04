@@ -215,7 +215,7 @@ Gearbox daemons libraries
 %package daemons-config
 Summary: Sample configuration for gearbox-daemons
 Group: Development/Libraries
-Requires: gearbox-dbsetup cronolog gearbox-svc-builder gearbox-daemons
+Requires: gearbox-dbsetup cronolog gearbox-svc-builder gearbox-daemons gearbox-status-plugin-sql gearmand
 
 %description daemons-config
 Sample configuration for gearbox-daemons
