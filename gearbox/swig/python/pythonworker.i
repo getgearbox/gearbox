@@ -208,7 +208,7 @@ from os.path import isfile
 class Worker(PythonWorker):
     def __init__(self, config):
         if ( not isfile(config) ):
-            raise IOError("config file 'bogusfile.conf' is not a file")
+            raise IOError("config file '%s' is not a file" % config)
         super(Worker, self).__init__(config)
         self.set_self(self)
 
