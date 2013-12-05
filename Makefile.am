@@ -208,7 +208,6 @@ gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker
 	gearbox/worker/Worker.cc \
     $(NULL)
 
-
 ############################################################
 ### workers/gearbox - workers for internal gearbox services
 ############################################################
@@ -357,14 +356,14 @@ CLEANFILES += \
 	workers/gearbox/sql/status-migration/9.undo.sql \
 	$(NULL)
 
+workers/gearbox/conf/.handlers.d:
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/gearbox/conf/.handlers.d < workers/gearbox/WorkerGearbox.cc
 
-# on install generate the handlers dir and directories needed by gearbox daemons
+gbhandlersdir = ${sysconfdir}/gearbox/gearbox-handlers.d/
+dist_gbhandlers_DATA = workers/gearbox/conf/.handlers.d/*
+
+# on install generate directories needed by gearbox daemons
 install-data-hook:
-	$(mkinstalldirs) $(DESTDIR)$(sysconfdir)/gearbox/gearbox-handlers.d/
-	@for handler in  `$(srcdir)/common/build/print_handlers < $(srcdir)/workers/gearbox/WorkerGearbox.cc`; do \
-		$(LN_S) /dev/null $(DESTDIR)$(sysconfdir)/gearbox/gearbox-handlers.d/$$handler; \
-	done
-
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/counters
 	$(mkinstalldirs) $(DESTDIR)/var/log/gearbox
 
@@ -563,6 +562,7 @@ plugins_status_sql_sql_status_la_SOURCES = \
 dist_bin_SCRIPTS = \
 	tools/gearbox_tools/gbtrace \
 	tools/gearbox_tools/gbq \
+	tools/gearbox_tools/gb-gen-handlers \
 	tools/svcbuilder/bin/gearbox-svc-builder
 
 tmplpkgdatadir = ${pkgdatadir}/gbtrace/templates

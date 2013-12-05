@@ -1,0 +1,93 @@
+#!/bin/env perl
+######################################################################
+# Copyright (c) 2012, Yahoo! Inc. All rights reserved.
+#
+# This program is free software. You may copy or redistribute it under
+# the same terms as Perl itself. Please see the LICENSE.Artistic file 
+# included with this project for the terms of the Artistic License
+# under which this project is licensed. 
+######################################################################
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+
+sub usage {
+    warn <<EOM;
+Usage: $0 [options] [source file]
+
+Options:
+  --handlers-dir <dir> what directory to drop the files into [./.handlers.d]
+  --json               rather than outputing a directory of symlinks, print json
+  --help               this help message
+
+$0 should be able to parse handlers from workers written in
+C++, python, php or perl.
+
+You can specify a source file to read on STDIN or as an argument.
+
+Examples:
+    $0 workerFoo.cc
+    cat foo-workers/*.py |$0 --handlers-dir=/etc/gearbox/foo-handlers.d/
+    $0 --json workerFoo.pl > /etc/gearbox/foo-handlers.json
+EOM
+    exit;
+}
+
+my %opts;
+GetOptions(
+    'handlers-dir|d=s'  => \$opts{handlers_dir},
+    'json|j' => \$opts{json},
+    'help|?' => sub { &usage() }
+) || usage();
+
+
+my $fh = *STDIN;
+if ( my $source_file = $ARGV[0] ) {
+    open($fh, $source_file) or die "Failed to open $source_file: $!\n";
+}
+
+my $handlers;
+my $code = do {
+    local $/;
+    <$fh>
+};
+while( $code =~ /(?:WORKER_REGISTER\(\s*\S+\s*,\s*|(?:\.|->)register_handler\(\s*\")([^")\s]+)/sg ) {
+     my $handler = $1;
+     $handler =~ /^do_\w+_(\w+)_\w+_\w+/;
+     push @{$handlers->{$1}}, $handler;
+}
+
+if ( $opts{json} ) {
+    print <<EOM;
+{
+    "handlers" : [
+EOM
+
+    my $first = 1;
+    foreach my $key (keys %$handlers) {
+        foreach my $handler (sort @{$handlers->{$key}}) {
+            print !$first ? ",\n" : "";
+            print "       \"$handler\"";
+            $first = 0;
+        }
+    }
+    print <<EOM;
+
+    ]
+}
+EOM
+
+exit;
+}
+
+my $handlers_dir = $opts{handlers_dir} || "./.handlers.d";
+system("rm -rf $handlers_dir");
+mkdir("$handlers_dir");
+
+foreach my $key (keys %$handlers) {
+    foreach my $handler (sort @{$handlers->{$key}}) {
+        system("ln -s /dev/null $handlers_dir/$handler");
+    }
+}

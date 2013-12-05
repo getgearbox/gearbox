@@ -359,6 +359,7 @@ Gearbox python-lib libraries
 Summary: Gearbox tools
 Group: Development/Tools
 Requires: perl-Template-Toolkit gearbox-perl-lib perl-DBD-SQLite perl-DBD-MySQL
+Version: 0.1.1
 
 %description tools
 Gearbox tools
@@ -366,6 +367,7 @@ Gearbox tools
 %files tools
 %defattr(-,root,root,-)
 %{_bindir}/gbq
+%{_bindir}/gb-gen-handlers
 %{_bindir}/gbtrace
 %{_datadir}/gearbox/gbtrace/templates/*
 
