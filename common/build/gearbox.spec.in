@@ -280,6 +280,8 @@ Sample configuration for gearbox-daemons
 Summary: gearbox apache module
 Group: Development/Libraries
 Requires: httpd
+Version: 0.1
+Release: 2
 
 %description -n mod_gearbox
 apache module for gearbox
@@ -292,6 +294,7 @@ apache module for gearbox
 %{_libdir}/httpd/modules/mod_gearbox.so.1
 %{_libdir}/httpd/modules/mod_gearbox.so.1.0.0
 %{_sysconfdir}/httpd/conf.d/gearbox.conf
+%{_sysconfdir}/gearbox/logger/httpd-logger.conf
 
 # ============ status-plugin-sql =============
 

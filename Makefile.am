@@ -541,6 +541,8 @@ apache_mod_gearbox_mod_gearbox_la_SOURCES = apache/mod_gearbox/mod_gearbox.cc
 apacheconfddir = ${APACHE_CONFD_DIR}
 dist_apacheconfd_DATA = apache/mod_gearbox/gearbox.conf
 
+dist_gbconflogger_DATA += apache/mod_gearbox/httpd-logger.conf
+
 ###############################################
 ### plugins/status/sql
 ###############################################
