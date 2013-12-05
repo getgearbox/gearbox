@@ -298,17 +298,18 @@ apache module for gearbox
 %package status-plugin-sql
 Summary: Gearbox status-plugin-sql
 Group: Development/Libraries
+Release: 2
 
 %description status-plugin-sql
 Gearbox status-plugin-sql
 
 %files status-plugin-sql
 %defattr(-,root,root,-)
-%{_libdir}/sql_status.a
-%{_libdir}/sql_status.la
-%{_libdir}/sql_status.so
-%{_libdir}/sql_status.so.1
-%{_libdir}/sql_status.so.1.0.0
+%{_libexecdir}/gearbox/plugins/status/sql_status.a
+%{_libexecdir}/gearbox/plugins/status/sql_status.la
+%{_libexecdir}/gearbox/plugins/status/sql_status.so
+%{_libexecdir}/gearbox/plugins/status/sql_status.so.1
+%{_libexecdir}/gearbox/plugins/status/sql_status.so.1.0.0
 
 # ============ perl-lib =============
 
@@ -442,7 +443,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgearbox_store.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libgearbox_worker.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libworker_gearbox.so
 chrpath --delete $RPM_BUILD_ROOT%{_libdir}/httpd/modules/mod_gearbox.so
-chrpath --delete $RPM_BUILD_ROOT%{_libdir}/sql_status.so
+chrpath --delete $RPM_BUILD_ROOT%{_libexecdir}/gearbox/plugins/status/sql_status.so
 
 %check
 

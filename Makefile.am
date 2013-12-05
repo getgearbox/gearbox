@@ -544,7 +544,9 @@ dist_apacheconfd_DATA = apache/mod_gearbox/gearbox.conf
 ###############################################
 ### plugins/status/sql
 ###############################################
-lib_LTLIBRARIES+=plugins/status/sql/sql_status.la
+gblibexecdir = ${libexecdir}/gearbox
+gbstatusplugindir = ${gblibexecdir}/plugins/status
+gbstatusplugin_LTLIBRARIES=plugins/status/sql/sql_status.la
 
 plugins_status_sql_sql_status_la_LDFLAGS = $(BOOST_LDFLAGS) $(SOCI_CORE_LIB) -module -version-info $(GEARBOX_SQL_STATUS_PLUGIN_LIBRARY_VERSION)
 plugins_status_sql_sql_status_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
@@ -572,7 +574,6 @@ svcperllib_HEADERS = \
 	tools/svcbuilder/lib/Gearbox/Service/Builder.pm \
 	tools/svcbuilder/lib/Gearbox/Service/Entry.pm
 
-gblibexecdir = ${libexecdir}/gearbox
 dist_gblibexec_SCRIPTS = common/sql/dbsetup
 
 EXTRA_DIST = \
