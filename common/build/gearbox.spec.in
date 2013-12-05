@@ -339,6 +339,7 @@ Gearbox perl-lib libraries
 %package python-lib
 Summary: Gearbox python libraries
 Group: Development/Libraries
+Version: 0.1.1
 
 %description python-lib
 Gearbox python-lib libraries
