@@ -23,7 +23,7 @@ sub init {
     my ($class, $config) = @_;
     Gearbox::log_init( $config );
     my $cfg = Gearbox::ConfigFile->new($config);
-    Log::Log4perl::init( $cfg->get_string_default("log", "config_file", "/home/y/conf/gearbox/logger/gearbox-logger.conf" ) );
+    Log::Log4perl::init( $cfg->get_string_default("log", "config_file", "/etc/gearbox/logger/gearbox-logger.conf" ) );
     Log::Log4perl::MDC->put("pid" => $$);
 }
 
