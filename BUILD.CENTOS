@@ -11,11 +11,12 @@ sudo yum install ~/rpmbuild/RPMS/x86_64/yajl*
 install swig >= 2.0
 ==================
 sudo yum install -y pcre-devel
-wget http://downloads.sourceforge.net/project/swig/swig/swig-2.0.11/swig-2.0.11.tar.gz
-tar xvfz swig-2.0.11.tar.gz
-cd swig-2.0.11
-./configure
-make && sudo make install
+wget http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/source/SRPMS/swig-2.0.11-2.fc21.src.rpm
+rpmbuild --rebuild swig-2.0.11-2.fc21.src.rpm
+# if you get a test failure like this:
+#     SUITE: base TEST: CCACHE_HASHDIR - Expected cache hit to be 5 got 6
+# try removing any ccache dirs from your PATH and unset CCACHE_HASHDIR env var
+sudo yum install ~/rpmbuild/RPMS/x86_64/swig*.rpm
 
 install Test::Trivial perl module
 =================================
