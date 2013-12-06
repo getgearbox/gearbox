@@ -301,7 +301,8 @@ apache module for gearbox
 %package status-plugin-sql
 Summary: Gearbox status-plugin-sql
 Group: Development/Libraries
-Release: 2
+Requires: soci-sqlite3 soci-mysql
+Release: 3
 
 %description status-plugin-sql
 Gearbox status-plugin-sql
