@@ -25,6 +25,11 @@ sudo yum install -y cpan
 # https://rt.cpan.org/Public/Bug/Display.html?id=64038
 sudo cpan Archive::Tar Test::Trivial
 
+enable epel
+===========
+wget http://mirror.pnl.gov/epel/6/i386/epel-release-6-8.noarch.rpm
+sudo yum install epel-release-6-8.noarch.rpm
+
 INIT
 =====
 ./autogen.sh
