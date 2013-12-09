@@ -1,7 +1,14 @@
 Summary: Gearbox - Framework for asynchronous job dispatching
 Name: @PACKAGE@
 Version: @VERSION@
-Release: 1
+# set release to 1 unless the caller sets it
+# this allows us to set the release number to the git commit at build time
+# for snapshot packages like this:
+#   RELEASE=`date +%Y%m%d`git`git rev-parse --short HEAD`
+#   rpmbuild -bb --define "_release $RELEASE" rpm/*.spec
+# See https://fedoraproject.org/wiki/Packaging:NamingGuidelines#Snapshot_packages
+%{!?_release: %define _release 1}
+Release:        %{_release}
 License: Apache
 Group: System Environment/Libraries
 BuildRequires: chrpath
@@ -281,7 +288,6 @@ Summary: gearbox apache module
 Group: Development/Libraries
 Requires: httpd
 Version: 0.1
-Release: 2
 
 %description -n mod_gearbox
 apache module for gearbox
@@ -302,7 +308,6 @@ apache module for gearbox
 Summary: Gearbox status-plugin-sql
 Group: Development/Libraries
 Requires: soci-sqlite3 soci-mysql
-Release: 3
 
 %description status-plugin-sql
 Gearbox status-plugin-sql

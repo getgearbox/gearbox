@@ -14,7 +14,7 @@ rpm-build: common/build/$(PACKAGE).spec clean-rpm
 	@mkdir -p ~/rpmbuild/SPECS/
 	@mkdir -p ~/rpmbuild/SRPMS/
 	@cp $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
-	@rpmbuild -ba common/build/$(PACKAGE).spec
+	@rpmbuild -ba --define "_release `date +%s`git`git rev-parse --short HEAD`" common/build/$(PACKAGE).spec
 	@cp ~/rpmbuild/RPMS/x86_64/$(PACKAGE)*-$(VERSION)*.rpm .
 	@cp ~/rpmbuild/RPMS/x86_64/mod_gearbox-$(VERSION)*.rpm .
 	@cp ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)*.rpm .
