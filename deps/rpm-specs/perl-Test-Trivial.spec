@@ -9,6 +9,7 @@ Source0:        http://www.cpan.org/authors/id/C/CO/CORYB/Test-Trivial-%{version
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker) perl(Regexp::Common) perl(Text::Diff) perl(Test::More) perl(IO::Scalar) perl(IO::Tee)
+Requires:       perl(Test::Builder) perl(Test::More) perl(IO::Tee)
 
 %description
 "Test::Trivial" was written to allow test writers to trivially write
