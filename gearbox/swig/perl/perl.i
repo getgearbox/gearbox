@@ -91,6 +91,9 @@
     case SVt_NULL:
       json.empty();
       return;
+#if PERL_REVERSION <= 5 && PERL_VERSION <= 10
+    case SVt_RV:
+#endif
     case SVt_IV:
       // this will probably be JSON::Boolean class
       if( sv_isobject(sv) ) {

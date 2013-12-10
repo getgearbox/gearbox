@@ -40,7 +40,3 @@ make deps
 BUILD
 =====
 make check
-
-Note that two test in gearbox/t/swig/perl/status.t fail due to issues with
-$status->meta().  It may be related to the version of swig we're using here, but
-I haven't diagnosed the problem yet.
