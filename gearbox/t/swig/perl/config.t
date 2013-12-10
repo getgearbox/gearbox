@@ -48,9 +48,7 @@ IS $cfg->as_json() => {
     "gearbox" => {
         "conf" => "."
     },
-    "scoreboard" => {
-        "name" => "./unit"
-    },
+    "config_dir" => "/dev/null",
     "test-int" => 1,
     "test-double"  => 1.2,
     "test-string" => "string",

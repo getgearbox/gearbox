@@ -45,9 +45,7 @@ IS( cfg.as_json(), {
     u"gearbox": {
         u"conf": u"."
     },
-    u"scoreboard": {
-        u"name": u"./unit"
-    },
+    u"config_dir": u"/dev/null",
     u"test-int": 1,
     u"test-double": 1.2,
     u"test-string": u"string",
