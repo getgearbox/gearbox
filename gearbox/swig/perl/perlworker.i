@@ -44,9 +44,10 @@
          if( sv_isobject(errsv) && sv_derived_from(errsv, "Gearbox::Error") ) {
            HV*self=(HV*)SvRV(errsv);
            STRLEN len;
+           char * errmsgptr = SvPV(*hv_fetch(self,"msg",3,0), len);
            throw_from_code(
              SvIV(*hv_fetch(self,"code",4,0)),
-             std::string(SvPV(*hv_fetch(self,"msg",3,0),len),len)
+             std::string(errmsgptr, len)
             );
          }
          else {
