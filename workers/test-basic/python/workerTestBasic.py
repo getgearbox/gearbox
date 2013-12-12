@@ -18,7 +18,7 @@ def file_put_contents(filename, contents):
         f.write(contents)
 
 class WorkerTestBasicPython(Worker):
-    DBDIR = "/usr/var/gearbox/db/test-basic-python/"
+    DBDIR = "/var/gearbox/db/test-basic-python/"
 
     def __init__(self, cfg):
         super(WorkerTestBasicPython, self).__init__(cfg)

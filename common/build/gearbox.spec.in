@@ -430,6 +430,7 @@ Gearbox test workers
 %attr(0755,-,-) %{_bindir}/workerTestChained.pl
 %attr(0755,-,-) %{_bindir}/workerTestDelay.pl
 %attr(0755,-,-) %{_bindir}/workerTestSync.pl
+%attr(0755,-,-) %{_bindir}/workerTestBasic.py
 %{_sysconfdir}/gearbox/test-workers-handlers.d/*
 %{_datadir}/gearbox/schemas/get-testagents-thing-v1.js
 %{_datadir}/gearbox/schemas/delete-testagents-thing-v1.js
@@ -445,6 +446,10 @@ Gearbox test workers
 %{_datadir}/gearbox/schemas/get-testbasicperl-thing-v1.js
 %{_datadir}/gearbox/schemas/delete-testbasicperl-thing-v1.js
 %{_datadir}/gearbox/schemas/create-testbasicperl-thing-v1.js
+%{_datadir}/gearbox/schemas/update-testbasicpython-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testbasicpython-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testbasicpython-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testbasicpython-thing-v1.js
 %{_datadir}/gearbox/schemas/update-testcancel-thing-v1.js
 %{_datadir}/gearbox/schemas/create-testcancel-continuation-v1.js
 %{_datadir}/gearbox/schemas/update-testcancelperl-thing-v1.js
@@ -508,6 +513,7 @@ Sample configuration for gearbox-test-workers
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-chained-perl
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-delay-perl
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-sync-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-basic-python
 %attr(0755,root,root) %{_sysconfdir}/init.d/gearbox-test-workers
 %{_sysconfdir}/gearbox/config.d/gearbox.conf
 %{_sysconfdir}/gearbox/test-agents.conf
@@ -516,6 +522,7 @@ Sample configuration for gearbox-test-workers
 %{_sysconfdir}/gearbox/test-agents-perl-agents.conf
 %{_sysconfdir}/gearbox/test-basic.conf
 %{_sysconfdir}/gearbox/test-basic-perl.conf
+%{_sysconfdir}/gearbox/test-basic-py.conf
 %{_sysconfdir}/gearbox/test-cancel.conf
 %{_sysconfdir}/gearbox/test-cancel-perl.conf
 %{_sysconfdir}/gearbox/test-chained.conf
@@ -528,6 +535,7 @@ Sample configuration for gearbox-test-workers
 %{_sysconfdir}/httpd/conf.d/httpd-test-agents-perl.conf
 %{_sysconfdir}/httpd/conf.d/httpd-test-basic.conf
 %{_sysconfdir}/httpd/conf.d/httpd-test-basic-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-basic-py.conf
 %{_sysconfdir}/httpd/conf.d/httpd-test-cancel.conf
 %{_sysconfdir}/httpd/conf.d/httpd-test-cancel-perl.conf
 %{_sysconfdir}/httpd/conf.d/httpd-test-chained.conf

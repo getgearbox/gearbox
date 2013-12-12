@@ -376,6 +376,7 @@ install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay-perl
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-basic-python
 	$(mkinstalldirs) $(DESTDIR)/var/log/gearbox
 
 bin_PROGRAMS+=workers/test-basic/workerTestBasic
@@ -420,10 +421,14 @@ dist_schemapkgdata_DATA += \
 	workers/test-basic/schemas/get-testbasic-thing-v1.js \
 	workers/test-basic/schemas/delete-testbasic-thing-v1.js \
 	workers/test-basic/schemas/create-testbasic-thing-v1.js \
-	workers/test-basic/perl/schemas/update-testbasicperl-thing-v1.js \
-	workers/test-basic/perl/schemas/get-testbasicperl-thing-v1.js \
-	workers/test-basic/perl/schemas/delete-testbasicperl-thing-v1.js \
-	workers/test-basic/perl/schemas/create-testbasicperl-thing-v1.js \
+    workers/test-basic/perl/schemas/update-testbasicperl-thing-v1.js \
+    workers/test-basic/perl/schemas/get-testbasicperl-thing-v1.js \
+    workers/test-basic/perl/schemas/delete-testbasicperl-thing-v1.js \
+    workers/test-basic/perl/schemas/create-testbasicperl-thing-v1.js \
+    workers/test-basic/python/schemas/update-testbasicpython-thing-v1.js \
+    workers/test-basic/python/schemas/get-testbasicpython-thing-v1.js \
+    workers/test-basic/python/schemas/delete-testbasicpython-thing-v1.js \
+    workers/test-basic/python/schemas/create-testbasicpython-thing-v1.js \
 	workers/test-cancel/schemas/update-testcancel-thing-v1.js \
 	workers/test-cancel/schemas/create-testcancel-continuation-v1.js \
 	workers/test-cancel/perl/schemas/update-testcancelperl-thing-v1.js \
@@ -478,6 +483,7 @@ dist_bin_SCRIPTS = \
 	workers/test-chained/perl/workerTestChained.pl \
 	workers/test-delay/perl/workerTestDelay.pl \
 	workers/test-sync/perl/workerTestSync.pl \
+    workers/test-basic/python/workerTestBasic.py \
 	$(NULL)
 
 dist_gbsysconf_DATA += \
@@ -486,7 +492,8 @@ dist_gbsysconf_DATA += \
 	workers/test-agents/perl/conf/test-agents-perl.conf \
 	workers/test-agents/perl/conf/test-agents-perl-agents.conf \
 	workers/test-basic/conf/test-basic.conf \
-	workers/test-basic/perl/conf/test-basic-perl.conf \
+    workers/test-basic/perl/conf/test-basic-perl.conf \
+    workers/test-basic/python/conf/test-basic-py.conf \
 	workers/test-cancel/conf/test-cancel.conf \
 	workers/test-cancel/perl/conf/test-cancel-perl.conf \
 	workers/test-chained/conf/test-chained.conf \
@@ -515,8 +522,9 @@ workers/.test-handlers.d:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/php/workerTestCancel.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/php/workerTestChained.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/php/workerTestDelay.php && \
-	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php
-
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php && \
+    tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/python/workerTestBasic.py
+    
 testhandlersdir = ${sysconfdir}/gearbox/test-workers-handlers.d/
 dist_testhandlers_DATA = workers/.test-handlers.d/*
 
@@ -672,7 +680,8 @@ dist_apacheconfd_DATA += \
 	workers/test-agents/conf/httpd-test-agents.conf \
 	workers/test-agents/perl/conf/httpd-test-agents-perl.conf \
 	workers/test-basic/conf/httpd-test-basic.conf \
-	workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
+    workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
+    workers/test-basic/python/conf/httpd-test-basic-py.conf \
 	workers/test-cancel/conf/httpd-test-cancel.conf \
 	workers/test-cancel/perl/conf/httpd-test-cancel-perl.conf \
 	workers/test-chained/conf/httpd-test-chained.conf \
@@ -755,3 +764,4 @@ deps:
 						perl-Test-Simple perl-Time-HiRes
 	@echo "# You'll have to find these packages yourself.  See BUILD.CENTOS"
 	sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial
+
