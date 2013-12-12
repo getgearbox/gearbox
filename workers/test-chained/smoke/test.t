@@ -22,7 +22,7 @@ my $c = Gearbox::Rest::Client->new( trace => $TRACE );
 
 $ENV{PREFIX} ||= "";
 my $PREFIX = $ENV{PREFIX} ? "/$ENV{PREFIX}" : "";
-my $URI = "http://" . ($ENV{SMOKE_HOST} || "localhost:4080") . "$PREFIX/test-chained/v1";
+my $URI = "http://" . ($ENV{SMOKE_HOST} || "localhost") . "$PREFIX/test-chained/v1";
 
 my $data;
 my $err;

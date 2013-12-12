@@ -16,7 +16,7 @@ use warnings;
 use Gearbox::Worker;
 use base qw(Gearbox::Worker);
 use JSON qw(to_json from_json);
-use constant DBDIR => "/usr/var/gearbox/db/test-chained-perl/";
+use constant DBDIR => "/var/gearbox/db/test-chained-perl/";
 
 sub new {
     my $self = shift->SUPER::new(@_);

@@ -210,7 +210,7 @@ Gearbox daemons libraries
 %{_libdir}/libworker_gearbox.so.0
 %{_libdir}/libworker_gearbox.so.0.0.0
 %{_sysconfdir}/gearbox/gearbox-handlers.d/*
-%{_localstatedir}/gearbox/db/counters/
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/counters/
 %{_datadir}/gearbox/schemas/create-delay-job-v1.js
 %{_datadir}/gearbox/schemas/create-global-status-v1.js
 %{_datadir}/gearbox/schemas/get-global-status-response-v1.js
@@ -418,12 +418,130 @@ Gearbox test workers
 
 %files test-workers
 %defattr(-,root,root,-)
-%{_bindir}/workerTestBasic
-%{_bindir}/workerTestAgents
-%{_bindir}/workerTestCancel
-%{_bindir}/workerTestChained
-%{_bindir}/workerTestDelay
-%{_bindir}/workerTestSync
+%attr(0755,-,-) %{_bindir}/workerTestAgents
+%attr(0755,-,-) %{_bindir}/workerTestBasic
+%attr(0755,-,-) %{_bindir}/workerTestCancel
+%attr(0755,-,-) %{_bindir}/workerTestChained
+%attr(0755,-,-) %{_bindir}/workerTestDelay
+%attr(0755,-,-) %{_bindir}/workerTestSync
+%attr(0755,-,-) %{_bindir}/workerTestAgents.pl
+%attr(0755,-,-) %{_bindir}/workerTestBasic.pl
+%attr(0755,-,-) %{_bindir}/workerTestCancel.pl
+%attr(0755,-,-) %{_bindir}/workerTestChained.pl
+%attr(0755,-,-) %{_bindir}/workerTestDelay.pl
+%attr(0755,-,-) %{_bindir}/workerTestSync.pl
+%{_sysconfdir}/gearbox/test-workers-handlers.d/*
+%{_datadir}/gearbox/schemas/get-testagents-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testagents-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testagents-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testagentsperl-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testagentsperl-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testagentsperl-thing-v1.js
+%{_datadir}/gearbox/schemas/update-testbasic-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testbasic-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testbasic-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testbasic-thing-v1.js
+%{_datadir}/gearbox/schemas/update-testbasicperl-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testbasicperl-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testbasicperl-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testbasicperl-thing-v1.js
+%{_datadir}/gearbox/schemas/update-testcancel-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testcancel-continuation-v1.js
+%{_datadir}/gearbox/schemas/update-testcancelperl-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testcancelperl-continuation-v1.js
+%{_datadir}/gearbox/schemas/get-testchained-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testchained-hello-v1.js
+%{_datadir}/gearbox/schemas/get-testchained-hello1-v1.js
+%{_datadir}/gearbox/schemas/get-testchained-goodbye-v1.js
+%{_datadir}/gearbox/schemas/delete-testchained-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testchained-service2-v1.js
+%{_datadir}/gearbox/schemas/create-testchained-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testchained-service2-v1.js
+%{_datadir}/gearbox/schemas/create-testchained-hello2-v1.js
+%{_datadir}/gearbox/schemas/create-testchained-goodbye-v1.js
+%{_datadir}/gearbox/schemas/get-testchainedperl-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testchainedperl-hello-v1.js
+%{_datadir}/gearbox/schemas/get-testchainedperl-hello1-v1.js
+%{_datadir}/gearbox/schemas/get-testchainedperl-goodbye-v1.js
+%{_datadir}/gearbox/schemas/delete-testchainedperl-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testchainedperl-service2-v1.js
+%{_datadir}/gearbox/schemas/create-testchainedperl-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testchainedperl-service2-v1.js
+%{_datadir}/gearbox/schemas/create-testchainedperl-hello2-v1.js
+%{_datadir}/gearbox/schemas/create-testchainedperl-goodbye-v1.js
+%{_datadir}/gearbox/schemas/get-testdelay-counter-v1.js
+%{_datadir}/gearbox/schemas/delete-testdelay-counter-v1.js
+%{_datadir}/gearbox/schemas/create-testdelay-counter-v1.js
+%{_datadir}/gearbox/schemas/get-testdelayperl-counter-v1.js
+%{_datadir}/gearbox/schemas/delete-testdelayperl-counter-v1.js
+%{_datadir}/gearbox/schemas/create-testdelayperl-counter-v1.js
+%{_datadir}/gearbox/schemas/update-testsync-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testsync-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testsync-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testsync-thing-v1.js
+%{_datadir}/gearbox/schemas/update-testsyncperl-thing-v1.js
+%{_datadir}/gearbox/schemas/get-testsyncperl-thing-v1.js
+%{_datadir}/gearbox/schemas/delete-testsyncperl-thing-v1.js
+%{_datadir}/gearbox/schemas/create-testsyncperl-thing-v1.js
+
+# ============ test-workers-config =============
+
+%package test-workers-config
+Summary: Sample configuration for gearbox-test-workers
+Group: Development/Libraries
+Requires: gearbox-daemons-config gearbox-dbsetup cronolog gearbox-svc-builder gearbox-status-plugin-sql gearmand gearbox-test-workers
+
+%description test-workers-config
+Sample configuration for gearbox-test-workers
+
+%files test-workers-config
+%defattr(-,root,root,-)
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-agents
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-basic
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-cancel
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-chained
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-delay
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-sync
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-agents-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-basic-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-cancel-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-chained-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-delay-perl
+%attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-sync-perl
+%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox-test-workers
+%{_sysconfdir}/gearbox/config.d/gearbox.conf
+%{_sysconfdir}/gearbox/test-agents.conf
+%{_sysconfdir}/gearbox/test-agents-agents.conf
+%{_sysconfdir}/gearbox/test-agents-perl.conf
+%{_sysconfdir}/gearbox/test-agents-perl-agents.conf
+%{_sysconfdir}/gearbox/test-basic.conf
+%{_sysconfdir}/gearbox/test-basic-perl.conf
+%{_sysconfdir}/gearbox/test-cancel.conf
+%{_sysconfdir}/gearbox/test-cancel-perl.conf
+%{_sysconfdir}/gearbox/test-chained.conf
+%{_sysconfdir}/gearbox/test-chained-perl.conf
+%{_sysconfdir}/gearbox/test-delay.conf
+%{_sysconfdir}/gearbox/test-delay-perl.conf
+%{_sysconfdir}/gearbox/test-sync.conf
+%{_sysconfdir}/gearbox/test-sync-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-agents.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-agents-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-basic.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-basic-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-cancel.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-cancel-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-chained.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-chained-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-delay.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-delay-perl.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-sync.conf
+%{_sysconfdir}/httpd/conf.d/httpd-test-sync-perl.conf
+
+%post test-workers-config
+/etc/init.d/gearbox-test-workers create
+
+%preun test-workers-config
+/etc/init.d/gearbox-test-workers delete
 
 %prep
 %setup -q

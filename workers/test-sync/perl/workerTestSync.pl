@@ -24,7 +24,7 @@ use base 'Gearbox::Worker';
 use JSON qw(from_json to_json);
 use File::Basename qw(basename);
 
-use constant DBDIR => "/usr/var/gearbox/db/test-sync-perl/";
+use constant DBDIR => "/var/gearbox/db/test-sync-perl/";
 
 sub new {
     my $class = shift;

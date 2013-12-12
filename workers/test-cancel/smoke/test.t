@@ -23,7 +23,7 @@ my $c = Gearbox::Rest::Client->new(
    auto_poll => 0
 );
 my $PREFIX = $ENV{PREFIX} ? "/$ENV{PREFIX}" : "";
-my $URI = "http://" . ($ENV{SMOKE_HOST} || "localhost:4080") . "$PREFIX/test-cancel/v1";
+my $URI = "http://" . ($ENV{SMOKE_HOST} || "localhost") . "$PREFIX/test-cancel/v1";
 
 my $data;
 my $err;

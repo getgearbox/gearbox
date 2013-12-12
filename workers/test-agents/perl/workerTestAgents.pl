@@ -25,13 +25,15 @@ sub new {
     $self->register_handler( "do_get_testagentsperl_thing_v1", \&thing_handler );
     $self->register_handler( "do_post_testagentsperl_thing_v1", \&thing_handler);
     $self->register_handler( "do_delete_testagentsperl_thing_v1", \&thing_handler);
+    $self->register_handler( "do_reg_testagentsperl_A_v1", \&dummy_handler);
+    $self->register_handler( "do_unreg_testagentsperl_A_v1", \&dummy_handler);
+    $self->register_handler( "do_reg_testagentsperl_B_v1", \&dummy_handler);
+    $self->register_handler( "do_unreg_testagentsperl_B_v1", \&dummy_handler);
+    $self->register_handler( "do_reg_testagentsperl_C_v1", \&dummy_handler);
+    $self->register_handler( "do_unreg_testagentsperl_C_v1", \&dummy_handler);
+    $self->register_handler( "do_reg_testagentsperl_D_v1", \&dummy_handler);
+    $self->register_handler( "do_unreg_testagentsperl_D_v1", \&dummy_handler);
     
-    for my $resource ( qw(A B C D) ) {
-        for my $op ( qw(reg unreg) ) {
-            $self->register_handler( "do_${op}_testagentsperl_${resource}_v1", \&dummy_handler );
-        }
-    }
-
     return $self;
 }
 
@@ -55,7 +57,7 @@ sub thing_handler {
     my $agents = $self->json()->decode(slurp("/etc/gearbox/test-agents-perl-agents.conf"));
 
     $resp->status()->add_message("calling agents");
-    
+
     if( $job->operation() eq "create" ) {
         $content->{"id"} = $job->resource_name();
         write_file(DBDIR.$job->resource_name(), $self->json()->encode($content));

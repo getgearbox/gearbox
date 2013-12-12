@@ -26,7 +26,7 @@ start() {
 
         # if we stopped it with svc -d (in the stop function below) start it
         # with svc -u
-        /usr/local/bin/svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
+        svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
         # when grep matches it returns 0, when it doesn't match it returns nonzero
         if [[ $? -eq 0 ]]; then
             action "Waiting for svscan to spawn supervise for new services" sleep 5
@@ -35,12 +35,18 @@ start() {
         fi
 }
 
+status() {
+        svstat /var/gearbox/gearbox-workers/*
+}
+
 stop() {
         action "Stopping gearbox services: " svc -d /var/gearbox/gearbox-workers/*
 }
 
 delete() {
+        # Create an empty daemons json string
         echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
+
         action "Deleting gearbox services: " \
         gearbox-svc-builder --file=/tmp/empty-daemons.conf \
                             --key=daemons \
@@ -66,8 +72,11 @@ case "$1" in
         stop
         start
         ;;
+  status)
+  		status
+  		;;
   *)
-        echo $"Usage: $0 {create|start|stop|restart|reload|delete}"
+        echo $"Usage: $0 {create|start|stop|restart|reload|delete|status}"
         exit 1
 esac
 exit 0

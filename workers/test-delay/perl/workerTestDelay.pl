@@ -17,7 +17,7 @@ use Gearbox::Worker;
 use JSON;
 use base qw(Gearbox::Worker);
 
-use constant DBDIR => "/usr/var/gearbox/db/test-delay-perl/";
+use constant DBDIR => "/var/gearbox/db/test-delay-perl/";
 
 sub new {
     my $self = shift->SUPER::new(@_);

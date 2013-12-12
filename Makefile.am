@@ -13,7 +13,7 @@ export DYLD_FORCE_FLAT_NAMESPACE=1
 LIBTAP=deps/libtap++-0.01/libtap++.la
 
 $(LIBTAP): deps/libtap++-0.01/tap++.C
-deps/libtap++-0.01/tap++.h:
+deps/libtap++-0.01/tap++.C deps/libtap++-0.01/tap++.h:
 	cd deps && tar xzf libtap-0.01.tar.gz
 # need bogus -rpath to force shared library
 deps_libtap___0_01_libtap___la_LDFLAGS = -rpath /dev/null
@@ -245,7 +245,7 @@ dist_schemapkgdata_DATA = \
 	workers/gearbox/schemas/get-global-status-v1.js \
 	workers/gearbox/schemas/update-global-status-v1.js \
 	$(NULL)
-
+	
 # configuration for daemons
 workers/gearbox/conf/config.d/%.conf : workers/gearbox/conf/config.d/%.conf.sh
 	$< > $@
@@ -269,9 +269,6 @@ dist_gbconfigd_DATA = \
 	workers/gearbox/conf/config.d/log.conf \
 	workers/gearbox/conf/config.d/status.conf \
 	$(NULL)
-
-initdsysconfdir = ${sysconfdir}/init.d/
-dist_initdsysconf_DATA = workers/gearbox/conf/init.d/gearbox
 
 # $< > $@ means execute the source into the target
 # e.g. workers/gearbox/sql/status.sql.sh > workers/gearbox/sql/status.sql
@@ -307,7 +304,8 @@ dist_gbsqlstatusmigrate_DATA = \
 	workers/gearbox/sql/status-migration/10.sql \
 	workers/gearbox/sql/status-migration/10.undo.sql \
 	workers/gearbox/sql/status-migration/11.sql \
-	workers/gearbox/sql/status-migration/11.undo.sql
+	workers/gearbox/sql/status-migration/11.undo.sql \
+	$(NULL)
 
 gbsqldelaymigratedir = ${gbsqldir}/delay-migration
 dist_gbsqldelaymigrate_DATA = \
@@ -320,7 +318,8 @@ dist_gbsqldelaymigrate_DATA = \
 	workers/gearbox/sql/delay-migration/5.sql \
 	workers/gearbox/sql/delay-migration/5.undo.sql \
 	workers/gearbox/sql/delay-migration/6.sql \
-	workers/gearbox/sql/delay-migration/6.undo.sql
+	workers/gearbox/sql/delay-migration/6.undo.sql \
+	$(NULL)
 
 CLEANFILES += \
 	workers/gearbox/conf/config.d/delay.conf \
@@ -365,6 +364,18 @@ dist_gbhandlers_DATA = workers/gearbox/conf/.handlers.d/*
 # on install generate directories needed by gearbox daemons
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/counters
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-agents
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-basic
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-cancel
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-agents-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-basic-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-cancel-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-chained-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-delay-perl
+	$(mkinstalldirs) $(DESTDIR)$(localstatedir)/gearbox/db/test-sync-perl
 	$(mkinstalldirs) $(DESTDIR)/var/log/gearbox
 
 bin_PROGRAMS+=workers/test-basic/workerTestBasic
@@ -396,6 +407,118 @@ bin_PROGRAMS+=workers/test-sync/workerTestSync
 workers_test_sync_workerTestSync_SOURCES = workers/test-sync/WorkerTestSync.h workers/test-sync/WorkerTestSync.cc workers/test-sync/workerTestSyncMain.cc
 workers_test_sync_workerTestSync_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB) $(BOOST_FILESYSTEM_LIB) $(BOOST_SYSTEM_LIB)
 workers_test_sync_workerTestSync_LDADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la gearbox/job/libgearbox_job.la
+
+# configuration for test workers
+dist_schemapkgdata_DATA += \
+	workers/test-agents/schemas/get-testagents-thing-v1.js \
+	workers/test-agents/schemas/delete-testagents-thing-v1.js \
+	workers/test-agents/schemas/create-testagents-thing-v1.js \
+	workers/test-agents/perl/schemas/get-testagentsperl-thing-v1.js \
+	workers/test-agents/perl/schemas/delete-testagentsperl-thing-v1.js \
+	workers/test-agents/perl/schemas/create-testagentsperl-thing-v1.js \
+	workers/test-basic/schemas/update-testbasic-thing-v1.js \
+	workers/test-basic/schemas/get-testbasic-thing-v1.js \
+	workers/test-basic/schemas/delete-testbasic-thing-v1.js \
+	workers/test-basic/schemas/create-testbasic-thing-v1.js \
+	workers/test-basic/perl/schemas/update-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/get-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/delete-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/create-testbasicperl-thing-v1.js \
+	workers/test-cancel/schemas/update-testcancel-thing-v1.js \
+	workers/test-cancel/schemas/create-testcancel-continuation-v1.js \
+	workers/test-cancel/perl/schemas/update-testcancelperl-thing-v1.js \
+	workers/test-cancel/perl/schemas/create-testcancelperl-continuation-v1.js \
+	workers/test-chained/schemas/get-testchained-thing-v1.js \
+	workers/test-chained/schemas/get-testchained-hello-v1.js \
+	workers/test-chained/schemas/get-testchained-hello1-v1.js \
+	workers/test-chained/schemas/get-testchained-goodbye-v1.js \
+	workers/test-chained/schemas/delete-testchained-thing-v1.js \
+	workers/test-chained/schemas/delete-testchained-service2-v1.js \
+	workers/test-chained/schemas/create-testchained-thing-v1.js \
+	workers/test-chained/schemas/create-testchained-service2-v1.js \
+	workers/test-chained/schemas/create-testchained-hello2-v1.js \
+	workers/test-chained/schemas/create-testchained-goodbye-v1.js \
+	workers/test-chained/perl/schemas/get-testchainedperl-thing-v1.js \
+	workers/test-chained/perl/schemas/get-testchainedperl-hello-v1.js \
+	workers/test-chained/perl/schemas/get-testchainedperl-hello1-v1.js \
+	workers/test-chained/perl/schemas/get-testchainedperl-goodbye-v1.js \
+	workers/test-chained/perl/schemas/delete-testchainedperl-thing-v1.js \
+	workers/test-chained/perl/schemas/delete-testchainedperl-service2-v1.js \
+	workers/test-chained/perl/schemas/create-testchainedperl-thing-v1.js \
+	workers/test-chained/perl/schemas/create-testchainedperl-service2-v1.js \
+	workers/test-chained/perl/schemas/create-testchainedperl-hello2-v1.js \
+	workers/test-chained/perl/schemas/create-testchainedperl-goodbye-v1.js \
+	workers/test-delay/schemas/get-testdelay-counter-v1.js \
+	workers/test-delay/schemas/delete-testdelay-counter-v1.js \
+	workers/test-delay/schemas/create-testdelay-counter-v1.js \
+	workers/test-delay/perl/schemas/get-testdelayperl-counter-v1.js \
+	workers/test-delay/perl/schemas/delete-testdelayperl-counter-v1.js \
+	workers/test-delay/perl/schemas/create-testdelayperl-counter-v1.js \
+	workers/test-sync/schemas/update-testsync-thing-v1.js \
+	workers/test-sync/schemas/get-testsync-thing-v1.js \
+	workers/test-sync/schemas/delete-testsync-thing-v1.js \
+	workers/test-sync/schemas/create-testsync-thing-v1.js \
+	workers/test-sync/perl/schemas/update-testsyncperl-thing-v1.js \
+	workers/test-sync/perl/schemas/get-testsyncperl-thing-v1.js \
+	workers/test-sync/perl/schemas/delete-testsyncperl-thing-v1.js \
+	workers/test-sync/perl/schemas/create-testsyncperl-thing-v1.js \
+	$(NULL)
+
+
+initdsysconfdir = ${sysconfdir}/init.d/
+dist_initdsysconf_DATA = \
+	workers/gearbox/conf/init.d/gearbox \
+	workers/gearbox/conf/init.d/gearbox-test-workers \
+	$(NULL)
+
+dist_bin_SCRIPTS = \
+	workers/test-agents/perl/workerTestAgents.pl \
+	workers/test-basic/perl/workerTestBasic.pl \
+	workers/test-cancel/perl/workerTestCancel.pl \
+	workers/test-chained/perl/workerTestChained.pl \
+	workers/test-delay/perl/workerTestDelay.pl \
+	workers/test-sync/perl/workerTestSync.pl \
+	$(NULL)
+
+dist_gbsysconf_DATA += \
+	workers/test-agents/conf/test-agents.conf \
+	workers/test-agents/conf/test-agents-agents.conf \
+	workers/test-agents/perl/conf/test-agents-perl.conf \
+	workers/test-agents/perl/conf/test-agents-perl-agents.conf \
+	workers/test-basic/conf/test-basic.conf \
+	workers/test-basic/perl/conf/test-basic-perl.conf \
+	workers/test-cancel/conf/test-cancel.conf \
+	workers/test-cancel/perl/conf/test-cancel-perl.conf \
+	workers/test-chained/conf/test-chained.conf \
+	workers/test-chained/perl/conf/test-chained-perl.conf \
+	workers/test-delay/conf/test-delay.conf \
+	workers/test-delay/perl/conf/test-delay-perl.conf \
+	workers/test-sync/conf/test-sync.conf \
+	workers/test-sync/perl/conf/test-sync-perl.conf \
+    $(NULL)
+
+workers/.test-handlers.d:
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d < workers/test-agents/WorkerTestAgents.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/WorkerTestBasic.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/WorkerTestCancel.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/WorkerTestChained.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/WorkerTestDelay.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/WorkerTestSync.cc && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-agents/perl/workerTestAgents.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/perl/workerTestBasic.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/perl/workerTestCancel.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/perl/workerTestChained.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/perl/workerTestDelay.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/perl/workerTestSync.pl && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-agents/php/workerTestAgents.php && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/php/workerTestBasic.php && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/php/workerTestCancel.php && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/php/workerTestChained.php && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/php/workerTestDelay.php && \
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php
+
+testhandlersdir = ${sysconfdir}/gearbox/test-workers-handlers.d/
+dist_testhandlers_DATA = workers/.test-handlers.d/*
 
 ###############################################
 ### gearbox/swig/perl
@@ -543,6 +666,24 @@ dist_apacheconfd_DATA = apache/mod_gearbox/gearbox.conf
 dist_gbconflogger_DATA += apache/mod_gearbox/httpd-logger.conf
 
 ###############################################
+### apache modules for test workers
+###############################################
+dist_apacheconfd_DATA += \
+	workers/test-agents/conf/httpd-test-agents.conf \
+	workers/test-agents/perl/conf/httpd-test-agents-perl.conf \
+	workers/test-basic/conf/httpd-test-basic.conf \
+	workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
+	workers/test-cancel/conf/httpd-test-cancel.conf \
+	workers/test-cancel/perl/conf/httpd-test-cancel-perl.conf \
+	workers/test-chained/conf/httpd-test-chained.conf \
+	workers/test-chained/perl/conf/httpd-test-chained-perl.conf \
+	workers/test-delay/conf/httpd-test-delay.conf \
+	workers/test-delay/perl/conf/httpd-test-delay-perl.conf \
+	workers/test-sync/conf/httpd-test-sync.conf \
+	workers/test-sync/perl/conf/httpd-test-sync-perl.conf \
+	$(NULL)
+
+###############################################
 ### plugins/status/sql
 ###############################################
 gblibexecdir = ${libexecdir}/gearbox
@@ -559,7 +700,7 @@ plugins_status_sql_sql_status_la_SOURCES = \
 ###############################################
 ### tools
 ###############################################
-dist_bin_SCRIPTS = \
+dist_bin_SCRIPTS += \
 	tools/gearbox_tools/gbtrace \
 	tools/gearbox_tools/gbq \
 	tools/gearbox_tools/gb-gen-handlers \
@@ -610,6 +751,7 @@ deps:
 	@echo "# These packages come from EPEL:"
 	sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql \
 						soci-sqlite3 libgearman libgearman-devel \
-						perl-Log-Log4perl perl-Log-Dispatch
+						perl-Log-Log4perl perl-Log-Dispatch \
+						perl-Test-Simple perl-Time-HiRes
 	@echo "# You'll have to find these packages yourself.  See BUILD.CENTOS"
 	sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial

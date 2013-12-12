@@ -1,0 +1,163 @@
+#!/bin/bash
+#
+# chkconfig: 35 90 12
+# description: gearbox test workers services
+#
+# Get function from functions library
+. /etc/init.d/functions
+
+export PATH=$PATH:/command
+create() {
+    # separate out create into it's own function and call it at rpm install
+    # time as well as start time so that changes to config files will
+    # modify the daemontools run scripts when you call 'service gearbox
+    # restart'
+    for filepath in /etc/gearbox/test*.conf
+    do
+        # Get the filename to use it in the service directory
+        filename=$(basename "$filepath")
+        filename="${filename%.*}"
+
+        # Do not create services for test-agents-agents and
+        # test-agents-<lang>-agents
+        if [ "$filename" == "test-agents-agents" -o \
+             "$filename" == "test-agents-perl-agents" -o \
+             "$filename" == "test-agents-python-agents" -o \
+             "$filename" == "test-agents-php-agents" ]
+        then
+            continue
+        fi
+
+        # Now create the appropriate service
+        action "Creating $filename services: " \
+		    gearbox-svc-builder --file="$filepath" \
+                                --key=daemons \
+                  	            --prefix="$filename"- \
+                   	            --service_dir=/var/gearbox/"$filename"-workers
+    done
+}
+
+start() {
+	# call create to rewrite the daemontools run files in case the config
+	# files have changed
+	create
+	
+	# if we stopped it with svc -d (in the stop function below) start it
+	# with svc -u
+	is_sleep_for_svscan_done=false		
+	for filepath in /var/gearbox/test*-workers
+	do
+		# Extract the service from the directory name
+		svc_name=$(basename "$filepath")
+		svc_name="${svc_name%-*}"
+	
+        # Do not start services for test-agents-agents and test-agents-<lang>-agents
+        if [ "$svc_name" == "test-agents-agents" -o \
+             "$svc_name" == "test-agents-perl-agents" -o \
+             "$svc_name" == "test-agents-python-agents" -o \
+             "$svc_name" == "test-agents-php-agents" ]
+        then
+            continue
+        fi
+
+        is_svc_restart_reqd=false
+		svstat "$filepath"/* |grep down 2>&1 > /dev/null
+	
+	    # when grep matches it returns 0, when it doesn't match it returns nonzero
+	    if [[ $? -eq 0 ]]; then
+			is_svc_restart_reqd=true
+		fi
+	
+		if [ $is_svc_restart_reqd ]; then
+			# even if there are multiple services that need to be started, sleep just once
+			if [ ! $is_sleep_for_svscan_done ]; then
+	        	action "Waiting for svscan to spawn supervise for new services" sleep 5
+				is_sleep_for_svscan_done=true
+			fi
+	
+			# Now start the appropriate service
+	        action "Starting $svc_name services: " \
+	            svc -u "$filepath"/*	
+        fi
+    done
+}
+
+status() {
+    svstat /var/gearbox/test*-workers/*
+}
+
+stop() {
+	for filepath in /var/gearbox/test*-workers
+	do
+		# Extract the service from the directory name
+		svc_name=$(basename "$filepath")
+		svc_name="${svc_name%-*}"
+
+        # Do not stop services for test-agents-agents and test-agents-<lang>-agents
+        if [ "$svc_name" == "test-agents-agents" -o \
+             "$svc_name" == "test-agents-perl-agents" -o \
+             "$svc_name" == "test-agents-python-agents" -o \
+             "$svc_name" == "test-agents-php-agents" ]
+        then
+            continue
+        fi
+
+		# Now stop the service
+        action "Stopping $svc_name services: " \
+			svc -d "$filepath"/*
+	done
+}
+
+delete() {
+    # Create an empty daemons json string
+    echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
+
+    for filepath in /var/gearbox/test*-workers
+    do
+        # Extract the service from the directory name
+        svc_name=$(basename "$filepath")
+        svc_name="${svc_name%-*}"
+   
+        # Do not delete services for test-agents-agents and test-agents-<lang>-agents
+        if [ "$svc_name" == "test-agents-agents" -o \
+             "$svc_name" == "test-agents-perl-agents" -o \
+             "$svc_name" == "test-agents-python-agents" -o \
+             "$svc_name" == "test-agents-php-agents" ]
+        then
+            continue
+        fi
+
+        action "Deleting $svc_name services: " \
+            gearbox-svc-builder --file=/tmp/empty-daemons.conf \
+                                --key=daemons \
+                                --prefix="$filename"- \
+                                --service_dir="$filepath"
+    done
+    rm /tmp/empty-daemons.conf
+}
+
+case "$1" in
+  create)
+        create
+        ;;
+  start)
+        start
+        ;;
+  status)
+  		status
+  		;;
+  delete)
+        delete
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {create|start|stop|restart|reload|delete|status}"
+        exit 1
+esac
+exit 0

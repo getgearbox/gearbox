@@ -20,6 +20,7 @@ Usage: $0 [options] [source file]
 Options:
   --handlers-dir <dir> what directory to drop the files into [./.handlers.d]
   --json               rather than outputing a directory of symlinks, print json
+  --update             update the existing handlers directory
   --help               this help message
 
 $0 should be able to parse handlers from workers written in
@@ -39,6 +40,7 @@ my %opts;
 GetOptions(
     'handlers-dir|d=s'  => \$opts{handlers_dir},
     'json|j' => \$opts{json},
+    'update|u' => \$opts{update},
     'help|?' => sub { &usage() }
 ) || usage();
 
@@ -83,8 +85,15 @@ exit;
 }
 
 my $handlers_dir = $opts{handlers_dir} || "./.handlers.d";
-system("rm -rf $handlers_dir");
-mkdir("$handlers_dir");
+if ( ! $opts{update} ) {
+    system("rm -rf $handlers_dir");
+    mkdir("$handlers_dir");
+} else {
+	if ( ! -d "$handlers_dir" ) {
+		# create the directory since the directory does not exist
+		mkdir("$handlers_dir");
+	}
+}
 
 foreach my $key (keys %$handlers) {
     foreach my $handler (sort @{$handlers->{$key}}) {
