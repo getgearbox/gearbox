@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # This script contains the required dependencies to be installed for 
 # gearbox. Note that the build instructions are commented in this script (for
 # informational purposes)
@@ -33,17 +35,9 @@
 # wget http://mirror.pnl.gov/epel/6/i386/epel-release-6-8.noarch.rpm
 # sudo yum install epel-release-6-8.noarch.rpm
 
-# Initialization
-# ./autogen.sh
-# ./configure
-# make deps (not needed if this script is executed to install the dependencies)
-
-# Build
-# make check
-
 echo "# These packages come from the base repo:"
 sudo yum install -y automake libtool libuuid-devel curl-devel \
-					openssl-devel perl-devel php-devel boost \
+					openssl-devel perl-devel php-devel python-devel boost \
 					boost-devel httpd-devel chrpath perl-ExtUtils-Embed \
 					perl-JSON perl-libwww-perl
 
@@ -55,3 +49,10 @@ sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql \
 
 echo "# These packages are for yajl and Test::Trivial"
 sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial
+
+# Initialization
+./autogen.sh
+./configure
+
+# Build and run tests
+make check

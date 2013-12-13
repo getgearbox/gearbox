@@ -355,7 +355,7 @@ CLEANFILES += \
 	workers/gearbox/sql/status-migration/9.undo.sql \
 	$(NULL)
 
-workers/gearbox/conf/.handlers.d:
+workers/gearbox/conf/.handlers.d/%:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/gearbox/conf/.handlers.d < workers/gearbox/WorkerGearbox.cc
 
 gbhandlersdir = ${sysconfdir}/gearbox/gearbox-handlers.d/
@@ -504,7 +504,7 @@ dist_gbsysconf_DATA += \
 	workers/test-sync/perl/conf/test-sync-perl.conf \
     $(NULL)
 
-workers/.test-handlers.d:
+workers/.test-handlers.d/%:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d < workers/test-agents/WorkerTestAgents.cc && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/WorkerTestBasic.cc && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-cancel/WorkerTestCancel.cc && \
