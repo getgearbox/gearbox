@@ -4,7 +4,7 @@ import setup
 import json
 
 from testtrivial import *
-from Gearbox import ConfigFile, Job, JobResponse, JobManager, HttpClient
+from gearbox import ConfigFile, Job, JobResponse, JobManager, HttpClient
 
 PLAN(106)
 
