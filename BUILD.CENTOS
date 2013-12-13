@@ -1,42 +1,57 @@
-These instructions worked under Oracle Linux 6.3, which should be the same
-as RHEL 6.3 or CentOS 6.3.
+#!/bin/bash
 
-install yajl >= 2.0
-===================
-sudo yum install -y cmake
-wget ftp://ftp.icm.edu.pl/vol/rzm2/linux-fedora-secondary/updates/testing/17/SRPMS/yajl-2.0.4-1.fc17.src.rpm
-rpmbuild --rebuild yajl-2.0.4-1.fc17.src.rpm
-sudo yum install ~/rpmbuild/RPMS/x86_64/yajl*
+# This script contains the required dependencies to be installed for 
+# gearbox. Note that the build instructions are commented in this script (for
+# informational purposes)
+#
+# These instructions worked under Oracle Linux 6.3, which should be the same
+# as RHEL 6.3 or CentOS 6.3.
 
-install swig >= 2.0
-==================
-sudo yum install -y pcre-devel
-wget http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/source/SRPMS/swig-2.0.11-2.fc21.src.rpm
-rpmbuild --rebuild swig-2.0.11-2.fc21.src.rpm
+# Install yajl >= 2.0
+# sudo yum install -y cmake
+# wget ftp://ftp.icm.edu.pl/vol/rzm2/linux-fedora-secondary/updates/testing/17/SRPMS/yajl-2.0.4-1.fc17.src.rpm
+# rpmbuild --rebuild yajl-2.0.4-1.fc17.src.rpm
+# sudo yum install ~/rpmbuild/RPMS/x86_64/yajl*
+
+# Install swig >= 2.0
+# sudo yum install -y pcre-devel
+# wget http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/source/SRPMS/swig-2.0.11-2.fc21.src.rpm
+# rpmbuild --rebuild swig-2.0.11-2.fc21.src.rpm
 # if you get a test failure like this:
 #     SUITE: base TEST: CCACHE_HASHDIR - Expected cache hit to be 5 got 6
 # try removing any ccache dirs from your PATH and unset CCACHE_HASHDIR env var
-sudo yum install ~/rpmbuild/RPMS/x86_64/swig*.rpm
+# sudo yum install ~/rpmbuild/RPMS/x86_64/swig*.rpm
 
-install Test::Trivial perl module
-=================================
-mkdir -p ~/rpmbuild/SOURCES/
-wget -P ~/rpmbuild/SOURCES/ http://search.cpan.org/CPAN/authors/id/K/KE/KENSHAN/IO-Tee-0.64.tar.gz \
-    http://www.cpan.org/authors/id/C/CO/CORYB/Test-Trivial-1.901.2.tar.gz
-rpmbuild -bb deps/rpm-specs/*.spec
-sudo yum install ~/rpmbuild/RPMS/noarch/perl-{Test-Trivial-1.901.2-1,IO-Tee-0.64-1}.noarch.rpm
+# install Test::Trivial perl module
+# mkdir -p ~/rpmbuild/SOURCES/
+# wget -P ~/rpmbuild/SOURCES/ http://search.cpan.org/CPAN/authors/id/K/KE/KENSHAN/IO-Tee-0.64.tar.gz \
+#    http://www.cpan.org/authors/id/C/CO/CORYB/Test-Trivial-1.901.2.tar.gz
+# rpmbuild -bb deps/rpm-specs/*.spec
+# sudo yum install ~/rpmbuild/RPMS/noarch/perl-{Test-Trivial-1.901.2-1,IO-Tee-0.64-1}.noarch.rpm
 
-enable epel
-===========
-wget http://mirror.pnl.gov/epel/6/i386/epel-release-6-8.noarch.rpm
-sudo yum install epel-release-6-8.noarch.rpm
+# enable epel
+# wget http://mirror.pnl.gov/epel/6/i386/epel-release-6-8.noarch.rpm
+# sudo yum install epel-release-6-8.noarch.rpm
 
-INIT
-=====
-./autogen.sh
-./configure
-make deps
+# Initialization
+# ./autogen.sh
+# ./configure
+# make deps (not needed if this script is executed to install the dependencies)
 
-BUILD
-=====
-make check
+# Build
+# make check
+
+echo "# These packages come from the base repo:"
+sudo yum install -y automake libtool libuuid-devel curl-devel \
+					openssl-devel perl-devel php-devel boost \
+					boost-devel httpd-devel chrpath perl-ExtUtils-Embed \
+					perl-JSON perl-libwww-perl
+
+echo "# These packages come from EPEL:"
+sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql \
+					soci-sqlite3 libgearman libgearman-devel \
+					perl-Log-Log4perl perl-Log-Dispatch \
+					perl-Test-Simple perl-Time-HiRes
+
+echo "# These packages are for yajl and Test::Trivial"
+sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial
