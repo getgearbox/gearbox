@@ -109,6 +109,15 @@ stop() {
 }
 
 delete() {
+    # check if services are in starting mode. We need to allow them to start
+    # completely for cleanup in delete operation
+    svstat /var/gearbox/test*-workers/* | grep "unable to open supervise" 2>&1 > /dev/null
+
+    # if any service is not created completely, we would wait for them to be created
+    if [[ $? -eq 0 ]]; then
+        action "Waiting for supervise to be spawned for new services" sleep 5
+    fi
+
     # Create an empty daemons json string
     echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
 

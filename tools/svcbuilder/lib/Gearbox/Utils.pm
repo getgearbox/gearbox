@@ -17,7 +17,7 @@ use Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK
-    = qw(read_file write_file debug set_verbose set_quiet info System);
+    = qw(read_file write_file debug set_verbose set_quiet info System get_status);
 
 sub read_file {
     my $file = shift;
@@ -44,6 +44,18 @@ sub write_file {
     close $fh;
 
     rename "$file.tmp" => $file;
+}
+
+sub get_status {
+    my $rc = shift;
+
+    if (($rc == -1) ||      # indicates failed operation
+        ($rc & 127)) {      # indicates that the child died
+        return -1;
+    }
+
+    # the exit code is detemined by right shifting by 8 bits
+    return ($rc >> 8);
 }
 
 sub System {

@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 BEGIN { $ENV{PERL_JSON_BACKEND} = 'JSON::PP' }
 use JSON; # always uses JSON::PP
-use Gearbox::Utils qw(System info debug);
+use Gearbox::Utils qw(System info debug get_status);
 use Gearbox::Service::Entry;
 use File::Basename;
 
@@ -184,7 +184,32 @@ sub remove_services {
         }
 
         System("svc -dx $sdir/$name $sdir/$name/log");
-        System("rm -rf $sdir/$name");
+    }
+
+    # check to see if supervise is not running. Remove the
+    # service directory once supervise is not running
+    for my $name (@to_remove) {
+        my $svok_count = 0;
+        my $svok_rc = 0;
+
+        # check for svok status for upto 5 times, or till supervise
+        # is no longer running
+        do {
+            # if previous check for svok fails, retry in 1 second
+            if ($svok_count > 0) {
+                System("sleep 1");
+            }
+            system("svok $sdir/$name");
+            $svok_rc = get_status($?);
+            ++$svok_count;
+        }
+        while (($svok_rc != 100) && ($svok_count < 5));
+
+        if ($svok_count < 5) {
+            System("rm -rf $sdir/$name");
+        } else {
+            warn("Failed to remove $sdir/$name with rc:$svok_rc");
+        }
     }
 }
 
