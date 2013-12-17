@@ -412,6 +412,7 @@ Gearbox tools
 %package test-workers
 Summary: Gearbox test-workers
 Group: Development/Libraries
+Requires: gearbox-python-lib
 
 %description test-workers
 Gearbox test workers
