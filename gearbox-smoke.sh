@@ -22,7 +22,6 @@ do
     cd $filepath/smoke
     ./test.t
 done
-#!/bin/bash
 
 # set PREFIX environment variable to python for python workers
 export PREFIX=python
