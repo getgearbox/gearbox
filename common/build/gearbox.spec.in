@@ -8,7 +8,7 @@ Version: @VERSION@
 #   rpmbuild -bb --define "_release $RELEASE" rpm/*.spec
 # See https://fedoraproject.org/wiki/Packaging:NamingGuidelines#Snapshot_packages
 %{!?_release: %define _release 1}
-Release:        %{_release}
+Release:        %{_release}%{?dist}
 License: Apache
 Group: System Environment/Libraries
 BuildRequires: chrpath
@@ -287,7 +287,6 @@ Sample configuration for gearbox-daemons
 Summary: gearbox apache module
 Group: Development/Libraries
 Requires: httpd
-Version: 0.1
 
 %description -n mod_gearbox
 apache module for gearbox
@@ -348,7 +347,6 @@ Gearbox perl-lib libraries
 %package python-lib
 Summary: Gearbox python libraries
 Group: Development/Libraries
-Version: 0.1.1
 
 %description python-lib
 Gearbox python-lib libraries
@@ -365,7 +363,6 @@ Gearbox python-lib libraries
 Summary: Gearbox tools
 Group: Development/Tools
 Requires: perl-Template-Toolkit gearbox-perl-lib perl-DBD-SQLite perl-DBD-MySQL
-Version: 0.1.1
 
 %description tools
 Gearbox tools

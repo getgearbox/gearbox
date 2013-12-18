@@ -9,6 +9,7 @@ CLEANFILES=
 CFLAGS=-g
 CXXFLAGS=-g -fpermissive
 export DYLD_FORCE_FLAT_NAMESPACE=1
+PKG_RELEASE ?= `whoami`_git_`git rev-parse --short HEAD`
 
 LIBTAP=deps/libtap++-0.01/libtap++.la
 

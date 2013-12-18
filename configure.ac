@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([gearbox], [0.1], [gearbox@corybennett.org])
+AC_INIT([gearbox], [0.2], [gearbox@corybennett.org])
 AC_CONFIG_SRCDIR([apache/mod_gearbox/mod_gearbox.cc])
 AC_CONFIG_MACRO_DIR([m4])
 

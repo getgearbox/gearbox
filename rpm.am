@@ -3,8 +3,6 @@
 rpm-build: common/build/$(PACKAGE).spec clean-rpm
 	$(MAKE) $(AM_MAKEFLAGS) dist
 	@rm -f *.rpm
-	@rm -f ~/rpmbuild/RPMS/x86_64/$(PACKAGE)-$(VERSION)*.rpm
-	@rm -f ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)*.rpm
 	@mkdir -p ~/rpmbuild/BUILD/
 	@mkdir -p ~/rpmbuild/RPMS/i386/
 	@mkdir -p ~/rpmbuild/RPMS/i686/
@@ -14,10 +12,10 @@ rpm-build: common/build/$(PACKAGE).spec clean-rpm
 	@mkdir -p ~/rpmbuild/SPECS/
 	@mkdir -p ~/rpmbuild/SRPMS/
 	@cp $(PACKAGE)-$(VERSION).tar.gz ~/rpmbuild/SOURCES/
-	@rpmbuild -ba --define "_release `date +%s`git`git rev-parse --short HEAD`" common/build/$(PACKAGE).spec
-	@cp ~/rpmbuild/RPMS/x86_64/$(PACKAGE)*-$(VERSION)*.rpm .
-	@cp ~/rpmbuild/RPMS/x86_64/mod_gearbox-$(VERSION)*.rpm .
-	@cp ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)*.rpm .
+	@rpmbuild -ba --define "_release $(PKG_RELEASE)" common/build/$(PACKAGE).spec
+	@cp ~/rpmbuild/RPMS/x86_64/$(PACKAGE)*-$(VERSION)-$(PKG_RELEASE).el6.x86_64.rpm .
+	@cp ~/rpmbuild/RPMS/x86_64/mod_gearbox-$(VERSION)-$(PKG_RELEASE).el6.x86_64.rpm .
+	@cp ~/rpmbuild/SRPMS/$(PACKAGE)-$(VERSION)-$(PKG_RELEASE).el6.src.rpm .
 
 rpm-sign: rpm-build
 	@rpm --addsign *.rpm
