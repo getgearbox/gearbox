@@ -36,7 +36,14 @@ start() {
 }
 
 status() {
-        svstat /var/gearbox/gearbox-workers/*
+        shopt -s nullglob
+        workers=(/var/gearbox/gearbox-workers/*)
+        if [ ${#workers[@]} -gt 0 ]; then
+                svstat ${workers[*]}
+        else
+                echo "no files in /var/gearbox/gearbox-workers..."
+                exit 1
+        fi
 }
 
 stop() {
@@ -88,4 +95,3 @@ case "$1" in
         echo $"Usage: $0 {create|start|stop|restart|reload|delete|status}"
         exit 1
 esac
-exit 0

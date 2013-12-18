@@ -44,7 +44,7 @@ start() {
 	
 	# if we stopped it with svc -d (in the stop function below) start it
 	# with svc -u
-	is_sleep_for_svscan_done=false		
+	is_sleep_for_svscan_done=false
 	for filepath in /var/gearbox/test*-workers
 	do
 		# Extract the service from the directory name
@@ -61,23 +61,33 @@ start() {
         fi
 
         is_svc_restart_reqd=false
-		svstat "$filepath"/* |grep down 2>&1 > /dev/null
-	
-	    # when grep matches it returns 0, when it doesn't match it returns nonzero
-	    if [[ $? -eq 0 ]]; then
-			is_svc_restart_reqd=true
-		fi
-	
-		if [ $is_svc_restart_reqd ]; then
-			# even if there are multiple services that need to be started, sleep just once
-			if [ ! $is_sleep_for_svscan_done ]; then
-	        	action "Waiting for svscan to spawn supervise for new services" sleep 5
-				is_sleep_for_svscan_done=true
-			fi
-	
-			# Now start the appropriate service
-	        action "Starting $svc_name services: " \
-	            svc -u "$filepath"/*	
+        shopt -s nullglob
+        files=($filepath/*)
+        shopt -u nullglob
+        if [[ ${#files[@]} -gt 0 ]]; then
+            svstat "$filepath"/* |grep down 2>&1 > /dev/null
+
+            # grep matches it returns 0, otherwise returns nonzero
+            if [[ $? -eq 0 ]]; then
+                is_svc_restart_reqd=true
+            fi
+
+            if [ $is_svc_restart_reqd ]; then
+                # even if there are multiple services that need to be started,
+                # sleep just once
+                if [ ! $is_sleep_for_svscan_done ]; then
+                    action \
+                        "Waiting for svscan to spawn supervise for new services" \
+                        sleep 5
+                    is_sleep_for_svscan_done=true
+                fi
+
+                # Now start the appropriate service
+                action "Starting $svc_name services: " \
+                    svc -u "$filepath"/*
+            fi
+        else
+            echo "$filepath is empty. Skipping..."
         fi
     done
 }
@@ -103,8 +113,15 @@ stop() {
         fi
 
 		# Now stop the service
-        action "Stopping $svc_name services: " \
-			svc -d "$filepath"/*
+        shopt -s nullglob
+        files=($filepath/*)
+        shopt -u nullglob
+        if [[ ${#files[@]} -gt 0 ]]; then
+            action "Stopping $svc_name services: " \
+                svc -d "$filepath"/*
+        else
+            echo "$filepath is empty. Skipping..."
+        fi
 	done
 }
 
