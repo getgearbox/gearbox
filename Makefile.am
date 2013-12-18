@@ -6,6 +6,13 @@ bin_PROGRAMS=
 lib_LTLIBRARIES=
 
 CLEANFILES=
+DISTCLEANFILES = \
+	Makefile.in \
+	TestMakefile.am \
+	config.h.in \
+	configure \
+	aclocal.m4
+
 CFLAGS=-g
 CXXFLAGS=-g -fpermissive
 export DYLD_FORCE_FLAT_NAMESPACE=1
@@ -46,10 +53,20 @@ dist_check_SCRIPTS += deps/PyTAP
 
 CLEANFILES += \
 	deps/PyTAP.tar.gz \
+	deps/test-trivial-python/testtrivial.pyc \
 	$(NULL)
 
 clean-local:
 	-rm -rf deps/PyTAP/
+	-find . -type d '.test-handler.d' -print0 | \
+		xargs --no-run-if-empty --verbose --null rm -rv
+
+distclean-local:
+	-rm -rf deps/libtap++-0.01/
+	-rm -rf deps/test-more-php/
+	-rm -rf autom4te.cache
+	-find . -type d \( -name '.db' -o -name '.handlers.d' \) -print0 | \
+		xargs --no-run-if-empty --verbose --null rm -rv
 
 check_LTLIBRARIES = $(LIBTAP)
 check_PROGRAMS =
