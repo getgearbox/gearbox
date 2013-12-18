@@ -2,7 +2,7 @@
 
 set -e
 
-# This script contains the required dependencies to be installed for 
+# This script contains the required dependencies to be installed for building 
 # gearbox. Note that the build instructions are commented in this script (for
 # informational purposes)
 #
