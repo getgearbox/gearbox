@@ -37,15 +37,15 @@ set -e
 
 echo "# These packages come from the base repo:"
 sudo yum install -y automake libtool libuuid-devel curl-devel \
-					openssl-devel perl-devel php-devel python-devel boost \
-					boost-devel httpd-devel chrpath perl-ExtUtils-Embed \
-					perl-JSON perl-libwww-perl
+                    openssl-devel perl-devel php-devel python-devel boost \
+                    boost-devel httpd-devel chrpath perl-ExtUtils-Embed \
+                    perl-JSON perl-libwww-perl
 
 echo "# These packages come from EPEL:"
 sudo yum install -y ccache log4cxx-devel soci-devel soci-mysql \
-					soci-sqlite3 libgearman libgearman-devel \
-					perl-Log-Log4perl perl-Log-Dispatch \
-					perl-Test-Simple perl-Time-HiRes
+                    soci-sqlite3 libgearman libgearman-devel \
+                    perl-Log-Log4perl perl-Log-Dispatch \
+                    perl-Test-Simple perl-Time-HiRes
 
 echo "# These packages are for yajl and Test::Trivial"
 sudo yum install -y 'yajl-devel >= 2' 'swig >= 2' perl-Test-Trivial
