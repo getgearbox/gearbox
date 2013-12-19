@@ -2,6 +2,7 @@
 // Copyrights licensed under the New BSD License. See the accompanying LICENSE file for terms.
 
 #include <gearbox/core/ConfigFile.h>
+#include <gearbox/core/util.h>
 
 #ifdef HAVE_CONFIG_H
 // Apache's ap_config_auto.h and gearbox's config.h conflict.
@@ -499,8 +500,8 @@ static int gearbox_handler(request_rec *r) {
 static void *gearbox_create_dir_config(apr_pool_t *p, char *dirspec) {
     gearbox_cfg *cfg = (gearbox_cfg *) apr_pcalloc(p, sizeof(gearbox_cfg));
 
-    if( bfs::exists( SYSCONFDIR "/gearbox/logger/httpd-logger.conf" ) ) {
-        log4cxx::PropertyConfigurator::configure( SYSCONFDIR "/gearbox/logger/httpd-logger.conf" );
+    if( bfs::exists( server_root() + "/logger/httpd-logger.conf" ) ) {
+        log4cxx::PropertyConfigurator::configure( server_root() + "/logger/httpd-logger.conf" );
         log4cxx::MDC::put("pid", boost::lexical_cast<std::string>(getpid()));
         _DEBUG("Logger Initialized");
     }

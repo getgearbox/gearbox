@@ -13,7 +13,7 @@ using namespace Gearbox;
 
 int main(int argc, char **argv) {
     chdir(TESTDIR);
-    TEST_START(20);
+    TEST_START(24);
     log_init("./unit.conf");
 
     IS( run(TRUE_BIN), 0 );
@@ -101,6 +101,13 @@ int main(int argc, char **argv) {
         IS( slurp(filename), contents );
     }
 
+    // server_root()
+    IS( server_root(), "/etc/gearbox" );
+    setenv("GB_SERVER_ROOT", "/lurking/grue", 1);
+    IS( server_root(), "/lurking/grue/gearbox" );
 
+    // server_abspath()
+    IS( server_abspath("/a/man/a/plan"), "/a/man/a/plan" ); 
+    IS( server_abspath("a/man/a/plan"), "/lurking/grue/gearbox/a/man/a/plan" ); 
     TEST_END;
 }

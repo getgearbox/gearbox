@@ -77,7 +77,7 @@ namespace Gearbox {
         }
             
         Json agents;
-        agents.parseFile( SYSCONFDIR "/gearbox/test-agents-agents.conf" );
+        agents.parseFile( server_root() + "/test-agents-agents.conf" );
         
         resp.status()->add_message("calling agents");
         

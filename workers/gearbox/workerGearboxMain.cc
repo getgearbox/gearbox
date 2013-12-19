@@ -6,6 +6,7 @@
 #define LOGCAT "gearbox.worker.gearbox"
 #include <gearbox/core/logger.h>
 
+#include <gearbox/core/util.h>
 #include <gearbox/store/dbconn.h>
 using namespace Gearbox::Database;
 using namespace Gearbox;
@@ -28,7 +29,7 @@ int main (int argc, char *argv[]) {
         opt::options_description options("Options", 100);
         options.add_options()
             ("help,h", "this help message")
-            ("config,f", value<string>(&config)->default_value(SYSCONFDIR "/gearbox/gearbox.conf"), "specify path to config file")
+            ("config,f", value<string>(&config)->default_value(server_root() + "/gearbox.conf"), "specify path to config file")
             ("no-sync,a", "This worker should only work on asynchronous jobs")
             ("no-async,s", "This worker should only work on synchronous jobs")
             ("max-requests,r", value<int>(&max_requests)->default_value(0), "maximum requests to handle before exiting")

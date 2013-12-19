@@ -5,6 +5,7 @@
 
 #define LOGCAT "gearbox.daemon.delay"
 #include <gearbox/core/logger.h>
+#include <gearbox/core/util.h>
 using namespace Gearbox;
 
 #include <boost/program_options/variables_map.hpp>
@@ -24,7 +25,7 @@ int main (int argc, char *argv[]) {
         opt::options_description options("Options",100);
         options.add_options()
             ("help,h", "this help message")
-            ("config,f", value<string>(&config)->default_value(SYSCONFDIR "/gearbox/delay.conf"), "specify path to config file")
+            ("config,f", value<string>(&config)->default_value(server_root() + "/delay.conf"), "specify path to config file")
             ;
         
         opt::variables_map args;
