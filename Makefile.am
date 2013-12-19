@@ -94,48 +94,48 @@ gearbox_core_libgearbox_core_includes = \
 	gearbox/core/Hash.h \
 	gearbox/core/HttpClient.h \
 	gearbox/core/Json.h \
-    gearbox/core/JsonGenerator.h \
-    gearbox/core/JsonParser.h \
-    gearbox/core/JsonPrivate.h \
-    gearbox/core/JsonSchema.h \
-    gearbox/core/logger.h \
-    gearbox/core/Pipe.h \
-    gearbox/core/Plugin.h \
-    gearbox/core/REST.h \
-    gearbox/core/strlcpy.h \
-    gearbox/core/SystemPair.h \
-    gearbox/core/TempDir.h \
-    gearbox/core/TempFile.h \
-    gearbox/core/Uri.h \
-    gearbox/core/util.h \
+	gearbox/core/JsonGenerator.h \
+	gearbox/core/JsonParser.h \
+	gearbox/core/JsonPrivate.h \
+	gearbox/core/JsonSchema.h \
+	gearbox/core/logger.h \
+	gearbox/core/Pipe.h \
+	gearbox/core/Plugin.h \
+	gearbox/core/REST.h \
+	gearbox/core/strlcpy.h \
+	gearbox/core/SystemPair.h \
+	gearbox/core/TempDir.h \
+	gearbox/core/TempFile.h \
+	gearbox/core/Uri.h \
+	gearbox/core/util.h \
 	$(NULL)
 
 coreincludedir = ${pkgincludedir}/core
 coreinclude_HEADERS = $(gearbox_core_libgearbox_core_includes)
 
 gearbox_core_libgearbox_core_la_SOURCES = $(gearbox_core_libgearbox_core_includes) \
-    gearbox/core/ConfigFile.cc \
-    gearbox/core/Errors.cc \
+	gearbox/core/ConfigFile.cc \
+	gearbox/core/Errors.cc \
 	gearbox/core/ffdigest.cc \
-    gearbox/core/File.cc \
-    gearbox/core/Hash.cc \
-    gearbox/core/HttpClient.cc \
-    gearbox/core/Json.cc \
-    gearbox/core/JsonGenerator.cc \
-    gearbox/core/JsonParser.cc \
-    gearbox/core/JsonSchema.cc \
-    gearbox/core/logger.cc \
-    gearbox/core/Pipe.cc \
-    gearbox/core/Plugin.cc \
-    gearbox/core/REST.cc \
-    gearbox/core/run.cc \
-    gearbox/core/sha1.cc \
-    gearbox/core/SystemPair.cc \
-    gearbox/core/TempDir.cc \
-    gearbox/core/TempFile.cc \
-    gearbox/core/Uri.cc \
-    gearbox/core/util.cc \
-    $(NULL)
+	gearbox/core/File.cc \
+	gearbox/core/Hash.cc \
+	gearbox/core/HttpClient.cc \
+	gearbox/core/Json.cc \
+	gearbox/core/JsonGenerator.cc \
+	gearbox/core/JsonParser.cc \
+	gearbox/core/JsonSchema.cc \
+	gearbox/core/logger.cc \
+	gearbox/core/Pipe.cc \
+	gearbox/core/Plugin.cc \
+	gearbox/core/REST.cc \
+	gearbox/core/run.cc \
+	gearbox/core/sha1.cc \
+	gearbox/core/SystemPair.cc \
+	gearbox/core/TempDir.cc \
+	gearbox/core/TempFile.cc \
+	gearbox/core/Uri.cc \
+	gearbox/core/util.cc \
+	$(NULL)
 
 gearbox_core_gearbox_json_SOURCES = gearbox/core/gearbox_json.cc
 gearbox_core_gearbox_json_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIB)
@@ -150,45 +150,45 @@ gearbox_job_libgearbox_job_la_CXXFLAGS = $(GEARMAN_CFLAGS)
 gearbox_job_libgearbox_job_la_LDFLAGS = $(GEARMAN_LIBS) $(BOOST_LDFLAGS) $(BOOST_GRAPH_LIB) -version-info $(GEARBOX_JOB_LIBRARY_VERSION)
 gearbox_job_libgearbox_job_la_LIBADD = gearbox/core/libgearbox_core.la
 gearbox_job_libgearbox_job_includes = \
-    gearbox/job/GearmanJobImpl.h \
-    gearbox/job/Job.h \
-    gearbox/job/JobImpl.h \
-    gearbox/job/JobManager.h \
-    gearbox/job/JobResponse.h \
-    gearbox/job/JobStatusImpl.h \
-    gearbox/job/JsonStatusImpl.h \
-    gearbox/job/RestJobImpl.h \
-    gearbox/job/Status.h \
-    gearbox/job/StatusCollection.h \
-    gearbox/job/StatusCollectionImpl.h \
-    gearbox/job/StatusCollectionImplV1.h \
-    gearbox/job/StatusImpl.h \
-    gearbox/job/StatusImplV1.h \
-    gearbox/job/StatusManager.h \
-    gearbox/job/TransientStatusImpl.h \
-    $(NULL)
+	gearbox/job/GearmanJobImpl.h \
+	gearbox/job/Job.h \
+	gearbox/job/JobImpl.h \
+	gearbox/job/JobManager.h \
+	gearbox/job/JobResponse.h \
+	gearbox/job/JobStatusImpl.h \
+	gearbox/job/JsonStatusImpl.h \
+	gearbox/job/RestJobImpl.h \
+	gearbox/job/Status.h \
+	gearbox/job/StatusCollection.h \
+	gearbox/job/StatusCollectionImpl.h \
+	gearbox/job/StatusCollectionImplV1.h \
+	gearbox/job/StatusImpl.h \
+	gearbox/job/StatusImplV1.h \
+	gearbox/job/StatusManager.h \
+	gearbox/job/TransientStatusImpl.h \
+	$(NULL)
 
 jobincludedir = ${pkgincludedir}/job
 jobinclude_HEADERS = $(gearbox_job_libgearbox_job_includes)
 
 gearbox_job_libgearbox_job_la_SOURCES = $(gearbox_job_libgearbox_job_includes) \
-    gearbox/job/GearmanJobImpl.cc \
-    gearbox/job/Job.cc \
-    gearbox/job/JobImpl.cc \
-    gearbox/job/JobManager.cc \
-    gearbox/job/JobResponse.cc \
-    gearbox/job/JobStatusImpl.cc \
-    gearbox/job/JsonStatusImpl.cc \
-    gearbox/job/RestJobImpl.cc \
-    gearbox/job/Status.cc \
-    gearbox/job/StatusCollection.cc \
-    gearbox/job/StatusCollectionImpl.cc \
-    gearbox/job/StatusCollectionImplV1.cc \
-    gearbox/job/StatusImpl.cc \
-    gearbox/job/StatusImplV1.cc \
-    gearbox/job/StatusManager.cc \
-    gearbox/job/TransientStatusImpl.cc \
-    $(NULL)
+	gearbox/job/GearmanJobImpl.cc \
+	gearbox/job/Job.cc \
+	gearbox/job/JobImpl.cc \
+	gearbox/job/JobManager.cc \
+	gearbox/job/JobResponse.cc \
+	gearbox/job/JobStatusImpl.cc \
+	gearbox/job/JsonStatusImpl.cc \
+	gearbox/job/RestJobImpl.cc \
+	gearbox/job/Status.cc \
+	gearbox/job/StatusCollection.cc \
+	gearbox/job/StatusCollectionImpl.cc \
+	gearbox/job/StatusCollectionImplV1.cc \
+	gearbox/job/StatusImpl.cc \
+	gearbox/job/StatusImplV1.cc \
+	gearbox/job/StatusManager.cc \
+	gearbox/job/TransientStatusImpl.cc \
+	$(NULL)
 
 ###############################################
 ### gearbox/store
@@ -199,8 +199,8 @@ gearbox_store_libgearbox_store_la_CXXFLAGS =
 gearbox_store_libgearbox_store_la_LDFLAGS = $(SOCI_CORE_LIB) -version-info $(GEARBOX_STORE_LIBRARY_VERSION)
 gearbox_store_libgearbox_store_la_LIBADD = gearbox/core/libgearbox_core.la
 gearbox_store_libgearbox_store_includes = \
-    gearbox/store/dbconn.h \
-    $(NULL)
+	gearbox/store/dbconn.h \
+	$(NULL)
 
 storeincludedir = ${pkgincludedir}/store
 storeinclude_HEADERS = $(gearbox_store_libgearbox_store_includes)
@@ -208,7 +208,7 @@ storeinclude_HEADERS = $(gearbox_store_libgearbox_store_includes)
 gearbox_store_libgearbox_store_la_SOURCES = $(gearbox_store_libgearbox_store_includes) \
 	gearbox/store/dbconn.cc \
 	gearbox/store/LoggedStatement.cc \
-    $(NULL)
+	$(NULL)
 
 ###############################################
 ### gearbox/worker
@@ -219,15 +219,15 @@ gearbox_worker_libgearbox_worker_la_CXXFLAGS =
 gearbox_worker_libgearbox_worker_la_LDFLAGS = $(SOCI_CORE_LIB) -version-info $(GEARBOX_WORKER_LIBRARY_VERSION)
 gearbox_worker_libgearbox_worker_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/job/libgearbox_job.la
 gearbox_worker_libgearbox_worker_includes = \
-    gearbox/worker/Worker.h \
-    $(NULL)
+	gearbox/worker/Worker.h \
+	$(NULL)
 
 workerincludedir = ${pkgincludedir}/worker
 workerinclude_HEADERS = $(gearbox_worker_libgearbox_worker_includes)
 
 gearbox_worker_libgearbox_worker_la_SOURCES = $(gearbox_worker_libgearbox_worker_includes) \
 	gearbox/worker/Worker.cc \
-    $(NULL)
+	$(NULL)
 
 ############################################################
 ### workers/gearbox - workers for internal gearbox services
@@ -243,7 +243,7 @@ workers_gearbox_libworker_gearbox_includes = \
 workers_gearbox_libworker_gearbox_la_SOURCES = \
 	$(workers_gearbox_libworker_gearbox_includes) \
 	workers/gearbox/WorkerGearbox.cc \
-    workers/gearbox/DelayProcessor.cc \
+	workers/gearbox/DelayProcessor.cc \
 	$(NULL)
 workers_gearbox_libworker_gearbox_la_LDFLAGS = $(BOOST_LDFLAGS) $(BOOST_FILESYSTEM_LIB)
 workers_gearbox_libworker_gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/store/libgearbox_store.la gearbox/worker/libgearbox_worker.la
@@ -442,14 +442,14 @@ dist_schemapkgdata_DATA += \
 	workers/test-basic/schemas/get-testbasic-thing-v1.js \
 	workers/test-basic/schemas/delete-testbasic-thing-v1.js \
 	workers/test-basic/schemas/create-testbasic-thing-v1.js \
-    workers/test-basic/perl/schemas/update-testbasicperl-thing-v1.js \
-    workers/test-basic/perl/schemas/get-testbasicperl-thing-v1.js \
-    workers/test-basic/perl/schemas/delete-testbasicperl-thing-v1.js \
-    workers/test-basic/perl/schemas/create-testbasicperl-thing-v1.js \
-    workers/test-basic/python/schemas/update-testbasicpython-thing-v1.js \
-    workers/test-basic/python/schemas/get-testbasicpython-thing-v1.js \
-    workers/test-basic/python/schemas/delete-testbasicpython-thing-v1.js \
-    workers/test-basic/python/schemas/create-testbasicpython-thing-v1.js \
+	workers/test-basic/perl/schemas/update-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/get-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/delete-testbasicperl-thing-v1.js \
+	workers/test-basic/perl/schemas/create-testbasicperl-thing-v1.js \
+	workers/test-basic/python/schemas/update-testbasicpython-thing-v1.js \
+	workers/test-basic/python/schemas/get-testbasicpython-thing-v1.js \
+	workers/test-basic/python/schemas/delete-testbasicpython-thing-v1.js \
+	workers/test-basic/python/schemas/create-testbasicpython-thing-v1.js \
 	workers/test-cancel/schemas/update-testcancel-thing-v1.js \
 	workers/test-cancel/schemas/create-testcancel-continuation-v1.js \
 	workers/test-cancel/perl/schemas/update-testcancelperl-thing-v1.js \
@@ -504,7 +504,7 @@ dist_bin_SCRIPTS = \
 	workers/test-chained/perl/workerTestChained.pl \
 	workers/test-delay/perl/workerTestDelay.pl \
 	workers/test-sync/perl/workerTestSync.pl \
-    workers/test-basic/python/workerTestBasic.py \
+	workers/test-basic/python/workerTestBasic.py \
 	$(NULL)
 
 dist_gbsysconf_DATA += \
@@ -513,8 +513,8 @@ dist_gbsysconf_DATA += \
 	workers/test-agents/perl/conf/test-agents-perl.conf \
 	workers/test-agents/perl/conf/test-agents-perl-agents.conf \
 	workers/test-basic/conf/test-basic.conf \
-    workers/test-basic/perl/conf/test-basic-perl.conf \
-    workers/test-basic/python/conf/test-basic-py.conf \
+	workers/test-basic/perl/conf/test-basic-perl.conf \
+	workers/test-basic/python/conf/test-basic-py.conf \
 	workers/test-cancel/conf/test-cancel.conf \
 	workers/test-cancel/perl/conf/test-cancel-perl.conf \
 	workers/test-chained/conf/test-chained.conf \
@@ -523,7 +523,7 @@ dist_gbsysconf_DATA += \
 	workers/test-delay/perl/conf/test-delay-perl.conf \
 	workers/test-sync/conf/test-sync.conf \
 	workers/test-sync/perl/conf/test-sync-perl.conf \
-    $(NULL)
+	$(NULL)
 
 workers/.test-handlers.d/%:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d < workers/test-agents/WorkerTestAgents.cc && \
@@ -544,8 +544,8 @@ workers/.test-handlers.d/%:
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-chained/php/workerTestChained.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-delay/php/workerTestDelay.php && \
 	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-sync/php/workerTestSync.php && \
-    tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/python/workerTestBasic.py
-    
+	tools/gearbox_tools/gb-gen-handlers --handlers-dir workers/.test-handlers.d --update < workers/test-basic/python/workerTestBasic.py
+
 testhandlersdir = ${sysconfdir}/gearbox/test-workers-handlers.d/
 dist_testhandlers_DATA = workers/.test-handlers.d/*
 
@@ -576,12 +576,12 @@ gearbox_swig_perl_libGearbox_la_LDFLAGS = -avoid-version -shared $(filter-out $(
 gearbox_swig_perl_libGearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
 gearbox_swig_perl_libGearbox_la_includes = \
 	gearbox/swig/SwigWorker.h \
-    $(NULL)
+	$(NULL)
 
 gearbox_swig_perl_libGearbox_la_SOURCES = $(gearbox_swig_perl_libGearbox_la_includes) \
 	gearbox/swig/perl/SwigGearbox_wrap.cc \
 	gearbox/swig/SwigWorker.cc \
-    $(NULL)
+	$(NULL)
 
 gearbox/swig/perl/SwigGearbox_wrap.cc gearbox/swig/perl/SwigGearbox_wrap.h gearbox/swig/perl/lib/Gearbox.pm: gearbox/swig/SwigGearbox.i gearbox/swig/perl/perl.i gearbox/swig/perl/perlworker.i
 	$(SWIG) -perl -c++ -o gearbox/swig/perl/SwigGearbox_wrap.cc -outdir gearbox/swig/perl/lib -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
@@ -610,9 +610,9 @@ gearbox_swig_php_SwigGearbox_la_includes = \
 	$(NULL)
 
 gearbox_swig_php_SwigGearbox_la_SOURCES = $(gearbox_swig_php_SwigGearbox_la_includes) \
-   gearbox/swig/php/SwigGearbox_wrap.cc \
-   gearbox/swig/SwigWorker.cc \
-    $(NULL)
+	gearbox/swig/php/SwigGearbox_wrap.cc \
+	gearbox/swig/SwigWorker.cc \
+	$(NULL)
 
 gearbox/swig/php/php_SwigGearbox.h gearbox/swig/php/SwigGearbox.php gearbox/swig/php/SwigGearbox_wrap.cc gearbox/swig/php/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/php/php.i gearbox/swig/php/phpworker.i
 	$(SWIG) -php -cppext cxx -c++ -prefix "Gearbox" -o gearbox/swig/php/SwigGearbox_wrap.cc -outdir gearbox/swig/php -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
@@ -650,14 +650,14 @@ gearbox_swig_python__gearbox_la_CPPFLAGS = $(SWIG_PYTHON_CPPFLAGS)
 gearbox_swig_python__gearbox_la_LDFLAGS = -module -avoid-version -shared $(SWIG_PYTHON_LIBS)
 gearbox_swig_python__gearbox_la_LIBADD = gearbox/core/libgearbox_core.la gearbox/job/libgearbox_job.la gearbox/worker/libgearbox_worker.la
 gearbox_swig_python__gearbox_la_includes = \
-    gearbox/swig/python/SwigGearbox_wrap.h \
+	gearbox/swig/python/SwigGearbox_wrap.h \
 	gearbox/swig/SwigWorker.h \
-    $(NULL)
+	$(NULL)
 
 gearbox_swig_python__gearbox_la_SOURCES = $(gearbox_swig_python__gearbox_la_includes) \
-    gearbox/swig/python/SwigGearbox_wrap.cc \
+	gearbox/swig/python/SwigGearbox_wrap.cc \
 	gearbox/swig/SwigWorker.cc \
-    $(NULL)
+	$(NULL)
 
 gearbox/swig/python/lib/gearbox.py gearbox/swig/python/SwigGearbox_wrap.cc gearbox/swig/python/SwigGearbox_wrap.h: gearbox/swig/SwigGearbox.i gearbox/swig/python/python.i gearbox/swig/python/pythonworker.i gearbox/swig/python/errors.i
 	$(SWIG) -python -c++ -o gearbox/swig/python/SwigGearbox_wrap.cc -outdir gearbox/swig/python/lib -I$(abs_top_srcdir) gearbox/swig/SwigGearbox.i
@@ -671,12 +671,12 @@ gearbox/swig/python/errors.i: gearbox/core/Errors.h gearbox/swig/perl/genErrors
 
 CLEANFILES += \
 	gearbox/swig/python/errors.i \
-    gearbox/swig/python/lib/gearbox.py \
-    gearbox/swig/python/lib/gearbox.pyc \
-    gearbox/swig/python/SwigGearbox_wrap.cc \
-    gearbox/swig/python/SwigGearbox_wrap.h \
+	gearbox/swig/python/lib/gearbox.py \
+	gearbox/swig/python/lib/gearbox.pyc \
+	gearbox/swig/python/SwigGearbox_wrap.cc \
+	gearbox/swig/python/SwigGearbox_wrap.h \
 	gearbox/t/swig/python/setup.pyc \
-    $(NULL)
+	$(NULL)
 
 ###############################################
 ### apache module mod_gearbox
@@ -701,8 +701,8 @@ dist_apacheconfd_DATA += \
 	workers/test-agents/conf/httpd-test-agents.conf \
 	workers/test-agents/perl/conf/httpd-test-agents-perl.conf \
 	workers/test-basic/conf/httpd-test-basic.conf \
-    workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
-    workers/test-basic/python/conf/httpd-test-basic-py.conf \
+	workers/test-basic/perl/conf/httpd-test-basic-perl.conf \
+	workers/test-basic/python/conf/httpd-test-basic-py.conf \
 	workers/test-cancel/conf/httpd-test-cancel.conf \
 	workers/test-cancel/perl/conf/httpd-test-cancel-perl.conf \
 	workers/test-chained/conf/httpd-test-chained.conf \
