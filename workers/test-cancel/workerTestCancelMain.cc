@@ -3,6 +3,8 @@
 
 #include "WorkerTestCancel.h"
 #include <gearbox/core/logger.h>
+#include <gearbox/core/util.h>
+using namespace Gearbox;
 
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
@@ -19,7 +21,7 @@ int main (int argc, char *argv[]) {
         opt::options_description options("Options",100);
         options.add_options()
             ("help,h", "this help message")
-            ("config,f", value<std::string>(&config)->default_value(SYSCONFDIR "/gearbox/test-cancel.conf"), "specify path to config file")
+            ("config,f", value<std::string>(&config)->default_value(server_root() + "/test-cancel.conf"), "specify path to config file")
             ;
         
         opt::variables_map args;

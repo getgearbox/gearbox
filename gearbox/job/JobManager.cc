@@ -34,7 +34,7 @@ namespace Gearbox {
     static SchemaMap schemas;
 
     static JsonSchema * getSchema(const std::string & schemaName, const ConfigFile & cfg) {
-        static std::string schemadir = cfg.get_string_default("schemadir", DATADIR "/gearbox/schemas");
+        static std::string schemadir = cfg.get_path_default("schemadir", DATADIR "/gearbox/schemas");
         std::string schema = schemadir + "/" + schemaName + ".js";
         if( schemas.find(schema) == schemas.end() ) {
             struct stat buf;
@@ -118,7 +118,7 @@ namespace Gearbox {
                     }
                 }
                 
-                std::string confdir = cfg.get_string_default("gearbox", "conf", SYSCONFDIR "/gearbox");
+                std::string confdir = cfg.get_string_default("gearbox", "conf", server_root());
                 glob_t globbuf;
                 glob( std::string(confdir + "/*handlers[._]d").c_str(), 0, NULL, &globbuf);
         

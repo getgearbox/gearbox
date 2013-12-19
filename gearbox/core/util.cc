@@ -124,6 +124,17 @@ namespace Gearbox {
         const std::string SPACE_STR = " ";
     } /* end anonymous namespace */
     
+    std::string server_root() 
+    {
+        std::string server_root(SYSCONFDIR);
+        const char *sr;
+        sr = getenv(ENV_SERVER_ROOT);
+        if ( sr != NULL ) {
+            server_root = std::string(sr);
+        }
+        return server_root + "/gearbox";
+    }
+
     /*
      * - non-empty words that only contain [a-zA-Z0-9_=.+,/-] pass through unchanged
      * - other words are enclosed in single-quotes, and each single-quote in them

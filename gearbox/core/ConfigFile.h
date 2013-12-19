@@ -71,6 +71,30 @@ namespace Gearbox {
         const Json &
         as_json() const;
 
+        const std::string
+        get_path(
+            const std::string & section,
+            const std::string & key
+        ) const;
+
+        const std::string
+        get_path_default(
+            const std::string & section,
+            const std::string & key,
+            const std::string & dflt
+        ) const;
+
+        const std::string
+        get_path(
+            const std::string & key
+        ) const;
+
+        const std::string
+        get_path_default(
+            const std::string & key,
+            const std::string & dflt
+        ) const;
+
     private:
         class Private;
         Private * impl;

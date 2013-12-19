@@ -4,6 +4,7 @@
 #include <gearbox/core/ConfigFile.h>
 
 #include "config.h"
+#include "util.h"
 #include <gearbox/core/logger.h>
 #include <glob.h>
 #include <map>
@@ -22,7 +23,7 @@ namespace Gearbox {
             if( ! content.get() ) {
                 content = CONFIG_MAP[file] = boost::shared_ptr<Json>(new Json());
                 content->parseFile(file);
-                std::string config_dir(SYSCONFDIR "/gearbox/config.d");
+                std::string config_dir = server_root() + "/config.d";
                 if( content->hasKey("config_dir") ) {
                     config_dir = content->get("config_dir").as<std::string>();
                 }
@@ -180,6 +181,58 @@ namespace Gearbox {
 
     const Json & ConfigFile::as_json() const {
         return *(impl->content);
+    }
+
+    const std::string
+    ConfigFile::get_path(
+        const std::string & section,
+        const std::string & key
+    ) const {
+        if( impl->content->hasKey(section) && impl->content->get(section).hasKey(key) ) {
+            std::string path = impl->content->get(section).get(key).as<std::string>();
+            if ( path.at(0) != '/' ) {
+                path.insert(0, server_root() + "/");
+            }
+            return path;
+        }
+        return EMPTY_STRING;
+    }
+
+    const std::string
+    ConfigFile::get_path(
+        const std::string & key
+    ) const {
+        if( impl->content->hasKey(key) ) {
+            std::string path = impl->content->get(key).as<std::string>();
+            if ( path.at(0) != '/' ) {
+                path.insert(0, server_root() + "/");
+            }
+            return path;
+        }
+        return EMPTY_STRING;
+    }
+
+    const std::string
+    ConfigFile::get_path_default(
+        const std::string & section,
+        const std::string & key,
+        const std::string & dflt
+    ) const {
+        if( impl->content->hasKey(section) && impl->content->get(section).hasKey(key) ) {
+            return get_path(section, key);
+        }
+        return dflt;
+    }
+
+    const std::string
+    ConfigFile::get_path_default(
+        const std::string & key,
+        const std::string & dflt
+    ) const {
+        if( impl->content->hasKey(key) ) {
+            return get_path(key);
+        }
+        return dflt;
     }
 
 } // namespace

@@ -9,6 +9,8 @@
 #include <boost/filesystem/path.hpp>
 #include <gearbox/core/Pipe.h>
 
+#define ENV_SERVER_ROOT "GB_SERVER_ROOT"
+
 namespace Gearbox 
 {
     std::string digest_full( const boost::filesystem::path & path );
@@ -33,6 +35,8 @@ namespace Gearbox
     int run (const std::string & cmd);
     int run (const std::string & cmd, std::string & output);
     int run (const std::string & cmd, std::string & stdout, std::string & stderr);
+
+    std::string server_root();
 
     std::string shellquote_list(const Cmd & cmd);
 
