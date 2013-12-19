@@ -1,31 +1,32 @@
-#!/bin/bash
+#!/bin/zsh -f
+#
+#
+set -e
 
-# keep track of the working directory
-CWD=$(pwd)
+SCRIPTS=$0
+LANGUAGES=(cpp perl python)
 
-# unset PREFIX environment variable for c++ workers
-unset PREFIX
+usage() {
+    echo "Usage: $SCRIPT [--languages \"cpp perl python\"] [--host gearbox]"
+    echo "    --languages defaults to \"$LANGUAGES\""
+    exit 1
+}
 
-# run the smoke tests for c++ workers
-for filepath in $CWD/workers/test-*
-do
-    cd $filepath/smoke
-    ./test.t
+while [[ $# -ge 1 ]]; do
+    case $1 in
+        --languages) shift; LANGUAGES=($1); shift ;;
+        --host) shift ; export SMOKE_HOST=$1 ; shift ;;
+        *) echo "Unknown option \"$1\""; usage ;;
+    esac
 done
 
-# set PREFIX environment variable to perl for perl workers
-export PREFIX=perl
+for language in $LANGUAGES; do
+    if [[ $language == "cpp" ]]; then
+        unset PREFIX
+    else
+        export PREFIX=$language
+    fi
 
-# run the smoke tests for perl workers
-for filepath in $CWD/workers/test-*
-do
-    cd $filepath/smoke
-    ./test.t
+    find workers -name 'test.t' -print0 | \
+        xargs --null -L1 zsh -c 'echo $0 ; cd $0:h && ./$0:t'
 done
-
-# set PREFIX environment variable to python for python workers
-export PREFIX=python
-
-# run the smoke tests for python workers
-cd $CWD/workers/test-basic/smoke
-./test.t
