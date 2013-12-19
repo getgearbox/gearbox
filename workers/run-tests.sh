@@ -14,7 +14,7 @@ usage() {
 
 while [[ $# -ge 1 ]]; do
     case $1 in
-        --languages) shift; LANGUAGES=($1); shift ;;
+        --languages) shift; LANGUAGES=($=1); shift ;;
         --host) shift ; export SMOKE_HOST=$1 ; shift ;;
         *) echo "Unknown option \"$1\""; usage ;;
     esac
