@@ -135,7 +135,7 @@ namespace Gearbox {
         return server_root + "/gearbox";
     }
 
-    std::string server_abspath(const std::string & path)
+    const std::string & server_abspath(const std::string & path)
     { 
         if ( path.at(0) != '/' ) {
              path.insert(0, server_root() + "/");

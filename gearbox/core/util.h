@@ -37,7 +37,7 @@ namespace Gearbox
     int run (const std::string & cmd, std::string & stdout, std::string & stderr);
 
     std::string server_root();
-    std::string server_abspath(const std::string & path);
+    const std::string & server_abspath(const std::string & path);
 
     std::string shellquote_list(const Cmd & cmd);
 
