@@ -32,9 +32,9 @@ BEGIN {
         $ENV{DYLD_FORCE_FLAT_NAMESPACE} = 1;
         exec($0,@ARGV);
     }
-    push @INC, Cwd::realpath("$path/../../../swig/perl");
-    push @INC, Cwd::realpath("$path/../../../swig/perl/.libs");
-    push @INC, Cwd::realpath("$path/../../../swig/perl/lib");
+    unshift @INC, Cwd::realpath("$path/../../../swig/perl");
+    unshift @INC, Cwd::realpath("$path/../../../swig/perl/.libs");
+    unshift @INC, Cwd::realpath("$path/../../../swig/perl/lib");
     $0 = Cwd::realpath($0);
     chdir($path);
 }
