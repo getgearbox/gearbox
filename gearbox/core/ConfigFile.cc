@@ -25,7 +25,7 @@ namespace Gearbox {
                 content->parseFile(file);
                 std::string config_dir = server_root() + "/config.d";
                 if( content->hasKey("config_dir") ) {
-                    config_dir = content->get("config_dir").as<std::string>();
+                    config_dir = server_abspath(content->get("config_dir").as<std::string>());
                 }
 
                 glob_t globbuf;
@@ -190,10 +190,7 @@ namespace Gearbox {
     ) const {
         if( impl->content->hasKey(section) && impl->content->get(section).hasKey(key) ) {
             std::string path = impl->content->get(section).get(key).as<std::string>();
-            if ( path.at(0) != '/' ) {
-                path.insert(0, server_root() + "/");
-            }
-            return path;
+            return server_abspath(path);
         }
         return EMPTY_STRING;
     }
@@ -204,10 +201,7 @@ namespace Gearbox {
     ) const {
         if( impl->content->hasKey(key) ) {
             std::string path = impl->content->get(key).as<std::string>();
-            if ( path.at(0) != '/' ) {
-                path.insert(0, server_root() + "/");
-            }
-            return path;
+            return server_abspath(path);
         }
         return EMPTY_STRING;
     }
