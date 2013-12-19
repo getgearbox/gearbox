@@ -126,18 +126,19 @@ namespace Gearbox {
     
     std::string server_root() 
     {
-        std::string server_root(SYSCONFDIR);
+        std::string server_root(DEFAULT_SERVER_ROOT);
         const char *sr;
         sr = getenv(ENV_SERVER_ROOT);
         if ( sr != NULL ) {
             server_root = std::string(sr);
         }
-        return server_root + "/gearbox";
+        return server_root;
     }
 
     const std::string & server_abspath(const std::string & path)
     { 
-        if ( path.at(0) != '/' ) {
+        char *f = path.at(0);
+        if ( f != '/' && f != '.' ) {
              path.insert(0, server_root() + "/");
         }
         return path;

@@ -9,6 +9,7 @@
 #include <boost/filesystem/path.hpp>
 #include <gearbox/core/Pipe.h>
 
+#define DEFAULT_SERVER_ROOT SYSCONFDIR"/gearbox"
 #define ENV_SERVER_ROOT "GB_SERVER_ROOT"
 
 namespace Gearbox 

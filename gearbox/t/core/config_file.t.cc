@@ -32,9 +32,9 @@ int main() {
 
         IS( cfg.get_path("section1", "nonsense"), "" );
         IS( cfg.get_path("section1", "mypath"), "/1/2/3" );
-        IS( cfg.get_path("section1", "yourpath"), "/altroot/gearbox/4/5/6" );
+        IS( cfg.get_path("section1", "yourpath"), "/altroot/4/5/6" );
         IS( cfg.get_path("zot"), "/foo");
-        IS( cfg.get_path("zap"), "/altroot/gearbox/foo");
+        IS( cfg.get_path("zap"), "/altroot/foo");
 
         unsetenv("GB_SERVER_ROOT");
         IS( cfg.get_path("section1", "yourpath"), "/etc/gearbox/4/5/6" );
