@@ -16,7 +16,7 @@ set -e
 # sudo yum install ~/rpmbuild/RPMS/x86_64/yajl*
 
 # Install swig >= 2.0
-# sudo yum install -y pcre-devel
+# sudo yum install -y pcre-devel python-devel tcl-devel guile-devel perl-devel 'perl(Test::More)' boost-devel
 # wget http://download.fedoraproject.org/pub/fedora/linux/development/rawhide/source/SRPMS/swig-2.0.11-2.fc21.src.rpm
 # rpmbuild --rebuild swig-2.0.11-2.fc21.src.rpm
 # if you get a test failure like this:
@@ -28,6 +28,7 @@ set -e
 # mkdir -p ~/rpmbuild/SOURCES/
 # wget -P ~/rpmbuild/SOURCES/ http://search.cpan.org/CPAN/authors/id/K/KE/KENSHAN/IO-Tee-0.64.tar.gz \
 #    http://www.cpan.org/authors/id/C/CO/CORYB/Test-Trivial-1.901.2.tar.gz
+# sudo yum install 'perl(Regexp::Common)' 'perl(Text::Diff)' 'perl(IO::Scalar)' 'perl(IO::Tee)'
 # rpmbuild -bb deps/rpm-specs/*.spec
 # sudo yum install ~/rpmbuild/RPMS/noarch/perl-{Test-Trivial-1.901.2-1,IO-Tee-0.64-1}.noarch.rpm
 
