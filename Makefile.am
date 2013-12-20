@@ -17,6 +17,7 @@ CFLAGS=-g
 CXXFLAGS=-g -fpermissive
 export DYLD_FORCE_FLAT_NAMESPACE=1
 PKG_RELEASE ?= `whoami`_git_`git rev-parse --short HEAD`
+GB_SMOKE_LANGUAGES ?= 'cpp perl'
 
 LIBTAP=deps/libtap++-0.01/libtap++.la
 
@@ -762,4 +763,7 @@ EXTRA_DIST = \
 	gearbox/swig/perl/genErrors \
 	common
 
+# Target for running smoke tests
+smoke:
+	workers/run-tests.sh --languages $(GB_SMOKE_LANGUAGES)
 include rpm.am

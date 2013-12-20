@@ -30,5 +30,11 @@ rpm: clean-rpm common/build/$(PACKAGE).spec rpm-build
 
 release: rpm rpm-sign
 
+install-rpms:
+	@sudo yum install -y $(PACKAGE)*-$(VERSION)-$(PKG_RELEASE).el6.x86_64.rpm mod_gearbox-$(VERSION)-$(PKG_RELEASE).el6.x86_64.rpm
+
+uninstall-rpms:
+	@rpm -qa | grep gearbox | grep $(VERSION)-$(PKG_RELEASE) | xargs sudo yum erase -y
+
 auto-rpmbuild:
 	@auto-br-rpmbuild -ba common/build/gearbox.spec
