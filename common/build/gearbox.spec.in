@@ -45,8 +45,8 @@ Gearbox core libraries
 %{_libdir}/libgearbox_core.a
 %{_libdir}/libgearbox_core.la
 %{_libdir}/libgearbox_core.so
-%{_libdir}/libgearbox_core.so.1
-%{_libdir}/libgearbox_core.so.1.0.0
+%{_libdir}/libgearbox_core.so.2
+%{_libdir}/libgearbox_core.so.2.0.0
 
 # ============ core-devel ============
 

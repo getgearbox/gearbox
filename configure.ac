@@ -166,18 +166,18 @@ PYTHON_SITEARCHDIR=`${PYTHON} -c "from distutils.sysconfig import get_python_lib
 
 # library versioning
 
-GEARBOX_CORE_LIBRARY_VERSION=1:0:0
-#                       | | |
-#                +------+ | +---+
-#                |        |     |
-#             current:revision:age
-#                |        |     |
-#                |        |     +- increment if interfaces have been added
-#                |        |        set to zero if interfaces have been removed
-#                |        |        or changed
-#                |        +- increment if source code has changed
-#                |           set to zero if current is incremented
-#                +- increment if interfaces have been added, removed or changed
+GEARBOX_CORE_LIBRARY_VERSION=2:0:0
+#                            | | |
+#                     +------+ | +---+
+#                     |        |     |
+#                  current:revision:age
+#                     |        |     |
+#                     |        |     +- increment if interfaces have been added
+#                     |        |        set to zero if interfaces have been removed
+#                     |        |        or changed
+#                     |        +- increment if source code has changed
+#                     |           set to zero if current is incremented
+#                     +- increment if interfaces have been added, removed or changed
 AC_SUBST([GEARBOX_CORE_LIBRARY_VERSION])
 
 GEARBOX_STORE_LIBRARY_VERSION=1:0:0
