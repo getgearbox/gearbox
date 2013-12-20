@@ -27,6 +27,6 @@ for language in $LANGUAGES; do
         export PREFIX=$language
     fi
 
-    find workers -name 'test.t' -print0 | \
+    find . -name 'test.t' -print0 | \
         xargs --null -L1 zsh -c 'echo $0 ; cd $0:h && ./$0:t'
 done
