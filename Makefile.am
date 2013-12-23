@@ -16,7 +16,9 @@ DISTCLEANFILES = \
 CFLAGS=-g
 CXXFLAGS=-g -fpermissive
 export DYLD_FORCE_FLAT_NAMESPACE=1
-PKG_RELEASE ?= `whoami`_git_`git rev-parse --short HEAD`
+BUILD_DATE := $(shell date +%s)
+GIT_HASH := $(shell git rev-parse --short HEAD)
+PKG_RELEASE ?= $(BUILD_DATE)_git_$(GIT_HASH)
 GB_SMOKE_LANGUAGES ?= 'cpp perl'
 
 LIBTAP=deps/libtap++-0.01/libtap++.la
