@@ -1,5 +1,7 @@
 %{
-#include <traceback.h>
+  #include <sstream>
+  #include "traceback.h"
+  #include "frameobject.h"
 
   class PythonWorker : public Gearbox::Worker {
      typedef Gearbox::Worker super;
@@ -136,6 +138,10 @@
       PyErr_NormalizeException(&errtype, &errvalue, &errtb);
 
       // print a traceback to stderr
+      // it'd be nice to get the traceback as a string the send it to _WARN but
+      // that wasn't straight forward.  The best I could find was the
+      // PyTraceback_AsString method here:
+      // http://lxr.mozilla.org/seamonkey/source/extensions/python/xpcom/src/ErrorUtils.cpp
       if ( errtb ) {
         char *cstr = new char [6+1];
         strcpy(cstr, "stderr");
@@ -177,16 +183,20 @@
       }
       Py_XDECREF(errvalue);
 
-      // string-ify errtype
-      std::string errtypestr = "";
+      // string-ify errtype and build the message to throw
+      std::ostringstream err;
       PyObject *pyerrtypestr = PyObject_Str( errtype );
       if ( pyerrtypestr ) {
-          errtypestr = PyString_AsString( pyerrtypestr );
-          errtypestr += ": ";
-          Py_DECREF(pyerrtypestr);
+        err << PyString_AsString( pyerrtypestr ) << ": ";
+        Py_DECREF(pyerrtypestr);
       }
 
-      gbTHROW( std::runtime_error( errtypestr + errmsg ) );
+      err << errmsg;
+      if ( PyTraceBack_Check(errtb) ) {
+        err << " (File " << PyString_AsString(((PyTracebackObject *)errtb)->tb_frame->f_code->co_filename);
+        err << " line " << ((PyTracebackObject *)errtb)->tb_lineno << ")";
+      }
+      gbTHROW( std::runtime_error( err.str() ) );
     }
 
     std::map<std::string,PyObject*> funcs;
