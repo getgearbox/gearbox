@@ -105,57 +105,59 @@ namespace Gearbox {
         }
 
         Private(const ConfigFile & c) : cfg(c) {
-            if( runnable_jobs.empty() ) {
-                std::string job_file = cfg.get_string("handlers_file" );
-                if ( ! job_file.empty() ) {
-                    _DEBUG( "Enabling jobs from file '" << job_file << "'..." );
-                    Json hcfg;
-                    hcfg.parseFile( job_file );
-                    for ( int i=0; i < hcfg["handlers"].length(); i++ ) {
-                        std::string job = hcfg["handlers"][i].as<std::string>();
-                        _TRACE( "-> " << job );
-                        this->runnable_jobs[job] = 1;
-                    }
+            build_runnable_jobs();
+        }
+
+        void build_runnable_jobs() {
+            std::string job_file = cfg.get_string("handlers_file" );
+            if ( ! job_file.empty() ) {
+                _DEBUG( "Enabling jobs from file '" << job_file << "'..." );
+                Json hcfg;
+                hcfg.parseFile( job_file );
+                for ( int i=0; i < hcfg["handlers"].length(); i++ ) {
+                    std::string job = hcfg["handlers"][i].as<std::string>();
+                    _TRACE( "-> " << job );
+                    this->runnable_jobs[job] = 1;
                 }
-                
-                std::string confdir = cfg.get_string_default("gearbox", "conf", server_root());
-                glob_t globbuf;
-                glob( std::string(confdir + "/*handlers[._]d").c_str(), 0, NULL, &globbuf);
-        
-                std::vector<std::string> job_dirs;
-                for( unsigned int i=0; i < globbuf.gl_pathc; i++ ) {
-                    if( bfs::is_directory(bfs::path(globbuf.gl_pathv[i])) ) {
-                        job_dirs.push_back( globbuf.gl_pathv[i] );
-                    }
+            }
+
+            std::string confdir = cfg.get_string_default("gearbox", "conf", server_root());
+            glob_t globbuf;
+            glob( std::string(confdir + "/*handlers[._]d").c_str(), 0, NULL, &globbuf);
+
+            std::vector<std::string> job_dirs;
+            for( unsigned int i=0; i < globbuf.gl_pathc; i++ ) {
+                if( bfs::is_directory(bfs::path(globbuf.gl_pathv[i])) ) {
+                    job_dirs.push_back( globbuf.gl_pathv[i] );
                 }
-                
-                globfree(&globbuf);
-                
-                for( unsigned int i=0; i < job_dirs.size(); ++i ) {
-                    _DEBUG( "Enabling jobs from dir '" << job_dirs[i] << "'..." );
-                    bfs::directory_iterator end;
-                    for ( bfs::directory_iterator itr( job_dirs[i] );
-                          itr != end;
-                          ++itr ) {
+            }
+
+            globfree(&globbuf);
+
+            for( unsigned int i=0; i < job_dirs.size(); ++i ) {
+                _DEBUG( "Enabling jobs from dir '" << job_dirs[i] << "'..." );
+                bfs::directory_iterator end;
+                for ( bfs::directory_iterator itr( job_dirs[i] );
+                      itr != end;
+                      ++itr ) {
 #if (BOOST_VERSION >= 104600)
-                        std::string job = itr->path().filename().string();
+                    std::string job = itr->path().filename().string();
 #else
-                        std::string job = itr->leaf();
+                    std::string job = itr->leaf();
 #endif
-                        size_t s = job.find( "do_", 0 );
-                        if ( s < std::string::npos ) {
-                            s = job.find("_", s);
-                            if( s < std::string::npos ) {
-                                _TRACE( "-> " << job );
-                                this->runnable_jobs[job] = 1;             
-                            }
-                            else {
-                                _DEBUG( "Ignoring '" << job << "' (does not start with do_)" );
-                            }
+                    size_t s = job.find( "do_", 0 );
+                    if ( s < std::string::npos ) {
+                        s = job.find("_", s);
+                        if( s < std::string::npos ) {
+                            _TRACE( "-> " << job );
+                            this->runnable_jobs[job] = 1;
                         }
                         else {
-                            _DEBUG( "Ignoring '" << job << "' (bad prefix)" );
+                            _DEBUG( "Ignoring '" << job << "' (does not start with do_)" );
                         }
+                    }
+                    else {
+                        _DEBUG( "Ignoring '" << job << "' (bad prefix)" );
                     }
                 }
             }
@@ -202,6 +204,12 @@ namespace Gearbox {
         if ( impl->cfg.get_int_default( "allow_unknown_jobs", 0 ) ) {
             return true;
         }
+
+        // if the job isn't in the cache, reload the cache
+        if ( !impl->runnable_jobs[name] ) {
+            impl->build_runnable_jobs();
+        }
+
         return impl->runnable_jobs[name];
     }
 
