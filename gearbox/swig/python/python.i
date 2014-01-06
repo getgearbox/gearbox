@@ -93,8 +93,7 @@ namespace std {
 
 %typemap(in) const Uri & (std::string uri, std::auto_ptr<Uri> cfptr) %{
   {
-    char * ptr = PyString_AsString($input);
-    uri.assign(ptr, PyString_Size($input));
+    uri.assign(PyString_AsString($input));
     cfptr.reset(new Uri(uri));
     $1 = cfptr.get();
   }
