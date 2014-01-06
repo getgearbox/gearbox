@@ -41,7 +41,7 @@ RestJobImpl::run() const {
     }
     
     if( ! this->parent_uri().empty() ) {
-        c.set_header("Y-Status-Parent-Uri", this->parent_uri());
+        c.set_header("Status-Parent-Uri", this->parent_uri());
     }
 
     JobResponse jr;
