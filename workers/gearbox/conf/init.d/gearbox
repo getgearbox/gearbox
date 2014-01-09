@@ -8,90 +8,91 @@
 
 export PATH=$PATH:/command
 create() {
-        # separate out create into it's own function and call it at rpm install
-        # time as well as start time so that changes to config files will
-        # modify the daemontools run scripts when you call 'service gearbox
-        # restart'
-        action "Creating gearbox services: " \
-        gearbox-svc-builder --file=/etc/gearbox/gearbox.conf \
-                            --key=daemons \
-                            --prefix=gearbox- \
-                            --service_dir=/var/gearbox/gearbox-workers
+    # separate out create into it's own function and call it at rpm install
+    # time as well as start time so that changes to config files will
+    # modify the daemontools run scripts when you call 'service gearbox
+    # restart'
+    action "Creating gearbox services: " \
+    gearbox-svc-builder --file=/etc/gearbox/gearbox.conf \
+                        --key=daemons \
+                        --prefix=gearbox- \
+                        --service_dir=/var/gearbox/gearbox-workers
 }
 
 start() {
-        # call create to rewrite the daemontools run files in case the config
-        # files have changed
-        create
+    # call create to rewrite the daemontools run files in case the config
+    # files have changed
+    create
 
-        # if we stopped it with svc -d (in the stop function below) start it
-        # with svc -u
-        svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
-        # when grep matches it returns 0, when it doesn't match it returns nonzero
-        if [[ $? -eq 0 ]]; then
-            action "Waiting for svscan to spawn supervise for new services" sleep 5
-            action "Starting gearbox services: " \
-                svc -u /var/gearbox/gearbox-workers/*
-        fi
+    # if we stopped it with svc -d (in the stop function below) start it
+    # with svc -u
+    svstat /var/gearbox/gearbox-workers/* |grep down 2>&1 > /dev/null
+    # when grep matches it returns 0, when it doesn't match it returns nonzero
+    if [[ $? -eq 0 ]]; then
+        action "Waiting for svscan to spawn supervise for new services" sleep 5
+        action "Starting gearbox services: " \
+            svc -u /var/gearbox/gearbox-workers/*
+    fi
 }
 
 status() {
-        shopt -s nullglob
-        workers=(/var/gearbox/gearbox-workers/*)
-        if [ ${#workers[@]} -gt 0 ]; then
-                svstat ${workers[*]}
-        else
-                echo "no files in /var/gearbox/gearbox-workers..."
-                exit 1
-        fi
+    shopt -s nullglob
+    workers=(/var/gearbox/gearbox-workers/*)
+    if [ ${#workers[@]} -gt 0 ]; then
+        svstat ${workers[*]}
+    else
+        echo "no files in /var/gearbox/gearbox-workers..."
+        exit 1
+    fi
 }
 
 stop() {
-        action "Stopping gearbox services: " svc -d /var/gearbox/gearbox-workers/*
+    action "Stopping gearbox services: " svc -d /var/gearbox/gearbox-workers/*
 }
 
 delete() {
-        # check if services are in starting mode. We need to allow them to start
-        # completely for cleanup in delete operation
-        svstat /var/gearbox/gearbox-workers/* | grep "unable to open supervise" 2>&1 > /dev/null
+    # check if services are in starting mode. We need to allow them to start
+    # completely for cleanup in delete operation
+    svstat /var/gearbox/gearbox-workers/* | grep "unable to open supervise" 2>&1 > /dev/null
 
-        # if any service is not created completely, we would wait for them to be created
-        if [[ $? -eq 0 ]]; then
-            action "Waiting for supervise to be spawned for new services" sleep 5
-        fi
+    # if any service is not created completely, we would wait for them to be created
+    if [[ $? -eq 0 ]]; then
+        action "Waiting for supervise to be spawned for new services" sleep 5
+    fi
 
-        # Create an empty daemons json string
-        echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
+    # Create an empty daemons json string
+    echo '{ "daemons": [] }' > /tmp/empty-daemons.conf
 
-        action "Deleting gearbox services: " \
-        gearbox-svc-builder --file=/tmp/empty-daemons.conf \
-                            --key=daemons \
-                            --prefix=gearbox- \
-                            --service_dir=/var/gearbox/gearbox-workers
-        rm /tmp/empty-daemons.conf
+    action "Deleting gearbox services: " \
+    gearbox-svc-builder --file=/tmp/empty-daemons.conf \
+                        --key=daemons \
+                        --prefix=gearbox- \
+                        --service_dir=/var/gearbox/gearbox-workers
+    rm /tmp/empty-daemons.conf
 }
 
 case "$1" in
-  create)
+    create)
         create
         ;;
-  start)
+    start)
         start
         ;;
-  delete)
+    delete)
         delete
         ;;
-  stop)
+    stop)
         stop
         ;;
-  restart|reload)
+    restart|reload)
         stop
         start
         ;;
-  status)
+    status)
   		status
   		;;
-  *)
-        echo $"Usage: $0 {create|start|stop|restart|reload|delete|status}"
+    *)
+        echo "Usage: $0 {create|start|stop|restart|reload|delete|status}"
         exit 1
+        ;;
 esac
