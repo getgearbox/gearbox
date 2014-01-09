@@ -24,6 +24,59 @@ namespace std {
   $result = $1.get() ? SWIG_NewPointerObj(SWIG_as_voidptr(new Status(*($1.get()))), SWIGTYPE_p_Gearbox__Status, SWIG_POINTER_OWN) : Py_BuildValue("");
 }
 
+%typemap(out) Gearbox::JobQueue {
+  int len = $1.size();
+  $result = PyList_New(len);
+
+  for(int i=0 ; i < len ; i++) {
+    int level_len = $1.at(i).size();
+    PyObject * level = PyList_New(level_len);
+    PyList_SetItem($result, i, level);
+
+    for(int k=0 ; k < level_len ; k++) {
+      PyObject * job = Py_BuildValue("");
+      std::vector<JobPtr> job_ptrs = $1.at(i);
+
+      if( job_ptrs.at(k) ) {
+        Job * j = new Job( *(job_ptrs.at(k)) );
+        job = SWIG_NewPointerObj(SWIG_as_voidptr(j), SWIGTYPE_p_Gearbox__Job, SWIG_POINTER_OWN);
+      }
+
+      PyList_SetItem(level, k, job);
+    }
+  }
+}
+
+%typemap(in) Gearbox::JobQueue & (JobQueue temp) {
+  {
+    PyObject * jq = $input;
+
+    if (PyList_Check(jq)) {
+      $1 = &temp;
+      Py_ssize_t len = PyList_Size(jq);
+
+      for( int i=0; i < len; i++ ) {
+        PyObject * level = PyList_GetItem(jq, i);
+        Py_ssize_t level_len = PyList_Size(level);
+
+        temp.push_back(std::vector<JobPtr>());
+        for( int j=0; j < level_len; j++ ) {
+          PyObject * job = PyList_GetItem(level, j);
+          Job * jptr;
+          SWIG_ConvertPtr(job,(void*)&jptr,SWIGTYPE_p_Gearbox__Job,0);
+          temp[i].push_back(boost::shared_ptr<Job>(new Job(*jptr)));
+        }
+      }
+    } else {
+        SWIG_exception(SWIG_TypeError, "list expected");
+    }
+  }
+}
+
+%typemap(typecheck) Gearbox::JobQueue & %{
+   $1 = PyList_Check($input) ? 1 : 0;
+%}
+
 %typemap(out) const Json & (PyObject *json_module, PyObject *json_mod_dict, PyObject *func, char format[] = "s") %{
   json_module = PyImport_ImportModule("json");
   if (json_module == NULL) {
@@ -142,7 +195,7 @@ namespace std {
 %}
 
 %exception {
-  try { $action  }
+  try { $action }
   catch(const Error & err) {
     std::string pkg("ERR_");
     pkg += err.name();

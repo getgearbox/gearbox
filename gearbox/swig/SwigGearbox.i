@@ -63,7 +63,9 @@ class HttpClient
 
 %ignore JobManager(const JobImpl *);
 %ignore getSchema(const JobImpl *, const ConfigFile &);
+#if defined(SWIGPERL) || defined(SWIGPHP)
 %rename(RealJobManager) JobManager;
+#endif
 %include "gearbox/job/JobManager.h"
 %include "gearbox/job/StatusManager.h"
 

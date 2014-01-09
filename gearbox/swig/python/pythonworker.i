@@ -221,7 +221,7 @@ class Worker(PythonWorker):
         # Allow ctrl-C to work
         # See https://mail.python.org/pipermail/cplusplus-sig/2012-December/016858.html
         signal.signal(signal.SIGINT, signal.SIG_DFL)
-        if ( not isfile(config) ):
+        if not isfile(config):
             raise IOError("config file '%s' is not a file" % config)
         super(Worker, self).__init__(config)
         self.set_self(self)
@@ -234,8 +234,13 @@ class Worker(PythonWorker):
 
     def pre_request(self, job):
         return 0
-
-# rename RealJobManager back to JobManager
-class JobManager(RealJobManager):
-    pass
 %}
+
+%extend Gearbox::JobManager {
+    %pythoncode %{
+        def job_queue_apply(self, queue, function, data):
+            for level in queue:
+                for job in level:
+                    getattr(job, function)(data)
+    %}
+}
