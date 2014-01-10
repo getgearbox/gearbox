@@ -216,6 +216,7 @@ Gearbox daemons libraries
 %{_datadir}/gearbox/schemas/get-global-status-response-v1.js
 %{_datadir}/gearbox/schemas/get-global-status-v1.js
 %{_datadir}/gearbox/schemas/update-global-status-v1.js
+%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox
 
 # ============ daemons-config =============
 
@@ -239,7 +240,6 @@ Sample configuration for gearbox-daemons
 %attr(0755,nobody,nobody) %dir /var/log/gearbox
 %attr(0755,nobody,nobody) %dir /var/gearbox/
 %attr(0755,nobody,nobody) %dir /var/gearbox/db/
-%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox
 %{_datadir}/gearbox/gearbox_daemons/delay-migration/2.sql
 %{_datadir}/gearbox/gearbox_daemons/delay-migration/2.undo.sql
 %{_datadir}/gearbox/gearbox_daemons/delay-migration/3.sql
@@ -436,6 +436,8 @@ Gearbox test workers
 %attr(0755,-,-) %{_bindir}/workerTestChained.py
 %attr(0755,-,-) %{_bindir}/workerTestDelay.py
 %attr(0755,-,-) %{_bindir}/workerTestSync.py
+#
+%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox-test-workers
 
 %{_sysconfdir}/gearbox/test-workers-handlers.d/*
 %{_datadir}/gearbox/schemas/get-testagents-thing-v1.js
@@ -554,8 +556,6 @@ Sample configuration for gearbox-test-workers
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-chained-python
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-delay-python
 %attr(0755,nobody,nobody) %dir %{_localstatedir}/gearbox/db/test-sync-python
-#
-%attr(0755,root,root) %{_sysconfdir}/init.d/gearbox-test-workers
 
 %{_sysconfdir}/gearbox/config.d/gearbox.conf
 %{_sysconfdir}/gearbox/test-agents.conf
