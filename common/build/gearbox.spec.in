@@ -30,6 +30,31 @@ the caller. The status object tracks the progress of that job so the caller can
 know when the resources is created, updated or deleted. Reads are also jobs
 worked on workers, but they are synchronous and don't use a status object.
 
+# ============ gearbox-framework ============
+
+%package -n gearbox-framework
+Summary: Gearbox Virtual Package
+Group: Development/Libraries
+
+Requires: gearbox-core >= @VERSION@-%{release}
+Requires: gearbox-store >= @VERSION@-%{release}
+Requires: gearbox-job >= @VERSION@-%{release}
+Requires: gearbox-worker >= @VERSION@-%{release}
+Requires: gearbox-daemons >= @VERSION@-%{release}
+Requires: gearbox-daemons-config >= @VERSION@-%{release}
+Requires: mod_gearbox >= @VERSION@-%{release}
+Requires: gearbox-status-plugin-sql >= @VERSION@-%{release}
+Requires: gearbox-perl-lib >= @VERSION@-%{release}
+Requires: gearbox-python-lib >= @VERSION@-%{release}
+Requires: gearbox-tools >= @VERSION@-%{release}
+Requires: gearbox-dbsetup >= @VERSION@-%{release}
+Requires: gearbox-svc-builder >= @VERSION@-%{release}
+
+%description -n gearbox-framework
+meta package for installing all the gearbox packages at the correct version
+
+%files -n gearbox-framework
+
 # ============ core ============
 
 %package core
