@@ -19,7 +19,7 @@ export DYLD_FORCE_FLAT_NAMESPACE=1
 BUILD_DATE := $(shell date +%s)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 PKG_RELEASE ?= $(BUILD_DATE)_git_$(GIT_HASH)
-GB_SMOKE_LANGUAGES ?= 'cpp perl'
+GB_SMOKE_LANGUAGES ?= 'cpp perl python'
 
 LIBTAP=deps/libtap++-0.01/libtap++.la
 
