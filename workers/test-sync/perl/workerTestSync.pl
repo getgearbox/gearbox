@@ -1,4 +1,4 @@
-#!/bin/env perl
+#!/usr/bin/env perl
 ######################################################################
 # Copyright (c) 2012, Yahoo! Inc. All rights reserved.
 #
