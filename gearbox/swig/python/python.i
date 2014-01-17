@@ -197,7 +197,7 @@ namespace std {
 %exception {
   try { $action }
   catch(const Error & err) {
-    std::string pkg("ERR_");
+    std::string pkg("gearbox.ERR_");
     pkg += err.name();
     char * cstr = new char [pkg.length()+1];
     strcpy (cstr, pkg.c_str());

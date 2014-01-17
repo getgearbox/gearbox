@@ -5,7 +5,9 @@ import setup
 from testtrivial import *
 from gearbox import ConfigFile
 
-PLAN(17)
+PLAN(19)
+
+IS( str(THROWS( lambda: ConfigFile("bogus.conf") ) ), "INTERNAL_SERVER_ERROR [500]: Could not open bogus.conf: No such file or directory" )
 
 vars = Vars()
 OK( vars.set("cfg", ConfigFile("./unit.conf") ) )
