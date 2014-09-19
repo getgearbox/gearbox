@@ -9,16 +9,22 @@
 
 namespace Gearbox {
     void log_init( const std::string & configFile) {
-        ConfigFile cfg(configFile);
-        
-        std::string log_conf_file = cfg.get_string("log", "config_file");
-        log4cxx::PropertyConfigurator::configure( log_conf_file );
-        
-        std::stringstream converter;
-        converter << getpid();
-        log4cxx::MDC::put("pid", converter.str());
+        try {
+            ConfigFile cfg(configFile);
+            
+            std::string log_conf_file = cfg.get_string("log", "config_file");
+            log4cxx::PropertyConfigurator::configure( log_conf_file );
+            
+            std::stringstream converter;
+            converter << getpid();
+            log4cxx::MDC::put("pid", converter.str());
 
-        std::string hostname = boost::asio::ip::host_name();
-        log4cxx::MDC::put("hostname", hostname);
+            std::string hostname = boost::asio::ip::host_name();
+            log4cxx::MDC::put("hostname", hostname);
+        } catch (const JsonError &ex) {
+            // Logger cannot be configured, send exception to stderr
+            std::cerr << ex.what() << std::endl;
+            throw ex;
+        }
     }
 }
